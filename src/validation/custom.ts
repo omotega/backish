@@ -1,15 +1,15 @@
 export const validationMessages = {
-  accountName: {
-    "string.empty": "account name cannot be empty.",
-    "any.required": '"account name" is required.',
+  name: {
+    "string.empty": " name cannot be empty.",
+    "any.required": '" name" is required.',
   },
-  dateOfBirth: {
-    "string.empty": "date of birth cannot be empty.",
-    "any.required": '"date of birth  is required!"',
-  }, 
-  accountType: {
-    "string.empty": "Account type cannot be empty.",
-    "any.required": '"Account type" is required!',
+  email: {
+    "string.empty": "email cannot be empty.",
+    "any.required": '"email  is required!"',
+  },
+  password: {
+    "string.empty": "password cannot be empty.",
+    "any.required": '"password" is required!',
   },
   accountNumber: {
     "number.empty": "account name cannot be empty.",
