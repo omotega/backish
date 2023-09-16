@@ -1,23 +1,23 @@
 {
-  "name": "flutterwave-assessment-test",
+  "name": "backish",
   "version": "1.0.0",
-  "main": "src/server.ts",
-  "repository": "https://github.com/omotega/flutterwave-assessment-test.git",
+  "main": "index.js",
+  "repository": "https://github.com/omotega/backish.git",
   "author": "omotega <tomoyibo@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon src/server.ts",
-    "start": "node dist/server.js",
-    "build": "tsc",
-    "test": "jest -i --verbose"
+    "dev":"nodemon ./src/server.ts",
+    "start":"node .dist/server.js"
   },
   "dependencies": {
+    "argon2": "^0.31.1",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "express-rate-limit": "^6.9.0",
     "http-status": "^1.6.2",
     "http-terminator": "^3.2.0",
     "joi": "^17.10.0",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^7.5.0",
     "mongoose-paginate-v2": "^1.7.31"
   },
@@ -25,6 +25,7 @@
     "@faker-js/faker": "^8.0.2",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.4",
+    "@types/jsonwebtoken": "^9.0.3",
     "@types/node": "^20.5.7",
     "@types/supertest": "^2.0.12",
     "jest": "^29.6.4",

@@ -1,5 +1,6 @@
-import { AppError, HttpCode } from "../../utils/errors";
+import { AppError } from "../../utils/errors";
 import { Response } from "express";
+import httpStatus from "http-status";
 class ErrorHandler {
   private isTrustedError(error: Error): boolean {
     if (error instanceof AppError) {
@@ -24,7 +25,7 @@ class ErrorHandler {
   ): void {
     if (response) {
       response
-        .status(HttpCode.INTERNAL_SERVER_ERROR)
+        .status(httpStatus.INTERNAL_SERVER_ERROR)
         .json({ message: "Internal server error" });
     }
 
