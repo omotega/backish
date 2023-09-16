@@ -7,7 +7,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.get("/", (req, res) => {
-  res.send("welcome to bankla application");
+  res.send("welcome to backish application");
 });
 
 app.use("/api", route);
