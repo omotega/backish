@@ -9,15 +9,13 @@ const signUp = async (req: Request, res: Response) => {
     email,
     password,
   });
-  res
-    .status(httpStatus.CREATED)
-    .json({
-      success: true,
-      message: "User registration successful",
-      data: response,
-    });
+  res.status(httpStatus.CREATED).json({
+    success: true,
+    message: "User registration successful",
+    data: response,
+  });
 };
 
 export default {
-    signUp
-}
+  signUp,
+};
