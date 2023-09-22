@@ -6,6 +6,7 @@
   "author": "omotega <tomoyibo@gmail.com>",
   "license": "MIT",
   "scripts": {
+    "test":"jest",
     "dev":"nodemon ./src/server.ts",
     "start":"node .dist/server.js"
   },
