@@ -1,5 +1,6 @@
 import express from "express";
 import route from "./routes";
+import docRouter from "./docs";
 
 const app = express();
 
@@ -11,6 +12,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api", route);
+app.use('/docs',docRouter)
 
 app.use((req, res) =>
   res.status(404).send({

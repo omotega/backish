@@ -2,6 +2,7 @@ import { Router, Request, Response, NextFunction } from "express";
 import { errorHandler } from "../midlewares/errors/errorhandler";
 import userRouter from "./userroute";
 
+
 const route = Router();
 
 route.use("/user", userRouter);

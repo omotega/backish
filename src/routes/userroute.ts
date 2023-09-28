@@ -12,4 +12,11 @@ userRouter
     usercontroller.signUp
   );
 
+userRouter
+  .route("/login")
+  .post(
+    validationMiddleware(userValidations.loginUserValidation),
+    usercontroller.login
+  );
+
 export default userRouter;
