@@ -9,6 +9,14 @@ const createUserValidation = {
   }),
 };
 
+const loginUserValidation = {
+  body: joi.object({
+    email: joi.string().email().required().messages(validationMessages.email),
+    password: joi.string().required().messages(validationMessages.password),
+  }),
+};
+
 export default {
   createUserValidation,
+  loginUserValidation
 };
