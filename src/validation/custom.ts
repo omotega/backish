@@ -11,9 +11,9 @@ export const validationMessages = {
     "string.empty": "password cannot be empty.",
     "any.required": '"password" is required!',
   },
-  accountNumber: {
-    "number.empty": "account name cannot be empty.",
-    "any.required": '"account name" is required.',
+  organizationName: {
+    "number.empty": "organization name cannot be empty.",
+    "any.required": '"organization  name" is required.',
   },
   initialBalance: {
     "number.empty": "initial balance cannot be empty.",

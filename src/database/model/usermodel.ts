@@ -13,6 +13,10 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
     },
+    orgId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Organization",
+    },
     role: {
       type: String,
       enum: ["user", "admin"],

@@ -1,21 +1,40 @@
 import httpStatus from "http-status";
 import userquery from "../database/queries/userquery";
-import { Iuser } from "../types/user";
 import { AppError } from "../utils/errors";
 import Helper from "../utils/helpers";
 import messages from "../utils/messages";
+import organizationquery from "../database/queries/organization";
 
-const registerUser = async (input: Iuser) => {
-  const isUser = await userquery.findUserByEmail(input.email);
+const registerUser = async ({
+  name,
+  email,
+  password,
+  organizationName,
+}: {
+  name: string;
+  email: string;
+  password: string;
+  organizationName: string;
+}) => {
+  const isUser = await userquery.findUserByEmail(email);
   if (isUser)
     throw new AppError({
       httpCode: httpStatus.FOUND,
       description: messages.USER_ALREADY_EXIST,
     });
-  const hash = await Helper.hashPassword(input.password);
+  const hash = await Helper.hashPassword(password);
+  const organization = await organizationquery.createOrganization({
+    name: organizationName,
+  });
+  if (!organization)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: messages.SOMETHING_HAPPENED,
+    });
   const user = await userquery.createUser({
-    name: input.name,
-    email: input.email,
+    orgId: organization.id,
+    name: name,
+    email: email,
     password: hash,
   });
   if (!user)

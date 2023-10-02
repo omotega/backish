@@ -4,7 +4,8 @@ const messages = {
   USER_LOGIN_ERROR: "User does't exist. please signUp",
   INCORRECT_PASSWORD: "Invalid password",
   SIGN_UP_SUCCESS: "User registration successful",
-  LOGIN_SUCCESS:  "login successful"
+  LOGIN_SUCCESS: "login successful",
+  SOMETHING_HAPPENED: "Something happened",
 };
 
-export default messages
+export default messages;

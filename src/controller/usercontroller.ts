@@ -5,11 +5,12 @@ import catchAsync from "../utils/catchasync";
 import messages from "../utils/messages";
 
 const signUp = catchAsync(async (req: Request, res: Response) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, organizationName } = req.body;
   const response = await userservice.registerUser({
     name,
     email,
     password,
+    organizationName,
   });
   res.status(httpStatus.CREATED).json({
     success: true,
