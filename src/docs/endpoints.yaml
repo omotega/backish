@@ -1,0 +1,18 @@
+openapi: 3.0.0
+info:
+  title: Backish
+  version: 1.0.0
+servers:
+  - url: http://{{https://locale-api-u09p.onrender.com/}}
+paths:
+  /api/user/signup:
+    get:
+      description: This handles the Registration/signup of the user
+      parameters:
+        -name: maxRating
+        description: |
+          The name of the user
+        in: body
+        shema: string
+      response:
+        200:
