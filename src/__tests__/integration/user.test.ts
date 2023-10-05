@@ -76,7 +76,7 @@ describe(" POST api/user/signup", () => {
   });
 });
 
-describe(" POST api/user/login", () => {
+describe(" POST /api/user/login", () => {
   test("Should login a user when the request body is correct", async () => {
     const payload = {
       email: userDetails.email,
