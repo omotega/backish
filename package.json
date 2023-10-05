@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "argon2": "^0.31.1",
+    "busboy": "^1.6.0",
+    "cloudinary": "^1.41.0",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "express-rate-limit": "^6.9.0",
@@ -26,6 +28,7 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^8.0.2",
+    "@types/busboy": "^1.5.1",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.4",
     "@types/jsonwebtoken": "^9.0.3",
