@@ -69,6 +69,9 @@ const loginUser = async ({
   return result;
 };
 
+const updateUser = 
+
+
 export default {
   registerUser,
   loginUser,
