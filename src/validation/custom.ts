@@ -15,8 +15,8 @@ export const validationMessages = {
     "number.empty": "organization name cannot be empty.",
     "any.required": '"organization  name" is required.',
   },
-  initialBalance: {
-    "number.empty": "initial balance cannot be empty.",
-    "any.required": '"initial balance" is required.',
+  filename: {
+    "number.empty": "filename  cannot be empty.",
+    "any.required": '"filename" is required.',
   },
 };

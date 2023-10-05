@@ -13,7 +13,7 @@ const folderSchema = new mongoose.Schema({
     type: String,
   },
   collaborator: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
     ref: ["User"],
   },
   Permission: {

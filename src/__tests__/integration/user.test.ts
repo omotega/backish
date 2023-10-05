@@ -7,23 +7,20 @@ import {
   userTwo,
 } from "../fixtures/user.fixture";
 import httpStatus from "http-status";
-import mongoose from "mongoose";
-import { MongoMemoryServer } from "mongodb-memory-server";
 import Helper from "../../utils/helpers";
 import messages from "../../utils/messages";
 import { faker } from "@faker-js/faker";
+import testDb from "../testdb";
 
 const api = supertest(app);
 let userDetails: any;
 
 beforeAll(async () => {
-  const mongoServer = await MongoMemoryServer.create();
-  await mongoose.connect(mongoServer.getUri());
+  testDb.dbConnect();
 });
 
 afterAll(async () => {
-  await mongoose.disconnect();
-  await mongoose.connection.close();
+  testDb.dbDisconnect();
 });
 
 describe(" POST api/user/signup", () => {
@@ -79,7 +76,7 @@ describe(" POST api/user/signup", () => {
   });
 });
 
-describe(" POST api/user/login", () => {
+describe(" POST /api/user/login", () => {
   test("Should login a user when the request body is correct", async () => {
     const payload = {
       email: userDetails.email,

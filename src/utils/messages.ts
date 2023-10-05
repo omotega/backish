@@ -6,6 +6,9 @@ const messages = {
   SIGN_UP_SUCCESS: "User registration successful",
   LOGIN_SUCCESS: "login successful",
   SOMETHING_HAPPENED: "Something happened",
+  MISSING_FILE_NAME: "file name not passed",
+  FILE_CREATION_ERROR: "an error occured when creating file",
+  USER_NOT_FOUND: "User not found",
 };
 
 export default messages;

@@ -9,7 +9,12 @@ async function findUserByEmail(userEmail: string) {
     return User.findOne({ email: userEmail})
 }
 
+async function findUserById(userId: string) {
+  return User.findOne({ id: userId})
+}
+
 export default {
   createUser,
-  findUserByEmail
+  findUserByEmail,
+  findUserById,
 };
