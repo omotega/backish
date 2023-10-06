@@ -32,6 +32,25 @@ const login = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateUser = catchAsync(async (req: Request, res: Response) => {
+  const { userId } = req.user;
+  const { email, password, name } = req.body;
+
+  const response = await userService.updateUserProfile(userId, {
+    email,
+    password,
+    name,
+  });
+
+  res.status(httpStatus.OK).json({
+    success: true,
+    message: messages.UPDATE_SUCCESS,
+    data: response,
+  });
+});
+
+
+
 export default {
   signUp,
   login,

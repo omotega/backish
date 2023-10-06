@@ -19,4 +19,11 @@ userRouter
     usercontroller.login
   );
 
+userRouter
+    .route("/update-profile")
+    .put(
+      validationMiddleware(userValidations.updateUserValidation),
+      usercontroller.updateProfile
+    );
+
 export default userRouter;
