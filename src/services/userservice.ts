@@ -64,15 +64,38 @@ const loginUser = async ({
       httpCode: httpStatus.BAD_REQUEST,
       description: messages.INCORRECT_PASSWORD,
     });
-  const token = Helper.generateToken({ id: isUser.id, email: isUser.email });
+  const token = Helper.generateToken({ userId: isUser.id, email: isUser.email });
   const result = { isUser, token };
   return result;
 };
 
-const updateUser = 
-
+const updateUser = async ({
+  userId,
+  name,
+}: {
+  userId: string;
+  name: string;
+}) => {
+  const isUser = await userquery.findUserById(userId);
+  if (!isUser)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: messages.USER_NOT_FOUND,
+    });
+  const updateUser = await userquery.updateUserDetails({
+    userId: isUser.id,
+    name: name,
+  });
+  if (!updateUser)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: messages.USER_UPDATE_ERROR,
+    });
+  return updateUser;
+};
 
 export default {
   registerUser,
   loginUser,
+  updateUser,
 };

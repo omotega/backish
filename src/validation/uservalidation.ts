@@ -17,7 +17,14 @@ const loginUserValidation = {
   }),
 };
 
+const updateUserValidation = {
+  body: joi.object({
+    name: joi.string().required().messages(validationMessages.name),
+  }),
+};
+
 export default {
   createUserValidation,
   loginUserValidation,
+  updateUserValidation,
 };

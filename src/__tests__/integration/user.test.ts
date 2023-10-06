@@ -3,6 +3,7 @@ import app from "../../app";
 import {
   userFour,
   userOne,
+  userSix,
   userThree,
   userTwo,
 } from "../fixtures/user.fixture";
@@ -23,6 +24,7 @@ afterAll(async () => {
   testDb.dbDisconnect();
 });
 
+let userData: any;
 describe(" POST api/user/signup", () => {
   test("Should register a user when the body is correct", async () => {
     const payload = userOne;
@@ -140,5 +142,50 @@ describe(" POST /api/user/login", () => {
       .expect(httpStatus.BAD_REQUEST);
 
     expect(body.message).toBe('"email  is required!"');
+  });
+});
+
+describe(" POST /api/user/update-profile", () => {
+  let userData: any;
+  beforeAll(async () => {
+    const payload = {
+      email: userDetails.email,
+      password: userOne.password,
+    };
+    const url = "/api/user/login";
+    const { body } = await api.post(url).send(payload);
+
+    userData = body;
+  });
+
+  test("Should update the user name and return a status code of 200", async () => {
+    const payload = userSix;
+    const url = "/api/user/update-profile";
+    const { body } = await api
+      .put(url)
+      .send(payload)
+      .set("Authorization", `Bearer ${userData.data.token}`)
+      .expect(httpStatus.OK);
+
+    expect(body.data.name).toBe(payload.name);
+  });
+
+  test("Should return an error when name field is empty", async () => {
+    const url = "/api/user/update-profile";
+    const { body } = await api
+      .put(url)
+      .send({})
+      .set("Authorization", `Bearer ${userData.data.token}`)
+      .expect(httpStatus.BAD_REQUEST);
+
+    console.log(body, "this is the body oo");
+    expect(body.message).toBe('" name" is required.');
+  });
+
+  test("Should return an error when user is not logged in", async () => {
+    const url = "/api/user/update-profile";
+    const { body } = await api.put(url).send({}).expect(httpStatus.BAD_REQUEST);
+
+    expect(body.message).toBe("authorization not found");
   });
 });

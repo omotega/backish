@@ -39,3 +39,7 @@ export const userFive = {
   createdAt: faker.defaultRefDate().toISOString(),
   updatedAt: faker.defaultRefDate().toISOString(),
 };
+
+export const userSix = {
+  name: faker.person.fullName(),
+};

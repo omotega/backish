@@ -9,6 +9,8 @@ const messages = {
   MISSING_FILE_NAME: "file name not passed",
   FILE_CREATION_ERROR: "an error occured when creating file",
   USER_NOT_FOUND: "User not found",
+  USER_UPDATE_ERROR: "An error occured ,update failed",
+  USER_UPDATE_SUCCESFUL: "details updated successfully",
 };
 
 export default messages;
