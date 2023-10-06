@@ -2,6 +2,7 @@ import usercontroller from "../controller/usercontroller";
 import { Router } from "express";
 import validationMiddleware from "../midlewares/validation";
 import userValidations from "../validation/uservalidation";
+import authGuard from "../midlewares/auth";
 
 const userRouter = Router();
 
@@ -20,10 +21,11 @@ userRouter
   );
 
 userRouter
-    .route("/update-profile")
-    .put(
-      validationMiddleware(userValidations.updateUserValidation),
-      usercontroller.updateProfile
-    );
+  .route("/update-profile")
+  .put(
+    authGuard.guard,
+    validationMiddleware(userValidations.updateUserValidation),
+    usercontroller.updateUser
+  );
 
 export default userRouter;

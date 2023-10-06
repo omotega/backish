@@ -68,4 +68,14 @@ describe(" POST api/file/upload-request", () => {
     expect(body.status).toBe(true);
     expect(body.data.message).toBe("file upload initiated succesfully");
   });
+
+  test("Should return an error when user is not logged in", async () => {
+    const url = "/api/file/upload-request";
+    const { body } = await api
+      .post(url)
+      .send({})
+      .expect(httpStatus.BAD_REQUEST);
+
+    expect(body.message).toBe("authorization not found");
+  });
 });
