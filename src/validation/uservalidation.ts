@@ -6,7 +6,7 @@ const createUserValidation = {
     name: joi.string().required().messages(validationMessages.name),
     email: joi.string().email().required().messages(validationMessages.email),
     password: joi.string().required().messages(validationMessages.password),
-    organizationName: joi.string().required().messages(validationMessages.name),
+    organizationName: joi.string().required().messages(validationMessages.organizationName),
   }),
 };
 

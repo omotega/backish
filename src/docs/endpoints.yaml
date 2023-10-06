@@ -3,16 +3,123 @@ info:
   title: Backish
   version: 1.0.0
 servers:
-  - url: http://{{https://locale-api-u09p.onrender.com/}}
+  - url: http://localhost:7777
 paths:
   /api/user/signup:
-    get:
-      description: This handles the Registration/signup of the user
-      parameters:
-        -name: maxRating
-        description: |
-          The name of the user
-        in: body
-        shema: string
-      response:
-        200:
+    post:
+      summary: signup a user
+      tags:
+        - User
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: manga daga
+                  description: The name of the user.
+                email:
+                  type: string
+                  example: aduak@yahoo.com
+                  description: The email of the user.
+                password:
+                  type: string
+                  example: speedvelocity
+                  description: The password of the user.
+                organizationName:
+                  type: string
+                  example: valaha
+                  description: The user organization name.
+      responses:
+        "201": # status code
+          description: successful
+        "400":
+          description: Bad request (e.g., validation error)
+        "500":
+          description: Internal server error
+
+  /api/user/login:
+    post:
+      summary: Logs in a user.
+      tags:
+        - User
+      description: Endpoint for user login.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: aduak@yahoo.com
+                password:
+                  type: string
+                  example: speedvelocity
+      responses:
+        "200": # status code
+          description: successful
+        "400":
+          description: Bad request (e.g., validation error)
+        "500":
+          description: Internal server error
+
+
+  /api/user/update-profile:
+    put:
+      summary: Fetches a user profile.
+      tags:
+        - User
+      security:
+        - BearerAuth: []
+      description: Endpoint to update a user profile.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: 'flacka vadam'
+      responses:
+        '200':    # status code
+          description: successful
+        '400':
+          description: Bad request (e.g., validation error)
+        '500':
+          description: Internal server error
+
+
+
+
+  /api/file/upload-request:
+    post:
+      summary: initiate file upload
+      tags:
+        - File
+      security: 
+        -BearerAuth: []
+      description: Endpoiont that initiate file upload 
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                filename: 
+                  type: string
+                  example: flag
+      responses:
+        '200':    # status code
+          description: successful
+        '400':
+          description: Bad request (e.g., validation error)
+        '500':
+          description: Internal server error
