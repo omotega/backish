@@ -3,7 +3,7 @@ info:
   title: Backish
   version: 1.0.0
 servers:
-  - url: http://localhost:7777
+  - url: https://backisk.onrender.com
 paths:
   /api/user/signup:
     post:

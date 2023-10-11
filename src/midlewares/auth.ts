@@ -5,6 +5,7 @@ import config from "../config/env";
 import userquery from "../database/queries/userquery";
 import { AppError } from "../utils/errors";
 import messages from "../utils/messages";
+import User from "../database/model/usermodel";
 
 export const guard = async (
   req: Request,
@@ -34,9 +35,10 @@ export const guard = async (
         .json({ message: "authorization not found" });
     }
   } catch (error) {
+    console.error(error);
     throw new AppError({
-      httpCode: httpStatus.FORBIDDEN,
-      description: "please login",
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: messages.SOMETHING_HAPPENED,
     });
   }
 };

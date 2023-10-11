@@ -1,3 +1,6 @@
 export interface Iorganization {
-  name: string;
+  orgName: string
+  invitedEmails?: Array<string>;
+  roleInOrganization?:string
+
 }

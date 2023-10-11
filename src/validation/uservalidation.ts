@@ -6,7 +6,10 @@ const createUserValidation = {
     name: joi.string().required().messages(validationMessages.name),
     email: joi.string().email().required().messages(validationMessages.email),
     password: joi.string().required().messages(validationMessages.password),
-    organizationName: joi.string().required().messages(validationMessages.organizationName),
+    organizationName: joi
+      .string()
+      .required()
+      .messages(validationMessages.organizationName),
   }),
 };
 
@@ -23,8 +26,16 @@ const updateUserValidation = {
   }),
 };
 
+const inviteUserValidation = {
+  body: joi.object({
+    email: joi.string().email().required().messages(validationMessages.email),
+    orgId: joi.string().required().messages(validationMessages.orgId),
+  }),
+};
+
 export default {
   createUserValidation,
   loginUserValidation,
   updateUserValidation,
+  inviteUserValidation,
 };

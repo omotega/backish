@@ -2,11 +2,17 @@
 
 ## Technologies used
 
-1. Mongoose
+- Node.js - Javascript runtime environment
+- Express - Web framework for Node.js
+- MongoDb - A document-oriented database
+- Mongoose - Elegant mongodb object modeling for node.js
 
-2. MongoDb
 
-3. Express
+## Documentation
+
+- API DOCUMENTATION: https://backisk.onrender.com/docs
+
+
 
 ## Installation
 

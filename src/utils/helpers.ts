@@ -1,6 +1,7 @@
 import argon from "argon2";
 import jwt from "jsonwebtoken";
 import config from "../config/env";
+import shortuuid, { generate } from "short-uuid";
 
 /**
  * contains all the helper methods
@@ -65,5 +66,11 @@ class Helper {
 
     return result;
   };
+  static generateRef = () => {
+    const reference = shortuuid.generate();
+    return reference;
+  };
+
 }
 export default Helper;
+

@@ -19,7 +19,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api", route);
-app.use('/docs',docRouter)
+app.use("/docs", docRouter);
 
 app.use((req, res) =>
   res.status(404).send({

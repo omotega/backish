@@ -12,6 +12,7 @@ import Helper from "../../utils/helpers";
 import messages from "../../utils/messages";
 import { faker } from "@faker-js/faker";
 import testDb from "../testdb";
+import * as sendEmailService from "../../utils/sendemail";
 
 const api = supertest(app);
 let userDetails: any;
@@ -187,5 +188,95 @@ describe(" POST /api/user/update-profile", () => {
     const { body } = await api.put(url).send({}).expect(httpStatus.BAD_REQUEST);
 
     expect(body.message).toBe("authorization not found");
+  });
+});
+
+describe(" POST /api/user/invite-user", () => {
+  let userData: any;
+  let emailSpy: any;
+  beforeAll(async () => {
+    const payload = {
+      email: userDetails.email,
+      password: userOne.password,
+    };
+    const url = "/api/user/login";
+    const { body } = await api.post(url).send(payload);
+
+    userData = body;
+
+    emailSpy = jest.spyOn(sendEmailService, "default");
+  });
+
+  test("Should send an email and return a status code of 200", async () => {
+    const payload = {
+      orgId: userDetails.orgId[0],
+      email: faker.internet.email(),
+    };
+    const url = "/api/user/invite-user";
+    const { body } = await api
+      .post(url)
+      .send(payload)
+      .set("Authorization", `Bearer ${userData.data.token}`)
+      .expect(httpStatus.OK);
+
+    expect(emailSpy).toBeCalledTimes(1);
+    expect(body).toMatchObject({
+      success: true,
+      message: "Invitation sent successfully",
+    });
+  });
+
+  test("Should return an error if organization doesnt exist", async () => {
+    const payload = {
+      orgId: faker.database.mongodbObjectId(),
+      email: faker.internet.email(),
+    };
+    const url = "/api/user/invite-user";
+    const { body } = await api
+      .post(url)
+      .send(payload)
+      .set("Authorization", `Bearer ${userData.data.token}`)
+      .expect(httpStatus.NOT_FOUND);
+
+    expect(body.message).toBe("organization not found");
+  });
+
+  test("Should return an error when user is not logged in", async () => {
+    const url = "/api/user/invite-user";
+    const { body } = await api
+      .post(url)
+      .send({})
+      .expect(httpStatus.BAD_REQUEST);
+
+    expect(body.message).toBe("authorization not found");
+  });
+
+  test("Should return an error if organId field is empty ", async () => {
+    const payload = {
+      email: faker.internet.email(),
+    };
+    const url = "/api/user/invite-user";
+    const { body } = await api
+      .post(url)
+      .send(payload)
+      .set("Authorization", `Bearer ${userData.data.token}`)
+      .expect(httpStatus.BAD_REQUEST);
+
+    expect(body.message).toBe('"org id" is required.');
+  });
+
+  test("Should return an error if email field is empty ", async () => {
+    const payload = {
+      orgId: faker.database.mongodbObjectId(),
+      
+    };
+    const url = "/api/user/invite-user";
+    const { body } = await api
+      .post(url)
+      .send(payload)
+      .set("Authorization", `Bearer ${userData.data.token}`)
+      .expect(httpStatus.BAD_REQUEST);
+
+    expect(body.message).toBe('"email  is required!"');
   });
 });

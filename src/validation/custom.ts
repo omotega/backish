@@ -19,4 +19,8 @@ export const validationMessages = {
     "number.empty": "filename  cannot be empty.",
     "any.required": '"filename" is required.',
   },
+  orgId: {
+    "number.empty": "org id  cannot be empty.",
+    "any.required": '"org id" is required.',
+  },
 };

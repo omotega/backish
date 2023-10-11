@@ -1,4 +1,3 @@
-import { Iuser } from "../../types/user";
 import User from "../model/usermodel";
 
 async function createUser(payload: any) {
