@@ -179,7 +179,6 @@ describe(" POST /api/user/update-profile", () => {
       .set("Authorization", `Bearer ${userData.data.token}`)
       .expect(httpStatus.BAD_REQUEST);
 
-    console.log(body, "this is the body oo");
     expect(body.message).toBe('" name" is required.');
   });
 

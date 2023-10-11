@@ -60,9 +60,19 @@ const inviteUser = catchAsync(async (req: Request, res: Response) => {
     message: messages.ORG_INVITATION_SUCCESS,
   });
 });
+
+const confirmInvite = catchAsync(async (req: Request, res: Response) => {
+  const { reference } = req.body;
+  const response = await userservice.confirmUserInvite(reference);
+  res.status(httpStatus.OK).json({
+    success: true,
+    message: response,
+  });
+});
 export default {
   signUp,
   login,
   updateUser,
-  inviteUser
+  inviteUser,
+  confirmInvite,
 };

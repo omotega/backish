@@ -33,9 +33,16 @@ const inviteUserValidation = {
   }),
 };
 
+const confirmInviteValidation = {
+  body: joi.object({
+    reference: joi.string().required().messages(validationMessages.reference),
+  }),
+};
+
 export default {
   createUserValidation,
   loginUserValidation,
   updateUserValidation,
   inviteUserValidation,
+  confirmInviteValidation
 };

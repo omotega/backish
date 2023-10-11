@@ -23,7 +23,6 @@ const sendEmail = async ({
 }) => {
   try {
     msg.to = email;
-    console.log(email, "let me check email");
     msg.subject = subject;
     msg.text = message;
     await sgMail.send(msg);

@@ -36,4 +36,11 @@ userRouter
     usercontroller.inviteUser
   );
 
+userRouter
+  .route("/confirm-invite")
+  .post(
+    validationMiddleware(userValidations.confirmInviteValidation),
+    usercontroller.confirmInvite
+  );
+
 export default userRouter;

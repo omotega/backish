@@ -23,4 +23,8 @@ export const validationMessages = {
     "number.empty": "org id  cannot be empty.",
     "any.required": '"org id" is required.',
   },
+  reference: {
+    "number.empty": "reference  cannot be empty.",
+    "any.required": '"reference" is required.',
+  },
 };
