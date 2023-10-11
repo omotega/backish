@@ -8,6 +8,7 @@
   "scripts": {
     "test": "jest",
     "dev": "nodemon ./src/server.ts",
+    "build": "tsc",
     "start": "node .dist/server.js"
   },
   "dependencies": {
