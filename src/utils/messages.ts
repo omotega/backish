@@ -11,6 +11,7 @@ const messages = {
   USER_NOT_FOUND: "User not found",
   USER_UPDATE_ERROR: "An error occured ,update failed",
   USER_UPDATE_SUCCESFUL: "details updated successfully",
+  ORG_INVITATION_SUCCESS: "Invitation sent successfully",
 };
 
 export default messages;

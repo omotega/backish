@@ -28,4 +28,19 @@ userRouter
     usercontroller.updateUser
   );
 
+userRouter
+  .route("/invite-user")
+  .post(
+    authGuard.guard,
+    validationMiddleware(userValidations.inviteUserValidation),
+    usercontroller.inviteUser
+  );
+
+userRouter
+  .route("/confirm-invite")
+  .post(
+    validationMiddleware(userValidations.confirmInviteValidation),
+    usercontroller.confirmInvite
+  );
+
 export default userRouter;

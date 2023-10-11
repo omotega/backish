@@ -45,8 +45,34 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const inviteUser = catchAsync(async (req: Request, res: Response) => {
+  const { userId } = req.User;
+  const { email, orgId } = req.body;
+
+  const response = await userservice.inviteUserToOrg({
+    userId: userId,
+    orgId: orgId,
+    invitedEmail: email,
+  });
+
+  res.status(httpStatus.OK).json({
+    success: true,
+    message: messages.ORG_INVITATION_SUCCESS,
+  });
+});
+
+const confirmInvite = catchAsync(async (req: Request, res: Response) => {
+  const { reference } = req.body;
+  const response = await userservice.confirmUserInvite(reference);
+  res.status(httpStatus.OK).json({
+    success: true,
+    message: response,
+  });
+});
 export default {
   signUp,
   login,
   updateUser,
+  inviteUser,
+  confirmInvite,
 };
