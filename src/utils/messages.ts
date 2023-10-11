@@ -12,6 +12,7 @@ const messages = {
   USER_UPDATE_ERROR: "An error occured ,update failed",
   USER_UPDATE_SUCCESFUL: "details updated successfully",
   ORG_INVITATION_SUCCESS: "Invitation sent successfully",
+  DATA_FETCHED_SUCCESS: "data fetched succesfuly",
 };
 
 export default messages;
