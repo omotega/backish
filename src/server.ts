@@ -12,7 +12,7 @@ export const httpTerminator = createHttpTerminator({
 });
 
 connectDb();
-cache.redisConnect();
+// cache.redisConnect();
 server.listen(port, () => {
   console.log(`server connected on port ${port}`);
 });
