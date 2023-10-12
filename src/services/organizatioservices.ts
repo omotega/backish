@@ -2,6 +2,7 @@ import Organization from "../database/model/organization";
 import usermodel from "../database/model/usermodel";
 import { AppError } from "../utils/errors";
 import httpStatus from "http-status";
+import messages from "../utils/messages";
 
 const listAllUsersInOrganization = async (orgId: string) => {
   const organization = await Organization.findOne({ _id: orgId }).select(
@@ -19,6 +20,11 @@ const listAllUsersInOrganization = async (orgId: string) => {
       return user;
     })
   );
+  if (!result.length)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: messages.SOMETHING_HAPPENED,
+    });
   return result;
 };
 

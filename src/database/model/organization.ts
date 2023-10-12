@@ -13,11 +13,6 @@ const organizationSchema = new mongoose.Schema(
         unique: true,
       },
     ],
-    roleInOrganization: {
-      type: String,
-      enum: ["super-admin", "admin", "guest"],
-      default: "super-admin",
-    },
   },
   {
     timestamps: true,

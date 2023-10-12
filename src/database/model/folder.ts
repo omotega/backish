@@ -4,6 +4,10 @@ const folderSchema = new mongoose.Schema(
   {
     foldername: {
       type: String,
+      required: true,
+    },
+    content: {
+      type: String,
     },
     orgId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -12,15 +16,15 @@ const folderSchema = new mongoose.Schema(
     description: {
       type: String,
     },
-    collaborator: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    },
     Permission: {
       type: String,
     },
     isPinned: {
       type: String,
+    },
+    isStarred: {
+      type: Boolean,
+      default: false,
     },
   },
   {
