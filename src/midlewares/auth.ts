@@ -5,7 +5,6 @@ import config from "../config/env";
 import userquery from "../database/queries/userquery";
 import { AppError } from "../utils/errors";
 import messages from "../utils/messages";
-import User from "../database/model/usermodel";
 
 export const guard = async (
   req: Request,
