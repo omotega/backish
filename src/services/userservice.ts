@@ -143,6 +143,7 @@ const inviteUserToOrg = async ({
     isOrganization._id
   );
   const referenceToken: any = Helper.generateRef();
+  console.log(referenceToken, "SEE THIS REFERENCE OO");
   const expires_at = new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000);
   const invite = await membership.create({
     email: invitedEmail,

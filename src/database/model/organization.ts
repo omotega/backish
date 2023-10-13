@@ -10,7 +10,6 @@ const organizationSchema = new mongoose.Schema(
     invitedEmails: [
       {
         type: String,
-        unique: true,
       },
     ],
   },
