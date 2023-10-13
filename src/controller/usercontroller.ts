@@ -33,10 +33,10 @@ const login = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateUser = catchAsync(async (req: Request, res: Response) => {
-  const { userId } = req.User;
+  const { _id } = req.User;
   const { name } = req.body;
 
-  const response = await userservice.updateUser({ userId: userId, name: name });
+  const response = await userservice.updateUser({ userId: _id, name: name });
 
   res.status(httpStatus.OK).json({
     success: true,
@@ -46,11 +46,11 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 const inviteUser = catchAsync(async (req: Request, res: Response) => {
-  const { userId } = req.User;
+  const { _id } = req.User;
   const { email, orgId } = req.body;
 
   const response = await userservice.inviteUserToOrg({
-    userId: userId,
+    userId: _id,
     orgId: orgId,
     invitedEmail: email,
   });

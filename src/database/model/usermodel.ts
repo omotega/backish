@@ -5,18 +5,29 @@ const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
+      required: true,
     },
     email: {
       type: "String",
       unique: true,
+      required: true,
     },
     password: {
       type: String,
+      required: true,
     },
-    orgId: [
+    orgStatus: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Organization",
+        orgId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Organization",
+          _id: false,
+        },
+        roleInOrg: {
+          type: String,
+          enum: ["super-admin", "admin", "user"],
+          default: "super-admin",
+        },
       },
     ],
   },

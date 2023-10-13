@@ -1,8 +1,14 @@
+import mongoose from "mongoose";
+
 export interface Iuser {
-  userId:string;
+  _id: string;
   name: string;
   email: string;
-  role?: string;
-  orgId: string;
   password: string;
+  orgStatus: [
+    {
+      roleInOrg: "super-admin" | "admin" | "user";
+      orgId: mongoose.Schema.Types.ObjectId | undefined;
+    }
+  ];
 }

@@ -9,7 +9,7 @@ import membership from "../database/model/membership";
 import usermodel from "../database/model/usermodel";
 import helperServices from "./helper-services";
 import Organization from "../database/model/organization";
-const baseUrl = "https://backisk.onrender.com";
+import mongoose from "mongoose";
 
 const registerUser = async ({
   name,
@@ -37,21 +37,36 @@ const registerUser = async ({
       httpCode: httpStatus.CONFLICT,
       description: "organization with this name already exist",
     });
-  const organization = await organizationquery.createOrganization({
-    orgName: organizationName,
-  });
-  if (!organization)
-    throw new AppError({
-      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-      description: messages.SOMETHING_HAPPENED,
-    });
-  const user = await userquery.createUser({
-    orgId: organization.id,
-    name: name,
-    email: email,
-    password: hash,
-  });
-  if (!user)
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  const organization = await Organization.create(
+    [
+      {
+        orgName: organizationName,
+      },
+    ],
+    { session }
+  );
+  const orgId = organization.map((item) => item._id);
+  const user = await usermodel.create(
+    [
+      {
+        orgStatus: [
+          {
+            orgId: orgId,
+            roleInOrg: "super-admin",
+          },
+        ],
+        name: name,
+        email: email,
+        password: hash,
+      },
+    ],
+    { session }
+  );
+  await session.commitTransaction();
+  session.endSession();
+  if (!user || !organization)
     throw new AppError({
       httpCode: httpStatus.INTERNAL_SERVER_ERROR,
       description: messages.USER_CREATION_ERROR,
@@ -79,7 +94,7 @@ const loginUser = async ({
       description: messages.INCORRECT_PASSWORD,
     });
   const token = Helper.generateToken({
-    userId: isUser.id,
+    userId: isUser._id,
     email: isUser.email,
   });
   const result = { isUser, token };
@@ -105,7 +120,6 @@ const updateUser = async ({
     });
   return updateUser;
 };
-
 const inviteUserToOrg = async ({
   orgId,
   userId,
@@ -115,7 +129,6 @@ const inviteUserToOrg = async ({
   userId: string;
   invitedEmail: string;
 }) => {
-  const getUser = await helperServices.getUserdetailsById(userId);
   const isOrganization = await organizationquery.find({
     _id: orgId,
   });
@@ -124,6 +137,11 @@ const inviteUserToOrg = async ({
       httpCode: httpStatus.NOT_FOUND,
       description: "organization not found",
     });
+  const getUser = await helperServices.getUserdetailsById(userId);
+  const checkUserPermission = await helperServices.checkUserPermission(
+    userId,
+    isOrganization._id
+  );
   const referenceToken: any = Helper.generateRef();
   const expires_at = new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000);
   const invite = await membership.create({
@@ -138,7 +156,7 @@ const inviteUserToOrg = async ({
       description: messages.SOMETHING_HAPPENED,
     });
   const sendUserEmail = await sendEmail({
-    email: "tagaomods@gmail.com",
+    email: invitedEmail,
     subject: `${isOrganization.orgName} organization invite`,
     message: `you are invited to join the ${isOrganization.orgName} organization on backish, this is the reference token ${invite.token}`,
   });
@@ -170,9 +188,19 @@ const confirmUserInvite = async (reference: string) => {
       httpCode: httpStatus.NOT_FOUND,
       description: "organization not found",
     });
-  console.log(isOrganization, "WHAT IS WRON WITH THIS ORGANIZATION");
   const updateQuery = {
     $push: { invitedEmails: userHasAccount.email },
+  };
+
+  const userUpdateQuery = {
+    $push: {
+      orgStatus: [
+        {
+          orgId: isOrganization._id,
+          roleInOrg: "guest",
+        },
+      ],
+    },
   };
   const response = await Promise.all([
     await Organization.findByIdAndUpdate(
@@ -180,11 +208,16 @@ const confirmUserInvite = async (reference: string) => {
       updateQuery
     ),
     await usermodel.findByIdAndUpdate(
-      { id: userHasAccount.id },
-      { $push: { orgId: isOrganization._id } }
+      { _id: userHasAccount._id },
+      userUpdateQuery
     ),
     await ismember.deleteOne({ id: ismember.id, token: ismember.token }),
   ]);
+  if (!response.length)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: messages.SOMETHING_HAPPENED,
+    });
   const message = `you have succesfully joined ${isOrganization.orgName} organization`;
   return message;
 };
