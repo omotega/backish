@@ -13,4 +13,12 @@ orgRouter
     organizationcontroller.getAllUsersInOrganization
   );
 
+orgRouter
+  .route("/leave-org")
+  .post(
+    authGuard.guard,
+    validationMiddleware(orgValidations.leaveOrgUserValidation),
+    organizationcontroller.signOutOfOrg
+  );
+
 export default orgRouter;
