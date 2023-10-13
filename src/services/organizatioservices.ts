@@ -3,6 +3,7 @@ import usermodel from "../database/model/usermodel";
 import { AppError } from "../utils/errors";
 import httpStatus from "http-status";
 import messages from "../utils/messages";
+import { userInfo } from "os";
 
 const listAllUsersInOrganization = async (orgId: string) => {
   const organization = await Organization.findOne({ _id: orgId }).select(
@@ -28,6 +29,27 @@ const listAllUsersInOrganization = async (orgId: string) => {
   return result;
 };
 
+const findUser = async ({ orgId, email }: { orgId: string; email: string }) => {
+  const userExistinOrg = await Organization.findOne({
+    _id: orgId,
+    invitedEmails: { $in: [email] },
+  });
+  if (!userExistinOrg)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: messages.USER_NOT_FOUND,
+    });
+  const userDetails = await usermodel
+    .findOne({ email: email })
+    .select("name -_id");
+  if (!userDetails)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: messages.USER_NOT_FOUND,
+    });
+  return userDetails;
+};
 export default {
   listAllUsersInOrganization,
+  findUser,
 };
