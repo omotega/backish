@@ -20,6 +20,7 @@ orgRouter
     authGuard.guard,
     validationMiddleware(orgValidations.getAUserValidation),
     organizationcontroller.getAUser
-  );
+  )
+
 
 export default orgRouter;

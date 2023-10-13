@@ -6,7 +6,7 @@ import { CustomRequest } from "./types/customrequest";
 const app = express();
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 
 declare global {
   namespace Express {

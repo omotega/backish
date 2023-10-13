@@ -32,3 +32,4 @@ const getAUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 export default { getAllUsersInOrganization, getAUser };
+

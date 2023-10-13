@@ -3,7 +3,7 @@ import usermodel from "../database/model/usermodel";
 import { AppError } from "../utils/errors";
 import httpStatus from "http-status";
 import messages from "../utils/messages";
-import { userInfo } from "os";
+
 
 const listAllUsersInOrganization = async (orgId: string) => {
   const organization = await Organization.findOne({ _id: orgId }).select(
@@ -52,4 +52,4 @@ const findUser = async ({ orgId, email }: { orgId: string; email: string }) => {
 export default {
   listAllUsersInOrganization,
   findUser,
-};
+}
