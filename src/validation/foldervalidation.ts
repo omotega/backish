@@ -12,6 +12,13 @@ const createFolderValidation = {
   }),
 };
 
+const starFolderValidation = {
+  body: joi.object({
+    orgId: joi.string().required().messages(validationMessages.orgId),
+    folderId: joi.string().required().messages(validationMessages.folderId),
+  }),
+};
 export default {
   createFolderValidation,
+  starFolderValidation,
 };
