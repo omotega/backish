@@ -34,6 +34,39 @@ const createFolder = async ({
   return folder;
 };
 
+
+const unstarFolder = async ({
+  orgId,
+  folderId,
+}: {
+  orgId: string;
+  folderId: string;
+}) => {
+  const folder = await foldermodel.findOne({
+    orgId: orgId,
+    _id: folderId,
+    isStarred: true,
+  });
+  if (!folder)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: "Organization not found",
+    });
+
+  const updatedDetails = await foldermodel.findByIdAndUpdate(
+    { _id: folder._id },
+    { isStarred: false },
+    { new: true }
+  );
+  if (!updatedDetails)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: "could not unstar folder",
+    });
+  return updatedDetails;
+};
+
 export default {
   createFolder,
+  unstarFolder
 };

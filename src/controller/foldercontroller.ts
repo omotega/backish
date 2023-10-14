@@ -17,6 +17,19 @@ const createFolder = catchAsync(async (req: Request, res: Response) => {
     .json({ status: true, message: "folder created", data: response });
 });
 
+const unstarFolder = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { folderId, orgId } = req.body;
+  const response = await folderservices.unstarFolder({
+    orgId: orgId,
+    folderId: folderId,
+  });
+  res
+    .status(httpStatus.OK)
+    .json({ status: true, message: "folder unstarred", data: response });
+});
+
 export default {
   createFolder,
+  unstarFolder
 };
