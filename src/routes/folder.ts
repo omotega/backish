@@ -13,6 +13,13 @@ folderRouter
     validationMiddleware(folderValidation.createFolderValidation),
     foldercontroller.createFolder
   );
+folderRouter
+  .route("/star-folder")
+  .post(
+    authGuard.guard,
+    validationMiddleware(folderValidation.starFolderValidation),
+    foldercontroller.starFolder
+  );
 
 folderRouter
   .route("/unstar-folder")

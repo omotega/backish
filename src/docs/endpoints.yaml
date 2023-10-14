@@ -71,7 +71,7 @@ paths:
 
   /api/user/update-profile:
     put:
-      summary: Fetches a user profile.
+      summary: Updates the user profile.
       tags:
         - User
       security:
@@ -95,6 +95,56 @@ paths:
         '500':
           description: Internal server error
 
+
+  /api/user/invite-user:
+    post:
+      summary: Invite a user to an organization.
+      tags:
+        - User
+      security:
+        - BearerAuth: []
+      description: Endpoint to invite a user to an organization.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                orgId:
+                  type: string
+      responses:
+        '200':    # status code
+          description: successful
+        '400':
+          description: Bad request (e.g., validation error)
+        '500':
+          description: Internal server error
+  
+  /api/user/confirm-invite:
+    post:
+      summary: Confirm an invite ro an organization.
+      tags:
+        - User
+      description: Endpoint to confirm an invite to an organization.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reference:
+                  type: string
+      responses:
+        '200':    # status code
+          description: successful
+        '400':
+          description: Bad request (e.g., validation error)
+        '500':
+          description: Internal server error
 
 
 
