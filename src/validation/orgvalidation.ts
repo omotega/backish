@@ -14,7 +14,15 @@ const getAUserValidation = {
   })
 };
 
+
+const leaveOrgUserValidation = {
+  body: joi.object({
+    orgId: joi.string().required().messages(validationMessages.orgId),
+  }),
+};
+
 export default {
   getAllUserValidation,
   getAUserValidation,
+  leaveOrgUserValidation,
 };

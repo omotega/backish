@@ -31,5 +31,18 @@ const getAUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-export default { getAllUsersInOrganization, getAUser };
+const signOutOfOrg = catchAsync(async (req: Request, res: Response) => {
+  const { orgId } = req.body;
+  const { _id } = req.User;
+  const response = await organizatioservices.leaveOrganization({
+    orgId: orgId,
+    userId: _id,
+  });
+  res.status(httpStatus.CREATED).json({
+    success: true,
+    message: response,
+  });
+});
+
+export default { getAllUsersInOrganization, getAUser,signOutOfOrg };
 
