@@ -27,4 +27,12 @@ export const validationMessages = {
     "number.empty": "reference  cannot be empty.",
     "any.required": '"reference" is required.',
   },
+  foldername: {
+    "number.empty": "folder name  cannot be empty.",
+    "any.required": '"folder name" is required.',
+  },
+  description: {
+    "number.empty": "description  cannot be empty.",
+    "any.required": '"description" is required.',
+  },
 };
