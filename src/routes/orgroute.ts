@@ -9,16 +9,18 @@ const orgRouter = Router();
 orgRouter
   .route("/getallusers")
   .get(
+    authGuard.guard,
     validationMiddleware(orgValidations.getAllUserValidation),
     organizationcontroller.getAllUsersInOrganization
   );
 
 orgRouter
-  .route("/leave-org")
-  .post(
+  .route("/get-a-user")
+  .get(
     authGuard.guard,
-    validationMiddleware(orgValidations.leaveOrgUserValidation),
-    organizationcontroller.signOutOfOrg
-  );
+    validationMiddleware(orgValidations.getAUserValidation),
+    organizationcontroller.getAUser
+  )
+
 
 export default orgRouter;

@@ -2,10 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import httpStatus from "http-status";
 import Helper from "../utils/helpers";
 import config from "../config/env";
-import userquery from "../database/queries/userquery";
 import { AppError } from "../utils/errors";
 import messages from "../utils/messages";
-import User from "../database/model/usermodel";
 import usermodel from "../database/model/usermodel";
 
 export const guard = async (
@@ -44,8 +42,6 @@ export const guard = async (
   }
 };
 
-// TokenExpiredError: jwt expired
-
 export default {
   guard,
-};
+}
