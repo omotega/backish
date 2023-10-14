@@ -7,13 +7,14 @@ const getAllUserValidation = {
   }),
 };
 
-const leaveOrgUserValidation = {
+const getAUserValidation = {
   body: joi.object({
     orgId: joi.string().required().messages(validationMessages.orgId),
-  }),
+    email: joi.string().email().required().messages(validationMessages.email),
+  })
 };
 
 export default {
   getAllUserValidation,
-  leaveOrgUserValidation,
+  getAUserValidation,
 };
