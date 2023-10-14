@@ -25,7 +25,7 @@ const registerUser = async ({
   const isUser = await userquery.findUserByEmail(email);
   if (isUser)
     throw new AppError({
-      httpCode: httpStatus.FOUND,
+      httpCode: httpStatus.CONFLICT,
       description: messages.USER_ALREADY_EXIST,
     });
   const hash = await Helper.hashPassword(password);

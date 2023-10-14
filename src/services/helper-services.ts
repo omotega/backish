@@ -13,7 +13,10 @@ async function getUserdetailsById(userId: string) {
   return user;
 }
 
-async function checkUserPermission(userId: string, orgId: any) {
+async function checkUserPermission(
+  userId: string,
+  orgId: any
+) {
   const user = await getUserdetailsById(userId);
   user.orgStatus.map((item) => {
     if (item.orgId === undefined || item.roleInOrg === undefined) return;

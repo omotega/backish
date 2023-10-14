@@ -4,6 +4,7 @@ const folderSchema = new mongoose.Schema(
   {
     foldername: {
       type: String,
+      unique: true,
       required: true,
     },
     content: {
