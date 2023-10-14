@@ -91,7 +91,7 @@ const leaveOrganization = async ({
   userExistinOrg.save();
   const message = `you have left ${userExistinOrg.orgName} organization`;
 
-  return "success";
+  return message;
 };
 export default {
   listAllUsersInOrganization,
