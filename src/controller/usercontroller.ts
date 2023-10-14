@@ -49,7 +49,7 @@ const inviteUser = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
   const { email, orgId } = req.body;
 
-  const response = await userservice.inviteUserToOrg({
+  await userservice.inviteUserToOrg({
     userId: _id,
     orgId: orgId,
     invitedEmail: email,

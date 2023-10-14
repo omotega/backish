@@ -1,5 +1,5 @@
-import config from "../config/env";
 import { createClient } from "redis";
+import config from "../config/env";
 
 const redisURL = `redis://localhost:6379`;
 

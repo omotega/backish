@@ -47,12 +47,28 @@ class Helper {
    */
 
   static decodeToken(token: any, secret = config.tokenSecret) {
-    const payload = jwt.verify(token, secret);
-    return {
-      valid: true,
-      expired: false,
-      payload,
-    };
+    try {
+      const payload = jwt.verify(token, secret);
+      return {
+        valid: true,
+        expired: false,
+        payload,
+      };
+    } catch (error) {
+      if (error instanceof jwt.TokenExpiredError) {
+        return {
+          valid: false,
+          expired: true,
+          error: "Token has expired",
+        };
+      } else {
+        return {
+          valid: false,
+          expired: false,
+          error: "Invalid token",
+        };
+      }
+    }
   }
   /**
    * utility function to exclude certain fields that should not be shown to the client
@@ -70,7 +86,5 @@ class Helper {
     const reference = shortuuid.generate();
     return reference;
   };
-
 }
 export default Helper;
-
