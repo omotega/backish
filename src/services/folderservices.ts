@@ -19,7 +19,16 @@ const createFolder = async ({
     userId,
     orgId
   );
-  if(!checkUserPermission) return
+  if (!checkUserPermission) return;
+  const folderExist = await foldermodel.findOne({
+    foldername: folderName,
+    orgId: orgId,
+  });
+  if (folderExist)
+    throw new AppError({
+      httpCode: httpStatus.CONFLICT,
+      description: `Folder with name ${folderName} already exist`,
+    });
   const folder = await foldermodel.create({
     foldername: folderName,
     orgId: orgId,
@@ -34,6 +43,38 @@ const createFolder = async ({
   return folder;
 };
 
+const starFolder = async ({
+  orgId,
+  folderId,
+}: {
+  orgId: string;
+  folderId: string;
+}) => {
+  const folder = await foldermodel.findOne({
+    orgId: orgId,
+    _id: folderId,
+    isStarred: false,
+  });
+  if (!folder)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: "Organization not found",
+    });
+
+  const updatedDetails = await foldermodel.findByIdAndUpdate(
+    { _id: folder._id },
+    { isStarred: true },
+    { new: true }
+  );
+  if (!updatedDetails)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: "could not star folder",
+    });
+  return updatedDetails;
+};
+
 export default {
   createFolder,
+  starFolder,
 };
