@@ -2,7 +2,7 @@ import httpStatus from "http-status";
 import foldermodel from "../database/model/folder";
 import { AppError } from "../utils/errors";
 import helperServices from "./helper-services";
-import { StringExpressionOperatorReturningBoolean } from "mongoose";
+
 
 const createFolder = async ({
   userId,
@@ -54,6 +54,7 @@ const starFolder = async ({
     orgId: orgId,
     _id: folderId,
     isStarred: false,
+
   });
   if (!folder)
     throw new AppError({
@@ -69,7 +70,38 @@ const starFolder = async ({
   if (!updatedDetails)
     throw new AppError({
       httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-      description: "could not star folder",
+      description: "could not star folder"
+    });
+  return updatedDetails;
+};
+
+const unstarFolder = async ({
+  orgId,
+  folderId,
+}: {
+  orgId: string;
+  folderId: string;
+}) => {
+  const folder = await foldermodel.findOne({
+    orgId: orgId,
+    _id: folderId,
+    isStarred: true,
+  });
+  if (!folder)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: "Organization not found",
+    });
+
+  const updatedDetails = await foldermodel.findByIdAndUpdate(
+    { _id: folder._id },
+    { isStarred: false },
+    { new: true }
+  );
+  if (!updatedDetails)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: "could not unstar folder",
     });
   return updatedDetails;
 };
@@ -77,4 +109,5 @@ const starFolder = async ({
 export default {
   createFolder,
   starFolder,
+  unstarFolder,
 };
