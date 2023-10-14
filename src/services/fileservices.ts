@@ -6,7 +6,6 @@ import messages from "../utils/messages";
 import filequeries from "../database/queries/file";
 import filemanagement from "../utils/filemanagement";
 
-
 const getFilePath = (fileName: string, fileId: string) =>
   path.normalize(path.join("src", "uploads", `file~${fileId}~${fileName}`));
 
@@ -25,9 +24,9 @@ const initiateFileUpload = async (fileName: string) => {
       description: messages.FILE_CREATION_ERROR,
     });
   const fileId = file.id;
-  const createath = filemanagement.createDirectory(directoryPath);
+  filemanagement.createDirectory(directoryPath);
   const filePath = getFilePath(fileName, fileId);
-  const result = fs.createWriteStream(filePath, {
+  fs.createWriteStream(filePath, {
     flags: "w",
   });
   const response = {
