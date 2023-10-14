@@ -35,7 +35,7 @@ const registerUser = async ({
   if (orgNameExist)
     throw new AppError({
       httpCode: httpStatus.CONFLICT,
-      description: "organization with this name already exist",
+      description: "Organization with this name already exist",
     });
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -120,6 +120,7 @@ const updateUser = async ({
     });
   return updateUser;
 };
+
 const inviteUserToOrg = async ({
   orgId,
   userId,
@@ -137,11 +138,8 @@ const inviteUserToOrg = async ({
       httpCode: httpStatus.NOT_FOUND,
       description: "organization not found",
     });
-  const getUser = await helperServices.getUserdetailsById(userId);
-  const checkUserPermission = await helperServices.checkUserPermission(
-    userId,
-    isOrganization._id
-  );
+  await helperServices.getUserdetailsById(userId);
+  await helperServices.checkUserPermission(userId, isOrganization._id);
   const referenceToken: any = Helper.generateRef();
   const expires_at = new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000);
   const invite = await membership.create({
@@ -155,7 +153,7 @@ const inviteUserToOrg = async ({
       httpCode: httpStatus.INTERNAL_SERVER_ERROR,
       description: messages.SOMETHING_HAPPENED,
     });
-  const sendUserEmail = await sendEmail({
+  await sendEmail({
     email: invitedEmail,
     subject: `${isOrganization.orgName} organization invite`,
     message: `you are invited to join the ${isOrganization.orgName} organization on backish, this is the reference token ${invite.token}`,
@@ -178,7 +176,7 @@ const confirmUserInvite = async (reference: string) => {
     throw new AppError({
       httpCode: httpStatus.NOT_FOUND,
       description:
-        "please you dont have an account please signup before you can confirm invite ",
+        "You do not have an account. Please signup before you can confirm invite.",
     });
   const isOrganization = await organizationquery.find({
     orgName: ismember.organizationName,
@@ -186,7 +184,7 @@ const confirmUserInvite = async (reference: string) => {
   if (!isOrganization)
     throw new AppError({
       httpCode: httpStatus.NOT_FOUND,
-      description: "organization not found",
+      description: "Organization not found",
     });
   const updateQuery = {
     $push: { invitedEmails: userHasAccount.email },
