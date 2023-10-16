@@ -2,7 +2,7 @@ import httpStatus from "http-status";
 import foldermodel from "../database/model/folder";
 import { AppError } from "../utils/errors";
 import helperServices from "./helper-services";
-
+import folder from "../database/model/folder";
 
 const createFolder = async ({
   userId,
@@ -54,7 +54,6 @@ const starFolder = async ({
     orgId: orgId,
     _id: folderId,
     isStarred: false,
-
   });
   if (!folder)
     throw new AppError({
@@ -70,7 +69,7 @@ const starFolder = async ({
   if (!updatedDetails)
     throw new AppError({
       httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-      description: "could not star folder"
+      description: "could not star folder",
     });
   return updatedDetails;
 };
@@ -106,8 +105,39 @@ const unstarFolder = async ({
   return updatedDetails;
 };
 
+const listAllStarredFolders = async ({
+  orgId,
+  folderId,
+  page,
+  limit
+}: {
+  orgId: string;
+  folderId: string;
+  page:number,
+  limit:number
+}) => {
+  const options = {
+    page,
+    limit,
+    sort: { createdAt: "desc" },
+    lean: true,
+  };
+  const result = await folder.paginate(
+    { orgId: orgId, _id: folderId, isStarred: true },
+    options
+  );
+  if (!result)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: "Organization not found",
+    });
+  return result;
+};
+
+
 export default {
   createFolder,
   starFolder,
   unstarFolder,
+  listAllStarredFolders,
 };
