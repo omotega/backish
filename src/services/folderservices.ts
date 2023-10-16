@@ -2,7 +2,7 @@ import httpStatus from "http-status";
 import foldermodel from "../database/model/folder";
 import { AppError } from "../utils/errors";
 import helperServices from "./helper-services";
-
+import organization from "../database/model/organization";
 
 const createFolder = async ({
   userId,
@@ -20,6 +20,13 @@ const createFolder = async ({
     orgId
   );
   if (!checkUserPermission) return;
+  const orgExist = await organization
+    .findOne({ _id: orgId })
+  if (!orgExist)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: `Organization  not found`,
+    });
   const folderExist = await foldermodel.findOne({
     foldername: folderName,
     orgId: orgId,
@@ -29,9 +36,10 @@ const createFolder = async ({
       httpCode: httpStatus.CONFLICT,
       description: `Folder with name ${folderName} already exist`,
     });
+
   const folder = await foldermodel.create({
     foldername: folderName,
-    orgId: orgId,
+    orgId: orgExist._id,
     description: description,
   });
 
@@ -54,7 +62,6 @@ const starFolder = async ({
     orgId: orgId,
     _id: folderId,
     isStarred: false,
-
   });
   if (!folder)
     throw new AppError({
@@ -70,7 +77,7 @@ const starFolder = async ({
   if (!updatedDetails)
     throw new AppError({
       httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-      description: "could not star folder"
+      description: "could not star folder",
     });
   return updatedDetails;
 };

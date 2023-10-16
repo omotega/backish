@@ -1,11 +1,10 @@
-import { string } from "joi";
 import mongoose from "mongoose";
 
 const membershipSchema = new mongoose.Schema({
   expiresAt: {
     type: Date,
   },
-  organizationName: {
+  orgName: {
     type: String,
   },
   email: {

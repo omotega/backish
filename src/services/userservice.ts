@@ -110,7 +110,7 @@ const updateUser = async ({
 }) => {
   const isUser = await helperServices.getUserdetailsById(userId);
   const updateUser = await userquery.updateUserDetails({
-    userId: isUser.id,
+    userId: isUser._id,
     name: name,
   });
   if (!updateUser)
@@ -179,7 +179,7 @@ const confirmUserInvite = async (reference: string) => {
         "You do not have an account. Please signup before you can confirm invite.",
     });
   const isOrganization = await organizationquery.find({
-    orgName: ismember.organizationName,
+    orgName: ismember.orgName,
   });
   if (!isOrganization)
     throw new AppError({

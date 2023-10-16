@@ -6,9 +6,16 @@ import { faker } from "@faker-js/faker";
 import testDb from "../testdb";
 import { fileDataOne } from "../fixtures/file";
 import { userOne } from "../fixtures/user.fixture";
+import {
+  createUser,
+  deleteOrganization,
+  deleteUsers,
+  genToken,
+} from "../helper/testhelper";
+import organization from "../../database/model/organization";
+import Helper from "../../utils/helpers";
 
 const api = supertest(app);
-let userDetails: any;
 
 beforeAll(async () => {
   testDb.dbConnect();
@@ -18,40 +25,45 @@ afterAll(async () => {
   testDb.dbDisconnect();
 });
 
-let users: any;
-let userData: any;
-
-const register = async () => {
-  const payload = userOne;
-  const url = "/api/user/signup";
-  const { body } = await api.post(url).send(payload);
-
-  users = body;
-};
-
-const Login = async () => {
-  const payload = {
-    email: users.data.email,
-    password: userOne.password,
-  };
-  const url = "/api/user/login";
-  const { body } = await api.post(url).send(payload);
-
-  userData = body;
-};
-
 describe(" POST api/file/upload-request", () => {
+  let userValueOne: any;
   let userToken: any;
-  beforeAll(async () => {
-    await register();
-    await Login();
+  let orgOne: any;
+
+  beforeEach(async () => {
+    orgOne = await organization.create({
+      orgName: faker.company.name(),
+    });
+    userValueOne = await createUser({
+      name: faker.person.fullName(),
+      email: faker.internet.email(),
+      password: await Helper.hashPassword(userOne.password),
+      orgStatus: [
+        {
+          orgId: orgOne._id,
+          roleInOrg: "super-admin",
+        },
+      ],
+      organizationName: faker.company.name(),
+    });
+    userToken = await genToken({
+      userId: userValueOne._id,
+      email: userValueOne.email,
+    });
   });
+
+  afterEach(async () => {
+    jest.clearAllMocks();
+    await deleteUsers();
+    await deleteOrganization();
+  });
+
   test("should return an error when filename field is not passed", async () => {
     const url = "/api/file/upload-request";
     const { body } = await api
       .post(url)
       .send({})
-      .set("Authorization", `Bearer ${userData.data.token}`)
+      .set("Authorization", `Bearer ${userToken}`)
       .expect(httpStatus.BAD_REQUEST);
     expect(body.message).toBe('"filename" is required.');
   });
@@ -61,7 +73,7 @@ describe(" POST api/file/upload-request", () => {
     const { body } = await api
       .post(url)
       .send(payload)
-      .set("Authorization", `Bearer ${userData.data.token}`)
+      .set("Authorization", `Bearer ${userToken}`)
       .expect(httpStatus.OK);
 
     expect(body.message).toBe("request succesful");
