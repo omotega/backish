@@ -7,7 +7,9 @@ import organizatioservices from "../services/organizatioservices";
 const getAllUsersInOrganization = catchAsync(
   async (req: Request, res: Response) => {
     const { orgId } = req.body;
-    const response = await organizatioservices.listAllUsersInOrganization(orgId);
+    const response = await organizatioservices.listAllUsersInOrganization(
+      orgId
+    );
     res.status(httpStatus.CREATED).json({
       success: true,
       message: messages.DATA_FETCHED_SUCCESS,
@@ -16,4 +18,31 @@ const getAllUsersInOrganization = catchAsync(
   }
 );
 
-export default { getAllUsersInOrganization };
+const getAUser = catchAsync(async (req: Request, res: Response) => {
+  const { orgId, email } = req.body;
+  const response = await organizatioservices.findUser({
+    orgId: orgId,
+    email: email,
+  });
+  res.status(httpStatus.CREATED).json({
+    success: true,
+    message: messages.DATA_FETCHED_SUCCESS,
+    data: response,
+  });
+});
+
+const signOutOfOrg = catchAsync(async (req: Request, res: Response) => {
+  const { orgId } = req.body;
+  const { _id } = req.User;
+  const response = await organizatioservices.leaveOrganization({
+    orgId: orgId,
+    userId: _id,
+  });
+  res.status(httpStatus.CREATED).json({
+    success: true,
+    message: response,
+  });
+});
+
+export default { getAllUsersInOrganization, getAUser,signOutOfOrg };
+

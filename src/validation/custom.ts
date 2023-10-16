@@ -7,6 +7,10 @@ export const validationMessages = {
     "string.empty": "email cannot be empty.",
     "any.required": '"email  is required!"',
   },
+  token: {
+    "string.empty": "token cannot be empty.",
+    "any.required": '"token  is required!"',
+  },
   password: {
     "string.empty": "password cannot be empty.",
     "any.required": '"password" is required!',
@@ -26,5 +30,13 @@ export const validationMessages = {
   reference: {
     "number.empty": "reference  cannot be empty.",
     "any.required": '"reference" is required.',
+  },
+  foldername: {
+    "number.empty": "folder name  cannot be empty.",
+    "any.required": '"folder name" is required.',
+  },
+  description: {
+    "number.empty": "description  cannot be empty.",
+    "any.required": '"description" is required.',
   },
 };

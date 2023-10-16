@@ -2,9 +2,9 @@ import { Request, Response, NextFunction } from "express";
 import httpStatus from "http-status";
 import Helper from "../utils/helpers";
 import config from "../config/env";
-import userquery from "../database/queries/userquery";
 import { AppError } from "../utils/errors";
 import messages from "../utils/messages";
+import usermodel from "../database/model/usermodel";
 
 export const guard = async (
   req: Request,
@@ -20,7 +20,7 @@ export const guard = async (
           description: "please login",
         });
       const decode: any = Helper.decodeToken(token, config.tokenSecret);
-      const user = await userquery.findUserById(decode.payload._id);
+      const user = await usermodel.findOne({_id: decode.payload.userId});
       if (!user)
         throw new AppError({
           httpCode: httpStatus.NOT_FOUND,
@@ -44,4 +44,4 @@ export const guard = async (
 
 export default {
   guard,
-};
+}

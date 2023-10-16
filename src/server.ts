@@ -1,11 +1,11 @@
 import app from "./app";
 import http from "http";
-import config from "./config/env";
 import connectDb from "./database/dbconnection";
-import cache from "./cache/redis";
+// import cache from "./cache/redis";
 import { createHttpTerminator } from "http-terminator";
+import config from "./config/env";
 
-const port = config.port;
+const port = config.PORT;
 export const server = http.createServer(app);
 export const httpTerminator = createHttpTerminator({
   server,
