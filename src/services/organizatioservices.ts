@@ -4,7 +4,7 @@ import { AppError } from "../utils/errors";
 import httpStatus from "http-status";
 import messages from "../utils/messages";
 import helperServices from "./helper-services";
-
+import organization from "../database/model/organization";
 
 const listAllUsersInOrganization = async (orgId: string) => {
   const organization = await Organization.findOne({ _id: orgId }).select(
@@ -111,8 +111,26 @@ const leaveOrganization = async ({
 
   return message;
 };
+
+const listUserOrganization = async ({ userId }: { userId: string }) => {
+  const isUser = await helperServices.getUserdetailsById(userId);
+  if (!isUser) return;
+  const result = await Promise.all(
+    await isUser.orgStatus.map(async (item: any) => {
+      const orgs = await organization
+        .findOne({ _id: item.orgId })
+        .select("orgName -_id");
+      return orgs;
+    })
+  );
+
+  if (!result) return;
+  return result;
+};
+
 export default {
   listAllUsersInOrganization,
   findUser,
   leaveOrganization,
-}
+  listUserOrganization,
+};

@@ -25,7 +25,9 @@ const starFolder = catchAsync(async (req: Request, res: Response) => {
     folderId: folderId,
   });
 
-  res.json({ status: true, message: "folder starred", data: response });
+  res
+    .status(httpStatus.OK)
+    .json({ status: true, message: "folder starred", data: response });
 });
 
 const unstarFolder = catchAsync(async (req: Request, res: Response) => {
