@@ -69,10 +69,42 @@ const confirmInvite = catchAsync(async (req: Request, res: Response) => {
     message: response,
   });
 });
+
+const recover = catchAsync(async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+
+    await userservice.recoverAccount(req, res, email);
+    res.status(httpStatus.OK).json({
+      success: true,
+      message: "Password reset email sent successfully.",
+    });
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+const passwordReset = catchAsync(async (req: Request, res: Response) => {
+  const { confirmPassword, password, token } = req.body;
+
+  await userservice.reset({
+    token,
+    password,
+    confirmPassword,
+  });
+
+  res.status(httpStatus.OK).json({
+    success: true,
+    message: messages.PASSWORD_RESET_SUCCESSFUL,
+  });
+});
+
 export default {
   signUp,
   login,
   updateUser,
   inviteUser,
   confirmInvite,
+  recover,
+  passwordReset,
 };

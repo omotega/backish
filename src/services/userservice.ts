@@ -10,6 +10,8 @@ import usermodel from "../database/model/usermodel";
 import helperServices from "./helper-services";
 import Organization from "../database/model/organization";
 import mongoose from "mongoose";
+import otpmodel from "../database/model/otpmodel";
+import { Request, Response } from "express";
 
 const registerUser = async ({
   name,
@@ -220,10 +222,77 @@ const confirmUserInvite = async (reference: string) => {
   return message;
 };
 
+const recoverAccount = async (
+  req: Request,
+  res: Response,
+  reqEmail: string
+) => {
+  const { email } = req.body;
+
+  const isUser = await usermodel.findOne({ email: reqEmail });
+
+  if (!isUser) {
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: messages.USER_NOT_FOUND,
+    });
+  }
+
+  const otp = Helper.generateOtp();
+  await otpmodel.findOneAndUpdate(
+    { email: email },
+    { token: otp, expired: false }
+  );
+
+  const subject: string = "Reset password otp";
+  const message = `Hi, Kindly use this ${otp} to reset your password`;
+
+  await sendEmail({
+    email: email,
+    subject: subject,
+    message: message,
+  });
+};
+
+const reset = async ({
+  token,
+  password,
+  confirmPassword,
+}: {
+  token: string;
+  password: string;
+  confirmPassword: string;
+}) => {
+  const otp = await otpmodel.findOneAndUpdate({ token, expired: true });
+  if (!otp)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: messages.OTP_NOT_FOUND,
+    });
+
+  if (password !== confirmPassword) {
+    throw new AppError({
+      httpCode: httpStatus.CONFLICT,
+      description: messages.PASSWORD_MISMATCH,
+    });
+  }
+
+  const hash = await Helper.hashPassword(password);
+  await usermodel.findOneAndUpdate(
+    {
+      email: otp.email,
+    },
+    { password: hash },
+    { new: true }
+  );
+};
+
 export default {
   registerUser,
   loginUser,
   updateUser,
   inviteUserToOrg,
   confirmUserInvite,
+  recoverAccount,
+  reset,
 };

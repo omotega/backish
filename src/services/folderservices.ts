@@ -50,7 +50,6 @@ const createFolder = async ({
     });
   return folder;
 };
-
 const starFolder = async ({
   orgId,
   folderId,

@@ -70,6 +70,7 @@ class Helper {
       }
     }
   }
+
   /**
    * utility function to exclude certain fields that should not be shown to the client
    */
@@ -82,9 +83,15 @@ class Helper {
 
     return result;
   };
+
   static generateRef = () => {
     const reference = shortuuid.generate();
     return reference;
   };
+
+  static generateOtp() {
+    const otp = `${Math.floor(100000 + Math.random() * 900000)}`;
+    return otp;
+  }
 }
 export default Helper;

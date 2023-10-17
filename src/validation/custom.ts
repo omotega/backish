@@ -7,6 +7,10 @@ export const validationMessages = {
     "string.empty": "email cannot be empty.",
     "any.required": '"email  is required!"',
   },
+  token: {
+    "string.empty": "token cannot be empty.",
+    "any.required": '"token  is required!"',
+  },
   password: {
     "string.empty": "password cannot be empty.",
     "any.required": '"password" is required!',
