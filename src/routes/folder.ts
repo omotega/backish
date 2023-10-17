@@ -14,4 +14,21 @@ folderRouter
     foldercontroller.createFolder
   );
 
+folderRouter
+  .route("/star-folder")
+  .post(
+    authGuard.guard,
+    validationMiddleware(folderValidation.starFolderValidation),
+    foldercontroller.starFolder
+  );
+
+folderRouter
+  .route("/unstar-folder")
+  .post(
+    authGuard.guard,
+    validationMiddleware(folderValidation.unstarFolderValidation),
+    foldercontroller.unstarFolder
+  );
+
+
 export default folderRouter;

@@ -39,4 +39,8 @@ export const validationMessages = {
     "number.empty": "description  cannot be empty.",
     "any.required": '"description" is required.',
   },
+  folderId: {
+    "number.empty": "folderid  cannot be empty.",
+    "any.required": '"folderid" is required.',
+  },
 };
