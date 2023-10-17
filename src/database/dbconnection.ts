@@ -1,7 +1,8 @@
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
+import mongoose from "mongoose";
+import config from "../config/env";
+
 dotenv.config();
-import mongoose from 'mongoose';
-import config from '../config/env';
 
 const connectDb = async () => {
   try {

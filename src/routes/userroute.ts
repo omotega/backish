@@ -43,4 +43,18 @@ userRouter
     usercontroller.confirmInvite
   );
 
+userRouter
+  .route("/recover-account")
+  .patch(
+    validationMiddleware(userValidations.recoverAccountValidation),
+    usercontroller.recover
+  );
+
+userRouter
+  .route("/reset-password")
+  .patch(
+    validationMiddleware(userValidations.passwordResetValidation),
+    usercontroller.passwordReset
+  );
+
 export default userRouter;

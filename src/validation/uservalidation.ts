@@ -39,10 +39,25 @@ const confirmInviteValidation = {
   }),
 };
 
+const recoverAccountValidation = {
+  body: joi.object({
+    email: joi.string().required().messages(validationMessages.email),
+  }),
+};
+
+const passwordResetValidation = {
+  body: joi.object({
+    token: joi.string().required().messages(validationMessages.token),
+    password: joi.string().required().messages(validationMessages.password),
+  }),
+};
+
 export default {
   createUserValidation,
   loginUserValidation,
   updateUserValidation,
   inviteUserValidation,
-  confirmInviteValidation
+  confirmInviteValidation,
+  recoverAccountValidation,
+  passwordResetValidation,
 };

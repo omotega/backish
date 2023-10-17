@@ -13,6 +13,7 @@ folderRouter
     validationMiddleware(folderValidation.createFolderValidation),
     foldercontroller.createFolder
   );
+
 folderRouter
   .route("/star-folder")
   .post(
@@ -29,6 +30,7 @@ folderRouter
     foldercontroller.unstarFolder
   );
 
+
 folderRouter
   .route("/get-starred-folders")
   .get(
@@ -36,5 +38,6 @@ folderRouter
     validationMiddleware(folderValidation.liststarredFoldersValidation),
     foldercontroller.getAllStarredFolders
   );
+
 
 export default folderRouter;

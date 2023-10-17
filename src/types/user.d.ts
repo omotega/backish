@@ -12,3 +12,12 @@ export interface Iuser {
     }
   ];
 }
+
+export interface IOtp {
+  _id?: string;
+  email: string;
+  token: number;
+  expired: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+}

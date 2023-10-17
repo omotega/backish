@@ -2,7 +2,7 @@ import httpStatus from "http-status";
 import foldermodel from "../database/model/folder";
 import { AppError } from "../utils/errors";
 import helperServices from "./helper-services";
-import folder from "../database/model/folder";
+
 
 const createFolder = async ({
   userId,
@@ -42,7 +42,6 @@ const createFolder = async ({
     });
   return folder;
 };
-
 const starFolder = async ({
   orgId,
   folderId,
@@ -122,7 +121,7 @@ const listAllStarredFolders = async ({
     sort: { createdAt: "desc" },
     lean: true,
   };
-  const result = await folder.paginate(
+  const result = await foldermodel.paginate(
     { orgId: orgId, _id: folderId, isStarred: true },
     options
   );
