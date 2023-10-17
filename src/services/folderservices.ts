@@ -3,7 +3,6 @@ import foldermodel from "../database/model/folder";
 import { AppError } from "../utils/errors";
 import helperServices from "./helper-services";
 
-
 const createFolder = async ({
   userId,
   folderName,
@@ -42,7 +41,6 @@ const createFolder = async ({
     });
   return folder;
 };
-
 const starFolder = async ({
   orgId,
   folderId,
