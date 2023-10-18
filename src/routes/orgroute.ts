@@ -20,9 +20,9 @@ orgRouter
     authGuard.guard,
     validationMiddleware(orgValidations.getAUserValidation),
     organizationcontroller.getAUser
-  )
+  );
 
-  orgRouter
+orgRouter
   .route("/leave-org")
   .post(
     authGuard.guard,
@@ -30,5 +30,8 @@ orgRouter
     organizationcontroller.signOutOfOrg
   );
 
+orgRouter
+  .route("/get-all-userorgs")
+  .get(authGuard.guard, organizationcontroller.getAllUserOrgs);
 
 export default orgRouter;

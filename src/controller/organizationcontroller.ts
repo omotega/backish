@@ -10,7 +10,7 @@ const getAllUsersInOrganization = catchAsync(
     const response = await organizatioservices.listAllUsersInOrganization(
       orgId
     );
-    res.status(httpStatus.CREATED).json({
+    res.status(httpStatus.OK).json({
       success: true,
       message: messages.DATA_FETCHED_SUCCESS,
       data: response,
@@ -24,7 +24,7 @@ const getAUser = catchAsync(async (req: Request, res: Response) => {
     orgId: orgId,
     email: email,
   });
-  res.status(httpStatus.CREATED).json({
+  res.status(httpStatus.OK).json({
     success: true,
     message: messages.DATA_FETCHED_SUCCESS,
     data: response,
@@ -38,11 +38,26 @@ const signOutOfOrg = catchAsync(async (req: Request, res: Response) => {
     orgId: orgId,
     userId: _id,
   });
-  res.status(httpStatus.CREATED).json({
+  res.status(httpStatus.OK).json({
     success: true,
     message: response,
   });
 });
 
-export default { getAllUsersInOrganization, getAUser,signOutOfOrg };
+const getAllUserOrgs = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const response = await organizatioservices.listUserOrganization({
+    userId: _id,
+  });
+  res.status(httpStatus.OK).json({
+    success: true,
+    message: response,
+  });
+});
 
+export default {
+  getAllUsersInOrganization,
+  getAUser,
+  signOutOfOrg,
+  getAllUserOrgs,
+};
