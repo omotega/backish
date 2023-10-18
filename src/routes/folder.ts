@@ -31,4 +31,13 @@ folderRouter
   );
 
 
+folderRouter
+  .route("/get-starred-folders")
+  .get(
+    authGuard.guard,
+    validationMiddleware(folderValidation.liststarredFoldersValidation),
+    foldercontroller.getAllStarredFolders
+  );
+
+
 export default folderRouter;
