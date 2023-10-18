@@ -37,9 +37,22 @@ const liststarredFoldersValidation = {
   }),
 };
 
+
+const listUnstarredFoldersValidation = {
+  body: joi.object({
+    orgId: joi.string().required().messages(validationMessages.orgId),
+    folderId: joi.string().required().messages(validationMessages.folderId),
+  }),
+  query: joi.object({
+    page: joi.number().required(),
+    limit: joi.number().required(),
+  }),
+}
+
 export default {
   createFolderValidation,
   starFolderValidation,
   unstarFolderValidation,
   liststarredFoldersValidation,
+  listUnstarredFoldersValidation
 };

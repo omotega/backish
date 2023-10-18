@@ -142,10 +142,40 @@ const listAllStarredFolders = async ({
   return result;
 };
 
+const listAllUnstarredFolders = async ({
+  orgId,
+  folderId,
+  page,
+  limit
+}: {
+  orgId: string;
+  folderId: string;
+  page:number,
+  limit:number
+}) => {
+  const options = {
+    page,
+    limit,
+    sort: { createdAt: "desc" },
+    lean: true,
+  };
+  const result = await foldermodel.paginate(
+    { orgId: orgId, _id: folderId, isStarred: false },
+    options
+  );
+  if (!result)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: "Organization not found",
+    });
+  return result;
+};
+
 
 export default {
   createFolder,
   starFolder,
   unstarFolder,
   listAllStarredFolders,
+  listAllUnstarredFolders
 };
