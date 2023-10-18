@@ -82,7 +82,6 @@ const leaveOrganization = async ({
   );
   if (!result) return;
   const index = isUser.orgStatus.indexOf(result);
-  console.log(index, "this is the index");
   if (index !== -1) {
     isUser.orgStatus.splice(index, 1);
   }
