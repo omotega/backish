@@ -30,7 +30,6 @@ folderRouter
     foldercontroller.unstarFolder
   );
 
-
 folderRouter
   .route("/get-starred-folders")
   .get(
@@ -39,5 +38,12 @@ folderRouter
     foldercontroller.getAllStarredFolders
   );
 
+folderRouter
+  .route("/get-all-folders")
+  .get(
+    authGuard.guard,
+    validationMiddleware(folderValidation.listAllFoldersValidation),
+    foldercontroller.getAllFolders
+  );
 
 export default folderRouter;

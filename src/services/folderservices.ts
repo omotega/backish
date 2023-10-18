@@ -4,7 +4,6 @@ import { AppError } from "../utils/errors";
 import helperServices from "./helper-services";
 import organization from "../database/model/organization";
 
-
 const createFolder = async ({
   userId,
   folderName,
@@ -21,8 +20,7 @@ const createFolder = async ({
     orgId
   );
   if (!checkUserPermission) return;
-  const orgExist = await organization
-    .findOne({ _id: orgId })
+  const orgExist = await organization.findOne({ _id: orgId });
   if (!orgExist)
     throw new AppError({
       httpCode: httpStatus.NOT_FOUND,
@@ -115,14 +113,12 @@ const unstarFolder = async ({
 
 const listAllStarredFolders = async ({
   orgId,
-  folderId,
   page,
-  limit
+  limit,
 }: {
   orgId: string;
-  folderId: string;
-  page:number,
-  limit:number
+  page: number;
+  limit: number;
 }) => {
   const options = {
     page,
@@ -131,7 +127,7 @@ const listAllStarredFolders = async ({
     lean: true,
   };
   const result = await foldermodel.paginate(
-    { orgId: orgId, _id: folderId, isStarred: true },
+    { orgId: orgId, isStarred: true },
     options
   );
   if (!result)
@@ -142,10 +138,36 @@ const listAllStarredFolders = async ({
   return result;
 };
 
+const getAllFolders = async ({
+  orgId,
+  page,
+  limit,
+}: {
+  orgId: string;
+  page: number;
+  limit: number;
+}) => {
+  const options = {
+    page,
+    limit,
+    sort: { createdAt: "desc" },
+    lean: true,
+  };
+
+  const allFolders = await foldermodel.paginate({ orgId: orgId }, options);
+  if (!allFolders)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: "Organization not found",
+    });
+
+  return allFolders;
+};
 
 export default {
   createFolder,
   starFolder,
   unstarFolder,
   listAllStarredFolders,
+  getAllFolders,
 };

@@ -48,25 +48,41 @@ const getAllStarredFolders = catchAsync(async (req: Request, res: Response) => {
     page: number;
     limit: number;
   };
-  const { folderId, orgId } = req.body;
+  const { orgId } = req.body;
   const response = await folderservices.listAllStarredFolders({
     orgId: orgId,
-    folderId: folderId,
     page: page,
     limit: limit,
   });
-  res
-    .status(httpStatus.OK)
-    .json({
-      status: true,
-      message: "folders fetched succesfully",
-      data: response,
-    });
+  res.status(httpStatus.OK).json({
+    status: true,
+    message: "folders fetched succesfully",
+    data: response,
+  });
+});
+
+const getAllFolders = catchAsync(async (req: Request, res: Response) => {
+  const { page = 1, limit = 10 } = req.query as unknown as {
+    page: number;
+    limit: number;
+  };
+  const { orgId } = req.body;
+  const response = await folderservices.getAllFolders({
+    orgId: orgId,
+    page: page,
+    limit: limit,
+  });
+  res.status(httpStatus.OK).json({
+    status: true,
+    message: "folders fetched succesfully",
+    data: response,
+  });
 });
 
 export default {
   createFolder,
   unstarFolder,
   starFolder,
-  getAllStarredFolders
+  getAllStarredFolders,
+  getAllFolders,
 };
