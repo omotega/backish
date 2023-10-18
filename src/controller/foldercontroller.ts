@@ -55,18 +55,31 @@ const getAllStarredFolders = catchAsync(async (req: Request, res: Response) => {
     page: page,
     limit: limit,
   });
+  res.status(httpStatus.OK).json({
+    status: true,
+    message: "folders fetched succesfully",
+    data: response,
+  });
+});
+
+const renameFolder = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { foldername, orgId, folderId } = req.body;
+  const response = await folderservices.renameFolder({
+    folderName: foldername,
+    folderId: folderId,
+    orgId: orgId,
+    userId: _id,
+  });
   res
-    .status(httpStatus.OK)
-    .json({
-      status: true,
-      message: "folders fetched succesfully",
-      data: response,
-    });
+    .status(httpStatus.CREATED)
+    .json({ status: true, message: "folder renamed", data: response });
 });
 
 export default {
   createFolder,
   unstarFolder,
   starFolder,
-  getAllStarredFolders
+  getAllStarredFolders,
+  renameFolder,
 };

@@ -37,9 +37,18 @@ const liststarredFoldersValidation = {
   }),
 };
 
+const renameFolderValidation = {
+  body: joi.object({
+    orgId: joi.string().required().messages(validationMessages.orgId),
+    foldername: joi.string().required().messages(validationMessages.foldername),
+    folderId: joi.string().required().messages(validationMessages.folderId),
+  }),
+};
+
 export default {
   createFolderValidation,
   starFolderValidation,
   unstarFolderValidation,
   liststarredFoldersValidation,
+  renameFolderValidation,
 };
