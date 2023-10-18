@@ -144,12 +144,10 @@ const listAllStarredFolders = async ({
 
 const listAllUnstarredFolders = async ({
   orgId,
-  folderId,
   page,
   limit
 }: {
   orgId: string;
-  folderId: string;
   page:number,
   limit:number
 }) => {
@@ -160,7 +158,7 @@ const listAllUnstarredFolders = async ({
     lean: true,
   };
   const result = await foldermodel.paginate(
-    { orgId: orgId, _id: folderId, isStarred: false },
+    { orgId: orgId, isStarred: false },
     options
   );
   if (!result)

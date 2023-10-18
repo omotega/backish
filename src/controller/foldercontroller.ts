@@ -70,10 +70,9 @@ const getAllUnstarredFolders = catchAsync(async (req: Request, res: Response) =>
     page: number;
     limit: number;
   };
-  const { folderId, orgId } = req.body;
+  const {  orgId } = req.body;
   const response = await folderservices.listAllUnstarredFolders({
     orgId: orgId,
-    folderId: folderId,
     page: page,
     limit: limit,
   });
