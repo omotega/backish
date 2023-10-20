@@ -76,10 +76,32 @@ const renameFolder = catchAsync(async (req: Request, res: Response) => {
     .json({ status: true, message: "folder renamed", data: response });
 });
 
+const getAllUnstarredFolders = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { page = 1, limit = 10 } = req.query as unknown as {
+    page: number;
+    limit: number;
+  };
+  const {  orgId } = req.body;
+  const response = await folderservices.listAllUnstarredFolders({
+    orgId: orgId,
+    page: page,
+    limit: limit,
+  });
+  res
+    .status(httpStatus.OK)
+    .json({
+      status: true,
+      message: "folders fetched succesfully",
+      data: response,
+    });
+});
+
 export default {
   createFolder,
   unstarFolder,
   starFolder,
   getAllStarredFolders,
+  getAllUnstarredFolders,
   renameFolder,
 };

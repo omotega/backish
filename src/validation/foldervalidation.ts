@@ -37,6 +37,16 @@ const liststarredFoldersValidation = {
   }),
 };
 
+
+const listUnstarredFoldersValidation = {
+  body: joi.object({
+    orgId: joi.string().required().messages(validationMessages.orgId),
+  }),
+  query: joi.object({
+    page: joi.number().required(),
+    limit: joi.number().required(),
+  }),
+}
 const renameFolderValidation = {
   body: joi.object({
     orgId: joi.string().required().messages(validationMessages.orgId),
@@ -45,10 +55,12 @@ const renameFolderValidation = {
   }),
 };
 
+
 export default {
   createFolderValidation,
   starFolderValidation,
   unstarFolderValidation,
   liststarredFoldersValidation,
+  listUnstarredFoldersValidation,
   renameFolderValidation,
 };

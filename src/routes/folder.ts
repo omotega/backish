@@ -39,6 +39,13 @@ folderRouter
   );
 
 folderRouter
+  .route("/get-unstarred-folders")
+  .get(
+    authGuard.guard,
+    validationMiddleware(folderValidation.listUnstarredFoldersValidation),
+    foldercontroller.getAllUnstarredFolders
+  )
+  folderRouter
   .route("/rename-folder")
   .post(
     authGuard.guard,
