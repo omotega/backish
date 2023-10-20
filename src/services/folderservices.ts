@@ -137,6 +137,83 @@ const listAllStarredFolders = async ({
     });
   return result;
 };
+const listAllUnstarredFolders = async ({
+  orgId,
+  page,
+  limit,
+}: {
+  orgId: string;
+  page: number;
+  limit: number;
+}) => {
+  const options = {
+    page,
+    limit,
+    sort: { createdAt: "desc" },
+    lean: true,
+  };
+  const result = await foldermodel.paginate(
+    { orgId: orgId, isStarred: false },
+    options
+  );
+  if (!result)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: "Organization not found",
+    });
+  return result;
+};
+
+const renameFolder = async ({
+  userId,
+  folderName,
+  orgId,
+  folderId,
+}: {
+  userId: string;
+  folderName: string;
+  orgId: string;
+  folderId: string;
+}) => {
+  const ifUserBelongsToOrganization =
+    await helperServices.checkIfUserBelongsToOrganization({
+      userId: userId,
+      orgId: orgId,
+    });
+  if (!ifUserBelongsToOrganization)
+    throw new AppError({
+      httpCode: httpStatus.CONFLICT,
+      description: `user doesn't belong to this organization`,
+    });
+  const folderExist = await foldermodel.findOne({
+    _id: folderId,
+    orgId: orgId,
+  });
+  if (!folderExist)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: `Folder doesn't exist`,
+    });
+
+  if (folderName === folderExist.foldername)
+    throw new AppError({
+      httpCode: httpStatus.CONFLICT,
+      description: `Foldername ${folderName} has already been used`,
+    });
+
+  const folder = await foldermodel.findOneAndUpdate(
+    { foldername: folderExist.foldername },
+    { foldername: folderName },
+    { new: true }
+  );
+
+  if (!folder)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: "an error occured,could not rename folder",
+    });
+  return folder;
+};
 
 const getAllFolders = async ({
   orgId,
@@ -170,4 +247,6 @@ export default {
   unstarFolder,
   listAllStarredFolders,
   getAllFolders,
+  listAllUnstarredFolders,
+  renameFolder,
 };

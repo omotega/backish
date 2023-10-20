@@ -2,6 +2,7 @@ import httpStatus from "http-status";
 import { AppError } from "../utils/errors";
 import messages from "../utils/messages";
 import usermodel from "../database/model/usermodel";
+import organization from "../database/model/organization";
 
 async function getUserdetailsById(userId: string) {
   const user = await usermodel.findOne({ _id: userId });
@@ -13,10 +14,7 @@ async function getUserdetailsById(userId: string) {
   return user;
 }
 
-async function checkUserPermission(
-  userId: string,
-  orgId: any
-) {
+async function checkUserPermission(userId: string, orgId: any) {
   const user = await getUserdetailsById(userId);
   user.orgStatus.map((item) => {
     if (item.orgId === undefined || item.roleInOrg === undefined) return;
@@ -31,7 +29,24 @@ async function checkUserPermission(
   return true;
 }
 
+async function checkIfUserBelongsToOrganization({
+  userId,
+  orgId,
+}: {
+  userId: string;
+  orgId: string;
+}) {
+  const isUser = await getUserdetailsById(userId);
+  if (!isUser) return;
+  const result = isUser.orgStatus.find(
+    (item) => item.orgId?.toString() === orgId
+  );
+  if (!result) return false;
+  return true;
+}
+
 export default {
   getUserdetailsById,
   checkUserPermission,
+  checkIfUserBelongsToOrganization,
 };

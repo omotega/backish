@@ -61,6 +61,44 @@ const getAllStarredFolders = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const renameFolder = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { foldername, orgId, folderId } = req.body;
+  const response = await folderservices.renameFolder({
+    folderName: foldername,
+    folderId: folderId,
+    orgId: orgId,
+    userId: _id,
+  });
+  res
+    .status(httpStatus.CREATED)
+    .json({ status: true, message: "folder renamed", data: response });
+});
+
+const getAllUnstarredFolders = catchAsync(
+  async (req: Request, res: Response) => {
+    const { _id } = req.User;
+    const { page = 1, limit = 10 } = req.query as unknown as {
+      page: number;
+      limit: number;
+    };
+
+    const { orgId } = req.body;
+
+    const response = await folderservices.listAllUnstarredFolders({
+      orgId: orgId,
+      page: page,
+      limit: limit,
+    });
+
+    res.status(httpStatus.OK).json({
+      status: true,
+      message: "folders fetched succesfully",
+      data: response,
+    });
+  }
+);
+
 const getAllFolders = catchAsync(async (req: Request, res: Response) => {
   const { page = 1, limit = 10 } = req.query as unknown as {
     page: number;
@@ -85,4 +123,6 @@ export default {
   starFolder,
   getAllStarredFolders,
   getAllFolders,
+  getAllUnstarredFolders,
+  renameFolder,
 };
