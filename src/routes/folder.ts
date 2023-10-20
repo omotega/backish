@@ -30,7 +30,6 @@ folderRouter
     foldercontroller.unstarFolder
   );
 
-
 folderRouter
   .route("/get-starred-folders")
   .get(
@@ -39,5 +38,12 @@ folderRouter
     foldercontroller.getAllStarredFolders
   );
 
+folderRouter
+  .route("/rename-folder")
+  .post(
+    authGuard.guard,
+    validationMiddleware(folderValidation.renameFolderValidation),
+    foldercontroller.renameFolder
+  );
 
 export default folderRouter;
