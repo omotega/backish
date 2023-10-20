@@ -39,12 +39,20 @@ folderRouter
   );
 
 folderRouter
+  .route("/get-all-folders")
+  .get(
+    authGuard.guard,
+    validationMiddleware(folderValidation.listAllFoldersValidation),
+    foldercontroller.getAllFolders
+  )
+  folderRouter
   .route("/get-unstarred-folders")
   .get(
     authGuard.guard,
     validationMiddleware(folderValidation.listUnstarredFoldersValidation),
     foldercontroller.getAllUnstarredFolders
   )
+  
   folderRouter
   .route("/rename-folder")
   .post(

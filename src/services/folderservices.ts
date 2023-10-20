@@ -113,12 +113,10 @@ const unstarFolder = async ({
 
 const listAllStarredFolders = async ({
   orgId,
-  folderId,
   page,
   limit,
 }: {
   orgId: string;
-  folderId: string;
   page: number;
   limit: number;
 }) => {
@@ -129,7 +127,7 @@ const listAllStarredFolders = async ({
     lean: true,
   };
   const result = await foldermodel.paginate(
-    { orgId: orgId, _id: folderId, isStarred: true },
+    { orgId: orgId, isStarred: true },
     options
   );
   if (!result)
@@ -139,15 +137,14 @@ const listAllStarredFolders = async ({
     });
   return result;
 };
-
 const listAllUnstarredFolders = async ({
   orgId,
   page,
-  limit
+  limit,
 }: {
   orgId: string;
-  page:number,
-  limit:number
+  page: number;
+  limit: number;
 }) => {
   const options = {
     page,
@@ -183,7 +180,7 @@ const renameFolder = async ({
       userId: userId,
       orgId: orgId,
     });
-  if (!ifUserBelongsToOrganization) 
+  if (!ifUserBelongsToOrganization)
     throw new AppError({
       httpCode: httpStatus.CONFLICT,
       description: `user doesn't belong to this organization`,
@@ -218,12 +215,38 @@ const renameFolder = async ({
   return folder;
 };
 
+const getAllFolders = async ({
+  orgId,
+  page,
+  limit,
+}: {
+  orgId: string;
+  page: number;
+  limit: number;
+}) => {
+  const options = {
+    page,
+    limit,
+    sort: { createdAt: "desc" },
+    lean: true,
+  };
+
+  const allFolders = await foldermodel.paginate({ orgId: orgId }, options);
+  if (!allFolders)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: "Organization not found",
+    });
+
+  return allFolders;
+};
 
 export default {
   createFolder,
   starFolder,
   unstarFolder,
   listAllStarredFolders,
+  getAllFolders,
   listAllUnstarredFolders,
   renameFolder,
 };
