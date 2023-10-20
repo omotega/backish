@@ -44,6 +44,13 @@ folderRouter
     authGuard.guard,
     validationMiddleware(folderValidation.listUnstarredFoldersValidation),
     foldercontroller.getAllUnstarredFolders
+  )
+  folderRouter
+  .route("/rename-folder")
+  .post(
+    authGuard.guard,
+    validationMiddleware(folderValidation.renameFolderValidation),
+    foldercontroller.renameFolder
   );
 
 export default folderRouter;
