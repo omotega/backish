@@ -71,7 +71,7 @@ const renameFolder = catchAsync(async (req: Request, res: Response) => {
     userId: _id,
   });
   res
-    .status(httpStatus.CREATED)
+    .status(httpStatus.OK)
     .json({ status: true, message: "folder renamed", data: response });
 });
 
@@ -117,6 +117,20 @@ const getAllFolders = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const folderAccess = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { folderId, orgId, collaboratorId } = req.body;
+  const response = await folderservices.addFolderAccess({
+    collaboratorId: collaboratorId,
+    folderId: folderId,
+    orgId: orgId,
+    userId: _id,
+  });
+  res
+    .status(httpStatus.OK)
+    .json({ status: true, message: "folder Access added", data: response });
+});
+
 export default {
   createFolder,
   unstarFolder,
@@ -125,4 +139,5 @@ export default {
   getAllFolders,
   getAllUnstarredFolders,
   renameFolder,
+  folderAccess,
 };
