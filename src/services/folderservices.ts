@@ -241,6 +241,50 @@ const getAllFolders = async ({
   return allFolders;
 };
 
+const addFolderAccess = async ({
+  userId,
+  folderId,
+  collaboratorId,
+  orgId,
+}: {
+  userId: string;
+  folderId: string;
+  collaboratorId: string;
+  orgId: string;
+}) => {
+  const checkUserPermission = await helperServices.checkUserPermission(
+    userId,
+    orgId
+  );
+  if (!checkUserPermission)
+    throw new AppError({
+      httpCode: httpStatus.NOT_ACCEPTABLE,
+      description: "you cant perfom this operation",
+    });
+
+  const isUser = await helperServices.getUserdetailsById(collaboratorId);
+  const collaboratorBelong =
+    await helperServices.checkIfUserBelongsToOrganization({
+      userId: collaboratorId,
+      orgId: orgId,
+    });
+
+  const addAccess = await foldermodel
+    .findByIdAndUpdate(
+      { _id: folderId },
+      { $push: { collaborators: [collaboratorId] } },
+      { new: true }
+    )
+    .select("foldername -_id");
+  if (!addAccess)
+    throw new AppError({
+      httpCode: httpStatus.NOT_ACCEPTABLE,
+      description: "could not complete this operation",
+    });
+  const message = `Added ${isUser.name} as collaborator  to ${addAccess.foldername} Folder`;
+  return message;
+};
+
 export default {
   createFolder,
   starFolder,
@@ -249,4 +293,5 @@ export default {
   getAllFolders,
   listAllUnstarredFolders,
   renameFolder,
+  addFolderAccess,
 };

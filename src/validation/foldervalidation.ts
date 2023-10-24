@@ -36,7 +36,6 @@ const liststarredFoldersValidation = {
   }),
 };
 
-
 const listUnstarredFoldersValidation = {
   body: joi.object({
     orgId: joi.string().required().messages(validationMessages.orgId),
@@ -45,15 +44,13 @@ const listUnstarredFoldersValidation = {
     page: joi.number().required(),
     limit: joi.number().required(),
   }),
-
-}
+};
 const renameFolderValidation = {
   body: joi.object({
     orgId: joi.string().required().messages(validationMessages.orgId),
     foldername: joi.string().required().messages(validationMessages.foldername),
     folderId: joi.string().required().messages(validationMessages.folderId),
   }),
-
 };
 
 const listAllFoldersValidation = {
@@ -66,7 +63,16 @@ const listAllFoldersValidation = {
   }),
 };
 
-
+const folderAccessValidation = {
+  body: joi.object({
+    orgId: joi.string().required().messages(validationMessages.orgId),
+    collaboratorId: joi
+      .string()
+      .required()
+      .messages(validationMessages.collaboratorId),
+    folderId: joi.string().required().messages(validationMessages.folderId),
+  }),
+};
 
 export default {
   createFolderValidation,
@@ -76,4 +82,5 @@ export default {
   listAllFoldersValidation,
   listUnstarredFoldersValidation,
   renameFolderValidation,
+  folderAccessValidation,
 };

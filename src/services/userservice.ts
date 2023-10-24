@@ -148,7 +148,7 @@ const inviteUserToOrg = async ({
     email: invitedEmail,
     token: referenceToken,
     expiresAt: expires_at,
-    organizationName: isOrganization.orgName,
+    orgName: isOrganization.orgName,
   });
   if (!invite)
     throw new AppError({
@@ -189,7 +189,7 @@ const confirmUserInvite = async (reference: string) => {
       description: "Organization not found",
     });
   const updateQuery = {
-    $push: { invitedEmails: userHasAccount.email },
+    $push: { invitedEmails: [userHasAccount.email] },
   };
 
   const userUpdateQuery = {

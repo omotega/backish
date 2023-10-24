@@ -12,6 +12,12 @@ const folderSchema = new mongoose.Schema(
     content: {
       type: String,
     },
+    collaborators: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
     orgId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Organization",

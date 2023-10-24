@@ -41,7 +41,11 @@ async function checkIfUserBelongsToOrganization({
   const result = isUser.orgStatus.find(
     (item) => item.orgId?.toString() === orgId
   );
-  if (!result) return false;
+  if (!result)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: "User does not belong this organization",
+    });
   return true;
 }
 

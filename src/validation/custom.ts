@@ -43,4 +43,8 @@ export const validationMessages = {
     "number.empty": "folderid  cannot be empty.",
     "any.required": '"folderid" is required.',
   },
+  collaboratorId: {
+    "number.empty": "collaborator id  cannot be empty.",
+    "any.required": '"collaborator id" is required.',
+  },
 };
