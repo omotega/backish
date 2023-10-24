@@ -34,4 +34,12 @@ orgRouter
   .route("/get-all-userorgs")
   .get(authGuard.guard, organizationcontroller.getAllUserOrgs);
 
+orgRouter
+  .route("/update-user-role")
+  .put(
+    authGuard.guard,
+    validationMiddleware(orgValidations.upadateUserroleValidation),
+    organizationcontroller.changeUserRole
+  );
+
 export default orgRouter;

@@ -55,9 +55,25 @@ const getAllUserOrgs = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const changeUserRole = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { orgId, collaboratorId } = req.body;
+  const response = await organizatioservices.updateUserRole({
+    userId: _id,
+    orgId: orgId,
+    collaboratorId: collaboratorId,
+  });
+  res.status(httpStatus.OK).json({
+    success: true,
+    message: "Role updates succesfully",
+    data: response,
+  });
+});
+
 export default {
   getAllUsersInOrganization,
   getAUser,
   signOutOfOrg,
   getAllUserOrgs,
+  changeUserRole
 };

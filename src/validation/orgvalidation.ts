@@ -21,8 +21,19 @@ const leaveOrgUserValidation = {
   }),
 };
 
+const upadateUserroleValidation = {
+  body: joi.object({
+    orgId: joi.string().required().messages(validationMessages.orgId),
+    collaboratorId: joi
+      .string()
+      .required()
+      .messages(validationMessages.collaboratorId),
+  }),
+};
+
 export default {
   getAllUserValidation,
   getAUserValidation,
   leaveOrgUserValidation,
+  upadateUserroleValidation,
 };

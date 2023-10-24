@@ -5,6 +5,7 @@ import httpStatus from "http-status";
 import messages from "../utils/messages";
 import helperServices from "./helper-services";
 import organization from "../database/model/organization";
+import userRoles from "../utils/role";
 
 const listAllUsersInOrganization = async (orgId: string) => {
   const organization = await Organization.findOne({ _id: orgId }).select(
@@ -127,9 +128,51 @@ const listUserOrganization = async ({ userId }: { userId: string }) => {
   return result;
 };
 
+const updateUserRole = async ({
+  userId,
+  orgId,
+  collaboratorId,
+}: {
+  userId: string;
+  orgId: string;
+  collaboratorId: string;
+}) => {
+  const UserPermission = await helperServices.checkUserPermission(
+    userId,
+    orgId
+  );
+  const userBelong = await helperServices.checkIfUserBelongsToOrganization({
+    userId: collaboratorId,
+    orgId: orgId,
+  });
+
+  const updateRole = await usermodel.findOneAndUpdate(
+    {
+      _id: collaboratorId,
+      "orgStatus.roleInOrg": userRoles.guest,
+      "orgStatus.orgId": orgId,
+    },
+    {
+      $set: {
+        "orgStatus.$.roleInOrg": userRoles.admin,
+      },
+    },
+    { new: true }
+  );
+  if (!updateRole)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: "Could not upadate role",
+    });
+  const message = `${updateRole.name} is now an Admin `;
+
+  return message;
+};
+
 export default {
   listAllUsersInOrganization,
   findUser,
   leaveOrganization,
   listUserOrganization,
+  updateUserRole,
 };
