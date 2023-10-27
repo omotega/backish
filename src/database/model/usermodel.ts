@@ -21,12 +21,13 @@ const userSchema = new mongoose.Schema(
         orgId: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Organization",
-          _id: false,
+          required:true,
         },
         roleInOrg: {
           type: String,
           enum: ["super-admin", "admin", "guest"],
           default: "super-admin",
+          
         },
       },
     ],

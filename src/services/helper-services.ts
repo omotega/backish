@@ -3,6 +3,7 @@ import { AppError } from "../utils/errors";
 import messages from "../utils/messages";
 import usermodel from "../database/model/usermodel";
 import organization from "../database/model/organization";
+import userRoles from "../utils/role";
 
 async function getUserdetailsById(userId: string) {
   const user = await usermodel.findOne({ _id: userId });
@@ -16,18 +17,22 @@ async function getUserdetailsById(userId: string) {
 
 async function checkUserPermission(userId: string, orgId: any) {
   const user = await getUserdetailsById(userId);
-  user.orgStatus.map((item) => {
-    if (item.orgId === undefined || item.roleInOrg === undefined) return;
-    if (item.orgId !== orgId && item.roleInOrg !== "super-admin") {
-      throw new AppError({
-        httpCode: httpStatus.NOT_ACCEPTABLE,
-        description:
-          "You are not authorized to invite users to the organization. Contact admin for help.",
-      });
-    }
-  });
+  const response = user.orgStatus.find(
+    (item) => item.orgId?.toString() === orgId.toString()
+  );
+  if (!response?.roleInOrg) return;
+  if (
+    response.roleInOrg !== userRoles.superAdmin &&
+    response.roleInOrg !== userRoles.admin
+  )
+    throw new AppError({
+      httpCode: httpStatus.NOT_ACCEPTABLE,
+      description:
+        "You are not authorized to carry out this operation. Contact admin for help.",
+    });
   return true;
 }
+
 
 async function checkIfUserBelongsToOrganization({
   userId,
