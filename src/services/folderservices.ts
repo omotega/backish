@@ -49,6 +49,7 @@ const createFolder = async ({
     });
   return folder;
 };
+
 const starFolder = async ({
   orgId,
   folderId,
@@ -137,6 +138,7 @@ const listAllStarredFolders = async ({
     });
   return result;
 };
+
 const listAllUnstarredFolders = async ({
   orgId,
   page,
@@ -164,14 +166,16 @@ const listAllUnstarredFolders = async ({
   return result;
 };
 
-const renameFolder = async ({
+const updateFolder = async ({
   userId,
   folderName,
+  description,
   orgId,
   folderId,
 }: {
   userId: string;
   folderName: string;
+  description: string;
   orgId: string;
   folderId: string;
 }) => {
@@ -203,7 +207,7 @@ const renameFolder = async ({
 
   const folder = await foldermodel.findOneAndUpdate(
     { foldername: folderExist.foldername },
-    { foldername: folderName },
+    { foldername: folderName, description: description },
     { new: true }
   );
 
@@ -263,11 +267,10 @@ const addFolderAccess = async ({
     });
 
   const isUser = await helperServices.getUserdetailsById(collaboratorId);
-  const collaboratorBelong =
-    await helperServices.checkIfUserBelongsToOrganization({
-      userId: collaboratorId,
-      orgId: orgId,
-    });
+  await helperServices.checkIfUserBelongsToOrganization({
+    userId: collaboratorId,
+    orgId: orgId,
+  });
 
   const addAccess = await foldermodel
     .findByIdAndUpdate(
@@ -285,6 +288,51 @@ const addFolderAccess = async ({
   return message;
 };
 
+const deleteFolder = async ({
+  userId,
+  orgId,
+  folderId,
+}: {
+  userId: string;
+  orgId: string;
+  folderId: string;
+}) => {
+  const checkUserPermission = await helperServices.checkUserPermission(
+    userId,
+    orgId
+  );
+  if (!checkUserPermission)
+    throw new AppError({
+      httpCode: httpStatus.NOT_ACCEPTABLE,
+      description: "you cant perfom this operation",
+    });
+  const ifUserBelongsToOrganization =
+    await helperServices.checkIfUserBelongsToOrganization({
+      userId: userId,
+      orgId: orgId,
+    });
+  if (!ifUserBelongsToOrganization)
+    throw new AppError({
+      httpCode: httpStatus.CONFLICT,
+      description: `user doesn't belong to this organization`,
+    });
+  const folderExist = await foldermodel.findOne({
+    _id: folderId,
+    orgId: orgId,
+  });
+  if (!folderExist)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: `Folder doesn't exist`,
+    });
+
+  const folder = await foldermodel.findOneAndDelete({
+    _id: folderId,
+  });
+
+  return folder;
+};
+
 export default {
   createFolder,
   starFolder,
@@ -292,6 +340,7 @@ export default {
   listAllStarredFolders,
   getAllFolders,
   listAllUnstarredFolders,
-  renameFolder,
+  updateFolder,
   addFolderAccess,
+  deleteFolder,
 };

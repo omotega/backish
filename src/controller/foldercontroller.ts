@@ -61,18 +61,34 @@ const getAllStarredFolders = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const renameFolder = catchAsync(async (req: Request, res: Response) => {
+const updateFolder = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
-  const { foldername, orgId, folderId } = req.body;
-  const response = await folderservices.renameFolder({
+  const { foldername, orgId, folderId, description } = req.body;
+  const response = await folderservices.updateFolder({
     folderName: foldername,
     folderId: folderId,
+    description: description,
     orgId: orgId,
     userId: _id,
   });
   res
     .status(httpStatus.OK)
-    .json({ status: true, message: "folder renamed", data: response });
+    .json({ status: true, message: "folder updated", data: response });
+});
+
+const deleteFolder = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { orgId, folderId } = req.params;
+  const response = await folderservices.deleteFolder({
+    orgId: orgId,
+    folderId: folderId,
+    userId: _id,
+  });
+  res.status(httpStatus.OK).json({
+    status: true,
+    message: `Folder ${folderId} deleted`,
+    data: response,
+  });
 });
 
 const getAllUnstarredFolders = catchAsync(
@@ -138,6 +154,7 @@ export default {
   getAllStarredFolders,
   getAllFolders,
   getAllUnstarredFolders,
-  renameFolder,
+  updateFolder,
   folderAccess,
+  deleteFolder,
 };
