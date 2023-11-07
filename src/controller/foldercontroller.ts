@@ -63,13 +63,15 @@ const getAllStarredFolders = catchAsync(async (req: Request, res: Response) => {
 
 const updateFolder = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
-  const { foldername, orgId, folderId, description } = req.body;
+  const { folderId } = req.params;
+  const { orgId, foldername, description } = req.body;
+
   const response = await folderservices.updateFolder({
-    folderName: foldername,
-    folderId: folderId,
-    description: description,
-    orgId: orgId,
+    folderId,
+    foldername,
+    description,
     userId: _id,
+    orgId,
   });
   res
     .status(httpStatus.OK)

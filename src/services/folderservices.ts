@@ -168,13 +168,13 @@ const listAllUnstarredFolders = async ({
 
 const updateFolder = async ({
   userId,
-  folderName,
+  foldername,
   description,
   orgId,
   folderId,
 }: {
   userId: string;
-  folderName: string;
+  foldername: string;
   description: string;
   orgId: string;
   folderId: string;
@@ -184,39 +184,51 @@ const updateFolder = async ({
       userId: userId,
       orgId: orgId,
     });
-  if (!ifUserBelongsToOrganization)
+  if (!ifUserBelongsToOrganization) {
     throw new AppError({
       httpCode: httpStatus.CONFLICT,
-      description: `user doesn't belong to this organization`,
+      description: `User doesn't belong to this organization`,
     });
+  }
+
   const folderExist = await foldermodel.findOne({
     _id: folderId,
     orgId: orgId,
   });
-  if (!folderExist)
+  if (!folderExist) {
     throw new AppError({
       httpCode: httpStatus.NOT_FOUND,
       description: `Folder doesn't exist`,
     });
+  }
 
-  if (folderName === folderExist.foldername)
-    throw new AppError({
-      httpCode: httpStatus.CONFLICT,
-      description: `Foldername ${folderName} has already been used`,
-    });
+  const updateFields: {
+    foldername?: string;
+    description?: string;
+  } = {};
 
-  const folder = await foldermodel.findOneAndUpdate(
-    { foldername: folderExist.foldername },
-    { foldername: folderName, description: description },
+  if (foldername !== undefined) {
+    updateFields.foldername = foldername;
+  }
+
+  if (description !== undefined) {
+    updateFields.description = description;
+  }
+
+  const updatedFolder = await foldermodel.findOneAndUpdate(
+    { orgId, _id: folderId },
+    updateFields,
     { new: true }
   );
 
-  if (!folder)
+  if (!updatedFolder) {
     throw new AppError({
       httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-      description: "an error occured,could not rename folder",
+      description: "An error occurred, could not update folder",
     });
-  return folder;
+  }
+
+  return updatedFolder;
 };
 
 const getAllFolders = async ({

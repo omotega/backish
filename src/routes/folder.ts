@@ -54,11 +54,11 @@ folderRouter
   );
 
 folderRouter
-  .route("/rename-folder")
+  .route("/:folderId")
   .patch(
     authGuard.guard,
-    validationMiddleware(folderValidation.renameFolderValidation),
-    foldercontroller.renameFolder
+    validationMiddleware(folderValidation.updateFolderValidation),
+    foldercontroller.updateFolder
   );
 
 folderRouter

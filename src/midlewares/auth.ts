@@ -13,25 +13,31 @@ export const guard = async (
 ) => {
   try {
     if (req.headers && req.headers.authorization) {
-      const token = req.headers.authorization.split(" ")[1];
-      if (!token)
-        throw new AppError({
-          httpCode: httpStatus.FORBIDDEN,
-          description: "please login",
-        });
-      const decode: any = Helper.decodeToken(token, config.tokenSecret);
-      const user = await usermodel.findOne({_id: decode.payload.userId});
-      if (!user)
-        throw new AppError({
-          httpCode: httpStatus.NOT_FOUND,
-          description: messages.USER_NOT_FOUND,
-        });
-      req.User = user;
-      return next();
+      const parts = req.headers.authorization.split(" ");
+      if (parts.length === 2) {
+        const scheme = parts[0];
+        const credentials = parts[1];
+        if (/^Bearer$/i.test(scheme)) {
+          const token = credentials;
+          const decode: any = Helper.decodeToken(token, config.tokenSecret);
+          const user = await usermodel.findById(decode.payload.userId);
+          if (!user)
+            throw new AppError({
+              httpCode: httpStatus.NOT_FOUND,
+              description: messages.USER_NOT_FOUND,
+            });
+          req.User = user;
+          return next();
+        }
+      } else {
+        return res
+          .status(httpStatus.BAD_REQUEST)
+          .json({ message: "Invalid authorization format" });
+      }
     } else {
-      res
+      return res
         .status(httpStatus.BAD_REQUEST)
-        .json({ message: "authorization not found" });
+        .json({ message: "Authorization not found" });
     }
   } catch (error) {
     console.error(error);
@@ -44,4 +50,4 @@ export const guard = async (
 
 export default {
   guard,
-}
+};
