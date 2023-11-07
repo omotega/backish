@@ -215,6 +215,16 @@ const updateFolder = async ({
     updateFields.description = description;
   }
 
+  const foldernameExist = await foldermodel.findOne({
+    foldername: foldername,
+  });
+  if (foldernameExist) {
+    throw new AppError({
+      httpCode: httpStatus.CONFLICT,
+      description: `${foldername} already exist. Kindly input a different one`,
+    });
+  }
+
   const updatedFolder = await foldermodel.findOneAndUpdate(
     { orgId, _id: folderId },
     updateFields,
