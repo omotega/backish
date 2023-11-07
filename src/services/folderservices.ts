@@ -19,7 +19,6 @@ const createFolder = async ({
     userId,
     orgId
   );
-  if (!checkUserPermission) return;
   const orgExist = await organization.findOne({ _id: orgId });
   if (!orgExist)
     throw new AppError({
@@ -40,6 +39,7 @@ const createFolder = async ({
     foldername: folderName,
     orgId: orgExist._id,
     description: description,
+    collaborators: [userId],
   });
 
   if (!folder)
@@ -293,7 +293,7 @@ const addFolderAccess = async ({
     .select("foldername -_id");
   if (!addAccess)
     throw new AppError({
-      httpCode: httpStatus.NOT_ACCEPTABLE,
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
       description: "could not complete this operation",
     });
   const message = `Added ${isUser.name} as collaborator  to ${addAccess.foldername} Folder`;

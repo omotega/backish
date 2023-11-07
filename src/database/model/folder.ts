@@ -25,13 +25,18 @@ const folderSchema = new mongoose.Schema(
     description: {
       type: String,
     },
-    Permission: {
-      type: String,
-    },
     isPinned: {
       type: String,
     },
+    isarchived: {
+      type: Boolean,
+      default: false,
+    },
     isStarred: {
+      type: Boolean,
+      default: false,
+    },
+    isDeleted: {
       type: Boolean,
       default: false,
     },
