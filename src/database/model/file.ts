@@ -31,7 +31,7 @@ const fileSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    coomments: {
+    description: {
       type: String,
     },
     md5Hash: {
@@ -41,9 +41,6 @@ const fileSchema = new mongoose.Schema(
       type: String,
     },
     password: {
-      type: String,
-    },
-    lastAccessed: {
       type: String,
     },
     addedBy: {
