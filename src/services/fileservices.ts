@@ -10,7 +10,6 @@ import helperServices from "./helper-services";
 
 const directoryPath = path.join("src", "uploads");
 
-
 const uploadFile = async ({
   folderId,
   uploadedFile,
@@ -48,7 +47,11 @@ const uploadFile = async ({
     })
   );
 
-  if (uploadedFile.length !== checkFileUploadstatus.length) return;
+  if (uploadedFile.length !== checkFileUploadstatus.length)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: "file upload error.Please try again",
+    });
 
   const sortedFiles = (uploadedFile as any)
     .slice(0)
