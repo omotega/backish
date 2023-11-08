@@ -1,12 +1,16 @@
 import joi from "joi";
 import { validationMessages } from "./custom";
+import path from "path";
 
-const uploadRequest = {
+const directoryPath = path.join("src", "uploads");
+
+const fileUploadValidation = {
   body: joi.object({
-    filename: joi.string().required().messages(validationMessages.filename),
+    orgId: joi.string().required().messages(validationMessages.orgId),
+    folderId: joi.string(),
   }),
 };
 
 export default {
-  uploadRequest,
+  fileUploadValidation,
 };

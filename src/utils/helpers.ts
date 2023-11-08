@@ -2,6 +2,10 @@ import argon from "argon2";
 import jwt from "jsonwebtoken";
 import config from "../config/env";
 import shortuuid, { generate } from "short-uuid";
+import fs from "fs";
+import crypto from "crypto";
+import { promisify } from "util";
+const fileRead = promisify(fs.readFile);
 
 /**
  * contains all the helper methods
@@ -92,6 +96,31 @@ class Helper {
   static generateOtp() {
     const otp = `${Math.floor(100000 + Math.random() * 900000)}`;
     return otp;
+  }
+
+  /**
+   * Calculates the MD5 hash of a file.
+   *
+   * @param  {String} filePath - The absolute path to the file.
+   * @return {String} - The MD5 hash.
+   */
+  static md5Generator = async (filePath: any) => {
+    const fileBuffer = await fileRead(filePath);
+
+    const md5Hash = crypto.createHash("md5").update(fileBuffer).digest("hex");
+    return md5Hash;
+  };
+
+  static formatFileSize(bytes: any) {
+    if (bytes < 1024) {
+      return bytes + " bytes";
+    } else if (bytes < 1024 * 1024) {
+      return (bytes / 1024).toFixed(2) + " KB";
+    } else if (bytes < 1024 * 1024 * 1024) {
+      return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+    } else {
+      return (bytes / (1024 * 1024 * 1024)).toFixed(2) + " GB";
+    }
   }
 }
 export default Helper;

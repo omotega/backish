@@ -3,15 +3,17 @@ import { Router } from "express";
 import validationMiddleware from "../midlewares/validation";
 import filevalidation from "../validation/filevalidation";
 import authGuard from "../midlewares/auth";
+import upload from "../midlewares/upload";
 
 const fileRouter = Router();
 
 fileRouter
-  .route("/upload-request")
+  .route("/upload-file")
   .post(
     authGuard.guard,
-    validationMiddleware(filevalidation.uploadRequest),
-    filecontroller.requestFileUpload
+    upload.array("file"),
+    validationMiddleware(filevalidation.fileUploadValidation),
+    filecontroller.fileUpload
   );
 
 export default fileRouter;

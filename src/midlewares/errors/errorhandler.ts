@@ -1,6 +1,7 @@
 import { AppError } from "../../utils/errors";
 import { Response } from "express";
 import httpStatus from "http-status";
+import multer from "multer";
 class ErrorHandler {
   private isTrustedError(error: Error): boolean {
     if (error instanceof AppError) {
@@ -31,6 +32,18 @@ class ErrorHandler {
 
     console.log("Application encountered a critical error. Exiting");
     process.exit(1);
+  }
+
+  private multerError(error: Error | AppError, response: Response): void {
+    if (error instanceof multer.MulterError) {
+      response
+        .status(httpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: "A Multer error occurred when uploading." });
+    } else if (error) {
+      response
+        .status(httpStatus.INTERNAL_SERVER_ERROR)
+        .json({ message: "An unknown error occurred when uploading." });
+    }
   }
 }
 

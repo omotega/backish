@@ -5,21 +5,25 @@ cloudinary.config({
   cloud_name: config.cloudinaryCloudName,
   api_key: config.cloudinaryApiKey,
   api_secret: config.cloudinaryApiSecret,
+  secure: true,
 });
 
 const uploadImage = async (imagePath: string) => {
   // Use the uploaded file's name as the asset's public ID and
   // allow overwriting the asset with new versions
-  const options = {
-    use_filename: true,
-    unique_filename: false,
-    overwrite: true,
-  };
 
   try {
     // Upload the image
-    const result = await cloudinary.uploader.upload(imagePath, options);
-    return { url: result.url, publicId: result.public_id };
+    const result = await cloudinary.uploader.upload(imagePath, {
+      timeout: 120000,
+      resource_type: "auto",
+    });
+    const response = {
+      url: result.url,
+      publicId: result.public_id,
+      size: result.bytes,
+    };
+    return response;
   } catch (error) {
     console.error(error);
   }
