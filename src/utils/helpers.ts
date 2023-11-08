@@ -34,7 +34,7 @@ class Helper {
 
   static generateToken(payload: any, secret = config.tokenSecret) {
     const token = jwt.sign(payload, secret, {
-      expiresIn: "1h",
+      expiresIn: "5h",
     });
 
     return token;
@@ -47,27 +47,15 @@ class Helper {
    */
 
   static decodeToken(token: any, secret = config.tokenSecret) {
-    try {
-      const payload = jwt.verify(token, secret);
+    const payload = jwt.verify(token, secret);
+    if (!payload) {
+      throw new Error("Invalid token ");
+    } else {
       return {
         valid: true,
         expired: false,
         payload,
       };
-    } catch (error) {
-      if (error instanceof jwt.TokenExpiredError) {
-        return {
-          valid: false,
-          expired: true,
-          error: "Token has expired",
-        };
-      } else {
-        return {
-          valid: false,
-          expired: false,
-          error: "Invalid token",
-        };
-      }
     }
   }
 

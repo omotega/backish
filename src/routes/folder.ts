@@ -54,11 +54,11 @@ folderRouter
   );
 
 folderRouter
-  .route("/rename-folder")
-  .post(
+  .route("/:folderId")
+  .patch(
     authGuard.guard,
-    validationMiddleware(folderValidation.renameFolderValidation),
-    foldercontroller.renameFolder
+    validationMiddleware(folderValidation.updateFolderValidation),
+    foldercontroller.updateFolder
   );
 
 folderRouter
@@ -68,5 +68,9 @@ folderRouter
     validationMiddleware(folderValidation.folderAccessValidation),
     foldercontroller.folderAccess
   );
+
+folderRouter
+  .route("/org/:orgId/delete-folder/:folderId")
+  .delete(authGuard.guard, foldercontroller.deleteFolder);
 
 export default folderRouter;

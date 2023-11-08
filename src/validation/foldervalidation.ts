@@ -45,11 +45,12 @@ const listUnstarredFoldersValidation = {
     limit: joi.number().required(),
   }),
 };
-const renameFolderValidation = {
+
+const updateFolderValidation = {
   body: joi.object({
     orgId: joi.string().required().messages(validationMessages.orgId),
-    foldername: joi.string().required().messages(validationMessages.foldername),
-    folderId: joi.string().required().messages(validationMessages.folderId),
+    foldername: joi.string().messages(validationMessages.foldername),
+    description: joi.string().messages(validationMessages.description),
   }),
 };
 
@@ -81,6 +82,6 @@ export default {
   liststarredFoldersValidation,
   listAllFoldersValidation,
   listUnstarredFoldersValidation,
-  renameFolderValidation,
+  updateFolderValidation,
   folderAccessValidation,
 };
