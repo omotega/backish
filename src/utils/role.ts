@@ -5,11 +5,4 @@ const userRoles = {
 };
 
 
-export const fileTypeEnum = {
-  AUDIO: "audio",
-  VIDEO: "video",
-  IMAGE: "image",
-  DOCUMENT: "document"
-};
-
 export default userRoles;

@@ -10,62 +10,6 @@ import helperServices from "./helper-services";
 
 const directoryPath = path.join("src", "uploads");
 
-//   if (!fileName)
-//     throw new AppError({
-//       httpCode: httpStatus.BAD_REQUEST,
-//       description: messages.MISSING_FILE_NAME,
-//     });
-//   const file = await filemodel.create({ filename: fileName });
-//   if (!file)
-//     throw new AppError({
-//       httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-//       description: messages.FILE_CREATION_ERROR,
-//     });
-//   const fileId = file._id.toString();
-//   filemanagement.createDirectory(directoryPath);
-//   const filePath = getFilePath(fileName, fileId);
-//   fs.createWriteStream(filePath, {
-//     flags: "w",
-//   });
-//   const response = {
-//     message: "file upload initiated succesfully",
-//     data: { fileId: file._id, fileName: file.filename },
-//   };
-//   return response;
-// };
-
-//   folderId,
-//   fileId,
-//   contentRange,
-//   requestHeader,
-// }: {
-//   folderId: string;
-//   fileId: string;
-//   contentRange: string;
-//   requestHeader: any;
-// }) => {
-//   const match = contentRange.match(/bytes=(\d+)-(\d+)\/(\d+)/);
-//   if (!match)
-//     throw new AppError({
-//       httpCode: httpStatus.BAD_REQUEST,
-//       description: 'Invalid "Content-Range" format',
-//     });
-//   const rangeStart = Number(match[1]);
-//   const rangeEnd = Number(match[2]);
-//   const fileSize = Number(match[3]);
-
-//   if (
-//     rangeStart >= fileSize ||
-//     rangeStart >= rangeEnd ||
-//     rangeStart >= rangeEnd
-//   )
-//     throw new AppError({
-//       httpCode: httpStatus.BAD_REQUEST,
-//       description: 'Invalid "Content-Range" provided',
-//     });
-
-//     const busboy = new Busboy({headers: requestHeader})
-// };
 
 const uploadFile = async ({
   folderId,

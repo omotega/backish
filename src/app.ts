@@ -2,18 +2,12 @@ import express from "express";
 import route from "./routes";
 import docRouter from "./docs";
 import { CustomRequest } from "./types/customrequest";
-import fileUpload from "express-fileupload";
 
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ limit: "300mb", extended: true }));
-// app.use(
-//   fileUpload({
-//     limits: { fileSize: 50 * 1024 * 1024 },
-//   })
-// );
 
 
 declare global {
