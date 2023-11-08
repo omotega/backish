@@ -47,11 +47,17 @@ const uploadFile = async ({
     })
   );
 
-  if (uploadedFile.length !== checkFileUploadstatus.length)
+  if (uploadedFile.length !== checkFileUploadstatus.length) {
+    await Promise.all(
+      fileInUploadDirectory.map(async (item: any) => {
+        filemanagement.deleteFileInDirectory(`${directoryPath}/${item}`);
+      })
+    );
     throw new AppError({
       httpCode: httpStatus.INTERNAL_SERVER_ERROR,
       description: "file upload error.Please try again",
     });
+  }
 
   const sortedFiles = (uploadedFile as any)
     .slice(0)
