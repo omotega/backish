@@ -3,10 +3,12 @@ import route from "./routes";
 import docRouter from "./docs";
 import { CustomRequest } from "./types/customrequest";
 
+
 const app = express();
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ limit: "300mb", extended: true }));
+
 
 declare global {
   namespace Express {

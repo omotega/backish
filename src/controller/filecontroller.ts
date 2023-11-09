@@ -3,14 +3,25 @@ import fileServices from "../services/fileservices";
 import { Request, Response } from "express";
 import catchAsync from "../utils/catchasync";
 
-const requestFileUpload = catchAsync(async (req: Request, res: Response) => {
-  const { filename } = req.body;
-  const uploadRequest = await fileServices.initiateFileUpload(filename);
-  res
-    .status(httpStatus.OK)
-    .json({ status: true, message: "request succesful", data: uploadRequest });
+const fileUpload = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { folderId, orgId } = req.body;
+  const uploadedFile = req.files;
+
+  const response = await fileServices.uploadFile({
+    userId: _id,
+    folderId: folderId,
+    uploadedFile: uploadedFile,
+    orgId: orgId,
+  });
+
+  res.status(httpStatus.CREATED).json({
+    status: true,
+    message: "file uploaded succesfully",
+    data: response,
+  });
 });
 
 export default {
-  requestFileUpload,
+  fileUpload,
 };

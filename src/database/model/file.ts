@@ -12,11 +12,15 @@ const fileSchema = new mongoose.Schema(
     },
     filename: {
       type: String,
+      required: true,
     },
     url: {
       type: String,
     },
     Format: {
+      type: String,
+    },
+    size: {
       type: String,
     },
     isStarred: {
@@ -30,9 +34,6 @@ const fileSchema = new mongoose.Schema(
     isDeleted: {
       type: Boolean,
       default: false,
-    },
-    description: {
-      type: String,
     },
     md5Hash: {
       type: String,
