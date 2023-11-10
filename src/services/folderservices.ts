@@ -340,8 +340,8 @@ const archiveFolder = async ({
   });
 
   const folderArchive = await foldermodel.findOneAndUpdate(
-    { _id: folderId },
-    { isArchive: true },
+    { _id: folderId, isarchived: false },
+    { isarchived: true },
     { new: true }
   );
   if (!archiveFolder)
@@ -350,6 +350,38 @@ const archiveFolder = async ({
       description: "An error ocured, could not archive folder",
     });
   return folderArchive;
+};
+
+const unarchiveFolder = async ({
+  userId,
+  orgId,
+  folderId,
+}: {
+  userId: string;
+  orgId: string;
+  folderId: string;
+}) => {
+  const checkUserPermission = await helperServices.checkUserPermission(
+    userId,
+    orgId
+  );
+  const ifUserBelongsToOrganization =
+    await helperServices.checkIfUserBelongsToOrganization({
+      userId: userId,
+      orgId: orgId,
+    });
+
+  const folderArchiveUpdate = await foldermodel.findOneAndUpdate(
+    { _id: folderId, isarchived: true },
+    { isarchived: false },
+    { new: true }
+  );
+  if (!archiveFolder)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: "An error ocured, could not unarchive folder",
+    });
+  return folderArchiveUpdate;
 };
 
 export default {
@@ -363,4 +395,5 @@ export default {
   addFolderAccess,
   deleteFolder,
   archiveFolder,
+  unarchiveFolder
 };

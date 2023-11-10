@@ -162,6 +162,19 @@ const folderArchive = catchAsync(async (req: Request, res: Response) => {
     .json({ status: true, message: "folder Archived", data: response });
 });
 
+const folderUnarchive = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { folderId, orgId } = req.body;
+  const response = await folderservices.unarchiveFolder({
+    folderId: folderId,
+    orgId: orgId,
+    userId: _id,
+  });
+  res
+    .status(httpStatus.OK)
+    .json({ status: true, message: "folder unArchived", data: response });
+});
+
 export default {
   createFolder,
   unstarFolder,
@@ -173,4 +186,5 @@ export default {
   folderAccess,
   deleteFolder,
   folderArchive,
+  folderUnarchive,
 };
