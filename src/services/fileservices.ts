@@ -7,6 +7,7 @@ import Helper from "../utils/helpers";
 import cloudinaryservices from "../utils/cloudinary";
 import httpStatus from "http-status";
 import helperServices from "./helper-services";
+import foldermodel from "../database/model/folder";
 
 const directoryPath = path.join("src", "uploads");
 
@@ -21,7 +22,7 @@ const uploadFile = async ({
   userId: string;
   orgId: string;
 }) => {
-  const checkUser = await helperServices.checkIfUserBelongsToOrganization({
+  await helperServices.checkIfUserBelongsToOrganization({
     userId: userId,
     orgId: orgId,
   });
@@ -106,6 +107,71 @@ const uploadFile = async ({
   };
 };
 
+const addFiletoFolder = async ({
+  fileId,
+  folderId,
+  userId,
+  orgId,
+}: {
+  fileId: string;
+  folderId: string;
+  userId: string;
+  orgId: string;
+}) => {
+  await helperServices.checkUserPermission(userId, orgId);
+
+  await helperServices.checkIfUserBelongsToOrganization({
+    userId: userId,
+    orgId: orgId,
+  });
+
+  const folderExist = await foldermodel
+    .findOne({
+      _id: folderId,
+      orgId: orgId,
+    })
+    .lean();
+
+  if (!folderExist) {
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: "Folder does not exist",
+    });
+  }
+
+  const fileExist = await filemodel
+    .findById({
+      _id: fileId,
+      orgId: orgId,
+    })
+    .lean();
+
+  if (!fileExist) {
+    throw new AppError({
+      httpCode: httpStatus.CONFLICT,
+      description: "File does not exist",
+    });
+  }
+
+  const addFile = await filemodel
+    .findOneAndUpdate(
+      { folderId: { $in: [folderId] } },
+      { $push: { files: fileId } },
+      { new: true }
+    )
+    .lean();
+
+  if (!addFile) {
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: "An error occurred, could not add File to new Folder",
+    });
+  }
+
+  return addFile;
+};
+
 export default {
   uploadFile,
+  addFiletoFolder,
 };

@@ -22,6 +22,26 @@ const fileUpload = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const addFileToFolder = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { folderId, orgId } = req.body;
+  const { fileId } = req.params;
+
+  const response = await fileServices.addFiletoFolder({
+    userId: _id,
+    folderId: folderId,
+    orgId: orgId,
+    fileId: fileId,
+  });
+
+  res.status(httpStatus.CREATED).json({
+    status: true,
+    message: "file added succesfully",
+    data: response,
+  });
+});
+
 export default {
   fileUpload,
+  addFileToFolder,
 };

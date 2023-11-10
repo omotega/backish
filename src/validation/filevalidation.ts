@@ -8,6 +8,14 @@ const fileUploadValidation = {
   }),
 };
 
+const addFileToFolderValidation = {
+  body: joi.object({
+    folderId: joi.string().messages(validationMessages.folderId),
+    orgId: joi.string().required().messages(validationMessages.orgId),
+  }),
+};
+
 export default {
   fileUploadValidation,
+  addFileToFolderValidation,
 };

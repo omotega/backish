@@ -16,4 +16,12 @@ fileRouter
     filecontroller.fileUpload
   );
 
+fileRouter
+  .route("/add-to-folder/:fileId")
+  .patch(
+    authGuard.guard,
+    validationMiddleware(filevalidation.addFileToFolderValidation),
+    filecontroller.addFileToFolder
+  );
+
 export default fileRouter;

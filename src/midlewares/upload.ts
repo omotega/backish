@@ -9,7 +9,8 @@ const storage = multer.diskStorage({
     cb(null, directoryPath);
   },
   filename: async (req, file, cb) => {
-    cb(null, file.originalname,);
+    // filemanagement.createDirectory(directoryPath);
+    cb(null, file.originalname);
   },
 });
 
