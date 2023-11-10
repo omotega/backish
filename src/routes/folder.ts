@@ -81,4 +81,12 @@ folderRouter
     foldercontroller.folderArchive
   );
 
+folderRouter
+  .route("/org/:orgId/unarchive-folder/:folderId")
+  .patch(
+    authGuard.guard,
+    validationMiddleware(folderValidation.folderUnarchiveValidation),
+    foldercontroller.folderUnarchive
+  );
+
 export default folderRouter;
