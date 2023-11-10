@@ -149,6 +149,19 @@ const folderAccess = catchAsync(async (req: Request, res: Response) => {
     .json({ status: true, message: "folder Access added", data: response });
 });
 
+const folderArchive = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { folderId, orgId } = req.body;
+  const response = await folderservices.archiveFolder({
+    folderId: folderId,
+    orgId: orgId,
+    userId: _id,
+  });
+  res
+    .status(httpStatus.OK)
+    .json({ status: true, message: "folder Archived", data: response });
+});
+
 export default {
   createFolder,
   unstarFolder,
@@ -159,4 +172,5 @@ export default {
   updateFolder,
   folderAccess,
   deleteFolder,
+  folderArchive,
 };

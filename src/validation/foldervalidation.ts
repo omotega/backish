@@ -75,6 +75,13 @@ const folderAccessValidation = {
   }),
 };
 
+const folderArchiveValidation = {
+  params: joi.object({
+    orgId: joi.string().required().messages(validationMessages.orgId),
+    folderId: joi.string().required().messages(validationMessages.folderId),
+  }),
+};
+
 export default {
   createFolderValidation,
   starFolderValidation,
@@ -84,4 +91,5 @@ export default {
   listUnstarredFoldersValidation,
   updateFolderValidation,
   folderAccessValidation,
+  folderArchiveValidation,
 };

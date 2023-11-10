@@ -184,12 +184,6 @@ const updateFolder = async ({
       userId: userId,
       orgId: orgId,
     });
-  if (!ifUserBelongsToOrganization) {
-    throw new AppError({
-      httpCode: httpStatus.CONFLICT,
-      description: `User doesn't belong to this organization`,
-    });
-  }
 
   const folderExist = await foldermodel.findOne({
     _id: folderId,
@@ -282,12 +276,6 @@ const addFolderAccess = async ({
     userId,
     orgId
   );
-  if (!checkUserPermission)
-    throw new AppError({
-      httpCode: httpStatus.NOT_ACCEPTABLE,
-      description: "you cant perfom this operation",
-    });
-
   const isUser = await helperServices.getUserdetailsById(collaboratorId);
   await helperServices.checkIfUserBelongsToOrganization({
     userId: collaboratorId,
@@ -323,20 +311,10 @@ const deleteFolder = async ({
     userId,
     orgId
   );
-  if (!checkUserPermission)
-    throw new AppError({
-      httpCode: httpStatus.NOT_ACCEPTABLE,
-      description: "you cant perfom this operation",
-    });
   const ifUserBelongsToOrganization =
     await helperServices.checkIfUserBelongsToOrganization({
       userId: userId,
       orgId: orgId,
-    });
-  if (!ifUserBelongsToOrganization)
-    throw new AppError({
-      httpCode: httpStatus.CONFLICT,
-      description: `user doesn't belong to this organization`,
     });
   const folderExist = await foldermodel.findOne({
     _id: folderId,
@@ -355,6 +333,38 @@ const deleteFolder = async ({
   return folder;
 };
 
+const archiveFolder = async ({
+  userId,
+  orgId,
+  folderId,
+}: {
+  userId: string;
+  orgId: string;
+  folderId: string;
+}) => {
+  const checkUserPermission = await helperServices.checkUserPermission(
+    userId,
+    orgId
+  );
+  const ifUserBelongsToOrganization =
+    await helperServices.checkIfUserBelongsToOrganization({
+      userId: userId,
+      orgId: orgId,
+    });
+
+  const folderArchive = await foldermodel.findOneAndUpdate(
+    { _id: folderId },
+    { isArchive: true },
+    { new: true }
+  );
+  if (!archiveFolder)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: "An error ocured, could not archive folder",
+    });
+  return archiveFolder;
+};
+
 export default {
   createFolder,
   starFolder,
@@ -365,4 +375,5 @@ export default {
   updateFolder,
   addFolderAccess,
   deleteFolder,
+  archiveFolder
 };

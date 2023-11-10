@@ -73,4 +73,12 @@ folderRouter
   .route("/org/:orgId/delete-folder/:folderId")
   .delete(authGuard.guard, foldercontroller.deleteFolder);
 
+folderRouter
+  .route("/org/:orgId/archive-folder/:folderId")
+  .patch(
+    authGuard.guard,
+    validationMiddleware(folderValidation.folderArchiveValidation),
+    foldercontroller.folderArchive
+  );
+
 export default folderRouter;
