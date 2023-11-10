@@ -15,10 +15,7 @@ const createFolder = async ({
   orgId: string;
   description: string;
 }) => {
-  const checkUserPermission = await helperServices.checkUserPermission(
-    userId,
-    orgId
-  );
+  await helperServices.checkUserPermission(userId, orgId);
   const orgExist = await organization.findOne({ _id: orgId });
   if (!orgExist)
     throw new AppError({
@@ -179,11 +176,10 @@ const updateFolder = async ({
   orgId: string;
   folderId: string;
 }) => {
-  const ifUserBelongsToOrganization =
-    await helperServices.checkIfUserBelongsToOrganization({
-      userId: userId,
-      orgId: orgId,
-    });
+  await helperServices.checkIfUserBelongsToOrganization({
+    userId: userId,
+    orgId: orgId,
+  });
 
   const folderExist = await foldermodel.findOne({
     _id: folderId,
@@ -272,10 +268,7 @@ const addFolderAccess = async ({
   collaboratorId: string;
   orgId: string;
 }) => {
-  const checkUserPermission = await helperServices.checkUserPermission(
-    userId,
-    orgId
-  );
+  await helperServices.checkUserPermission(userId, orgId);
   const isUser = await helperServices.getUserdetailsById(collaboratorId);
   await helperServices.checkIfUserBelongsToOrganization({
     userId: collaboratorId,
@@ -307,15 +300,12 @@ const deleteFolder = async ({
   orgId: string;
   folderId: string;
 }) => {
-  const checkUserPermission = await helperServices.checkUserPermission(
-    userId,
-    orgId
-  );
-  const ifUserBelongsToOrganization =
-    await helperServices.checkIfUserBelongsToOrganization({
-      userId: userId,
-      orgId: orgId,
-    });
+  await helperServices.checkUserPermission(userId, orgId);
+
+  await helperServices.checkIfUserBelongsToOrganization({
+    userId: userId,
+    orgId: orgId,
+  });
   const folderExist = await foldermodel.findOne({
     _id: folderId,
     orgId: orgId,
@@ -342,15 +332,12 @@ const archiveFolder = async ({
   orgId: string;
   folderId: string;
 }) => {
-  const checkUserPermission = await helperServices.checkUserPermission(
-    userId,
-    orgId
-  );
-  const ifUserBelongsToOrganization =
-    await helperServices.checkIfUserBelongsToOrganization({
-      userId: userId,
-      orgId: orgId,
-    });
+  await helperServices.checkUserPermission(userId, orgId);
+
+  await helperServices.checkIfUserBelongsToOrganization({
+    userId: userId,
+    orgId: orgId,
+  });
 
   const folderArchive = await foldermodel.findOneAndUpdate(
     { _id: folderId },
@@ -362,7 +349,7 @@ const archiveFolder = async ({
       httpCode: httpStatus.INTERNAL_SERVER_ERROR,
       description: "An error ocured, could not archive folder",
     });
-  return archiveFolder;
+  return folderArchive;
 };
 
 export default {
@@ -375,5 +362,5 @@ export default {
   updateFolder,
   addFolderAccess,
   deleteFolder,
-  archiveFolder
+  archiveFolder,
 };
