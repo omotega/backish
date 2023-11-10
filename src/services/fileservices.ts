@@ -164,7 +164,7 @@ const addFiletoFolder = async ({
   if (!addFile) {
     throw new AppError({
       httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-      description: "An error occurred, could not add file to new Folder",
+      description: "An error occurred, could not add File to new Folder",
     });
   }
 
