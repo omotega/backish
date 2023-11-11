@@ -19,7 +19,10 @@ const getAllUsersInOrganization = catchAsync(
 );
 
 const getAUser = catchAsync(async (req: Request, res: Response) => {
-  const { orgId, email } = req.body;
+  const { orgId } = req.params;
+  const { email } = req.query as unknown as {
+    email: string;
+  };
   const response = await organizatioservices.findUser({
     orgId: orgId,
     email: email,
@@ -75,5 +78,5 @@ export default {
   getAUser,
   signOutOfOrg,
   getAllUserOrgs,
-  changeUserRole
+  changeUserRole,
 };

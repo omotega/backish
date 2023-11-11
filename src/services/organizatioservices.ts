@@ -137,11 +137,8 @@ const updateUserRole = async ({
   orgId: string;
   collaboratorId: string;
 }) => {
-  const UserPermission = await helperServices.checkUserPermission(
-    userId,
-    orgId
-  );
-  const userBelong = await helperServices.checkIfUserBelongsToOrganization({
+  await helperServices.checkUserPermission(userId, orgId);
+  await helperServices.checkIfUserBelongsToOrganization({
     userId: collaboratorId,
     orgId: orgId,
   });

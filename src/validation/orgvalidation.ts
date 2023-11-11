@@ -8,12 +8,13 @@ const getAllUserValidation = {
 };
 
 const getAUserValidation = {
-  body: joi.object({
+  params: joi.object({
     orgId: joi.string().required().messages(validationMessages.orgId),
+  }),
+  query: joi.object({
     email: joi.string().email().required().messages(validationMessages.email),
-  })
+  }),
 };
-
 
 const leaveOrgUserValidation = {
   body: joi.object({

@@ -31,7 +31,7 @@ folderRouter
   );
 
 folderRouter
-  .route("/get-starred-folders")
+  .route("/get-starred-folders/:orgId")
   .get(
     authGuard.guard,
     validationMiddleware(folderValidation.liststarredFoldersValidation),
@@ -39,14 +39,14 @@ folderRouter
   );
 
 folderRouter
-  .route("/get-all-folders")
+  .route("/get-all-folders/:orgId")
   .get(
     authGuard.guard,
     validationMiddleware(folderValidation.listAllFoldersValidation),
     foldercontroller.getAllFolders
   );
 folderRouter
-  .route("/get-unstarred-folders")
+  .route("/get-unstarred-folders/:orgId")
   .get(
     authGuard.guard,
     validationMiddleware(folderValidation.listUnstarredFoldersValidation),

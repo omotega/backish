@@ -27,7 +27,7 @@ const unstarFolderValidation = {
 };
 
 const liststarredFoldersValidation = {
-  body: joi.object({
+  params: joi.object({
     orgId: joi.string().required().messages(validationMessages.orgId),
   }),
   query: joi.object({
@@ -37,7 +37,7 @@ const liststarredFoldersValidation = {
 };
 
 const listUnstarredFoldersValidation = {
-  body: joi.object({
+  params: joi.object({
     orgId: joi.string().required().messages(validationMessages.orgId),
   }),
   query: joi.object({
@@ -55,7 +55,7 @@ const updateFolderValidation = {
 };
 
 const listAllFoldersValidation = {
-  body: joi.object({
+  params: joi.object({
     orgId: joi.string().required().messages(validationMessages.orgId),
   }),
   query: joi.object({

@@ -48,7 +48,7 @@ const getAllStarredFolders = catchAsync(async (req: Request, res: Response) => {
     page: number;
     limit: number;
   };
-  const { orgId } = req.body;
+  const { orgId } = req.params;
   const response = await folderservices.listAllStarredFolders({
     orgId: orgId,
     page: page,
@@ -101,7 +101,7 @@ const getAllUnstarredFolders = catchAsync(
       limit: number;
     };
 
-    const { orgId } = req.body;
+    const { orgId } = req.params;
 
     const response = await folderservices.listAllUnstarredFolders({
       orgId: orgId,
@@ -122,7 +122,7 @@ const getAllFolders = catchAsync(async (req: Request, res: Response) => {
     page: number;
     limit: number;
   };
-  const { orgId } = req.body;
+  const { orgId } = req.params;
   const response = await folderservices.getAllFolders({
     orgId: orgId,
     page: page,
