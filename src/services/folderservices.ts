@@ -361,15 +361,11 @@ const unarchiveFolder = async ({
   orgId: string;
   folderId: string;
 }) => {
-  const checkUserPermission = await helperServices.checkUserPermission(
-    userId,
-    orgId
-  );
-  const ifUserBelongsToOrganization =
-    await helperServices.checkIfUserBelongsToOrganization({
-      userId: userId,
-      orgId: orgId,
-    });
+  await helperServices.checkUserPermission(userId, orgId);
+  await helperServices.checkIfUserBelongsToOrganization({
+    userId: userId,
+    orgId: orgId,
+  });
 
   const folderArchiveUpdate = await foldermodel.findOneAndUpdate(
     { _id: folderId, isarchived: true },
@@ -395,5 +391,5 @@ export default {
   addFolderAccess,
   deleteFolder,
   archiveFolder,
-  unarchiveFolder
+  unarchiveFolder,
 };

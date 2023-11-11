@@ -15,7 +15,7 @@ orgRouter
   );
 
 orgRouter
-  .route("/get-a-user")
+  .route("/get-a-user/:orgId")
   .get(
     authGuard.guard,
     validationMiddleware(orgValidations.getAUserValidation),

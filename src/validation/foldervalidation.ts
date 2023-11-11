@@ -1,9 +1,14 @@
 import joi from "joi";
 import { validationMessages } from "./custom";
+import { JoiObjectId } from "./helper";
 
 const createFolderValidation = {
   body: joi.object({
-    orgId: joi.string().required().messages(validationMessages.orgId),
+    orgId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.orgId),
     foldername: joi.string().required().messages(validationMessages.foldername),
     description: joi
       .string()
@@ -14,21 +19,41 @@ const createFolderValidation = {
 
 const starFolderValidation = {
   body: joi.object({
-    orgId: joi.string().required().messages(validationMessages.orgId),
-    folderId: joi.string().required().messages(validationMessages.folderId),
+    orgId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.orgId),
+      folderId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.folderId),
   }),
 };
 
 const unstarFolderValidation = {
   body: joi.object({
-    orgId: joi.string().required().messages(validationMessages.orgId),
-    folderId: joi.string().required().messages(validationMessages.folderId),
+    orgId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.orgId),
+    folderId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.folderId),
   }),
 };
 
 const liststarredFoldersValidation = {
-  body: joi.object({
-    orgId: joi.string().required().messages(validationMessages.orgId),
+  params: joi.object({
+    orgId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.orgId),
   }),
   query: joi.object({
     page: joi.number().required(),
@@ -37,8 +62,12 @@ const liststarredFoldersValidation = {
 };
 
 const listUnstarredFoldersValidation = {
-  body: joi.object({
-    orgId: joi.string().required().messages(validationMessages.orgId),
+  params: joi.object({
+    orgId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.orgId),
   }),
   query: joi.object({
     page: joi.number().required(),
@@ -48,15 +77,23 @@ const listUnstarredFoldersValidation = {
 
 const updateFolderValidation = {
   body: joi.object({
-    orgId: joi.string().required().messages(validationMessages.orgId),
+    orgId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.orgId),
     foldername: joi.string().messages(validationMessages.foldername),
     description: joi.string().messages(validationMessages.description),
   }),
 };
 
 const listAllFoldersValidation = {
-  body: joi.object({
-    orgId: joi.string().required().messages(validationMessages.orgId),
+  params: joi.object({
+    orgId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.orgId),
   }),
   query: joi.object({
     page: joi.number().required(),
@@ -66,26 +103,50 @@ const listAllFoldersValidation = {
 
 const folderAccessValidation = {
   body: joi.object({
-    orgId: joi.string().required().messages(validationMessages.orgId),
+    orgId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.orgId),
     collaboratorId: joi
       .string()
       .required()
       .messages(validationMessages.collaboratorId),
-    folderId: joi.string().required().messages(validationMessages.folderId),
+    folderId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.folderId),
   }),
 };
 
 const folderArchiveValidation = {
   params: joi.object({
-    orgId: joi.string().required().messages(validationMessages.orgId),
-    folderId: joi.string().required().messages(validationMessages.folderId),
+    orgId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.orgId),
+    folderId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.folderId),
   }),
 };
 
 const folderUnarchiveValidation = {
   params: joi.object({
-    orgId: joi.string().required().messages(validationMessages.orgId),
-    folderId: joi.string().required().messages(validationMessages.folderId),
+    orgId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.orgId),
+    folderId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.folderId),
   }),
 };
 

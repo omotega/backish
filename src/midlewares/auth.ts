@@ -5,6 +5,7 @@ import config from "../config/env";
 import { AppError } from "../utils/errors";
 import messages from "../utils/messages";
 import usermodel from "../database/model/usermodel";
+import { TokenExpiredError } from "jsonwebtoken";
 
 export const guard = async (
   req: Request,
@@ -20,7 +21,7 @@ export const guard = async (
         if (/^Bearer$/i.test(scheme)) {
           const token = credentials;
           const decode: any = Helper.decodeToken(token, config.tokenSecret);
-          const user = await usermodel.findById(decode.payload.userId);
+          const user = await usermodel.findById(decode.userId);
           if (!user)
             throw new AppError({
               httpCode: httpStatus.NOT_FOUND,
@@ -39,12 +40,10 @@ export const guard = async (
         .status(httpStatus.BAD_REQUEST)
         .json({ message: "Authorization not found" });
     }
-  } catch (error) {
-    console.error(error);
-    throw new AppError({
-      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-      description: messages.SOMETHING_HAPPENED,
-    });
+  } catch (error: any) {
+    console.error(error.message);
+    if (error instanceof TokenExpiredError)
+      res.status(httpStatus.INTERNAL_SERVER_ERROR).json("Please Login");
   }
 };
 

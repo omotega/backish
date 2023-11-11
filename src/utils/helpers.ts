@@ -52,15 +52,7 @@ class Helper {
 
   static decodeToken(token: any, secret = config.tokenSecret) {
     const payload = jwt.verify(token, secret);
-    if (!payload) {
-      throw new Error("Invalid token ");
-    } else {
-      return {
-        valid: true,
-        expired: false,
-        payload,
-      };
-    }
+    return payload;
   }
 
   /**
