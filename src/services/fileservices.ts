@@ -171,7 +171,43 @@ const addFiletoFolder = async ({
   return addFile;
 };
 
+const fetchAllFilesInFolder = async ({
+  orgId,
+  folderId,
+  userId,
+  page,
+}: {
+  orgId: string;
+  folderId: string;
+  userId: string;
+  page: number;
+}) => {
+  await helperServices.checkIfUserBelongsToOrganization({
+    userId: userId,
+    orgId: orgId,
+  });
+  const options = {
+    page: page,
+    limit: 10,
+    sort: { createdAt: "desc" },
+    lean: true,
+  };
+  const allfiles = await filemodel.paginate(
+    { folderId: { $in: [folderId] } },
+    options
+  );
+
+  if (!allfiles) {
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: "An error occurred, could not fetch files",
+    });
+  }
+  return allfiles
+};
+
 export default {
   uploadFile,
   addFiletoFolder,
+  fetchAllFilesInFolder,
 };

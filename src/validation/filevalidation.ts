@@ -27,7 +27,22 @@ const addFileToFolderValidation = {
   }),
 };
 
+const getAllFilesInFolderValidation = {
+  params: joi.object({
+    folderId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.folderId),
+    orgId: joi.string().required().messages(validationMessages.orgId),
+  }),
+  query: joi.object({
+    page: joi.number().required(),
+  }),
+};
+
 export default {
   fileUploadValidation,
   addFileToFolderValidation,
+  getAllFilesInFolderValidation,
 };

@@ -24,4 +24,10 @@ fileRouter
     filecontroller.addFileToFolder
   );
 
+fileRouter.route("/get-files-in-folder/:folderId/:orgId").get(
+  authGuard.guard,
+  validationMiddleware(filevalidation.getAllFilesInFolderValidation),
+  filecontroller.getAllFilesInFolder
+);
+
 export default fileRouter;
