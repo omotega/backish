@@ -27,6 +27,16 @@ const addFileToFolderValidation = {
   }),
 };
 
+const moveFileValidation = {
+  body: joi.object({
+    folderId: joi
+      .string()
+      .custom(JoiObjectId)
+      .messages(validationMessages.folderId),
+    orgId: joi.string().required().messages(validationMessages.orgId),
+  }),
+};
+
 const getAllFilesInFolderValidation = {
   params: joi.object({
     folderId: joi
@@ -45,4 +55,5 @@ export default {
   fileUploadValidation,
   addFileToFolderValidation,
   getAllFilesInFolderValidation,
+  moveFileValidation,
 };

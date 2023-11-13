@@ -24,10 +24,20 @@ fileRouter
     filecontroller.addFileToFolder
   );
 
-fileRouter.route("/get-files-in-folder/:folderId/:orgId").get(
-  authGuard.guard,
-  validationMiddleware(filevalidation.getAllFilesInFolderValidation),
-  filecontroller.getAllFilesInFolder
-);
+fileRouter
+  .route("/get-files-in-folder/:folderId/:orgId")
+  .get(
+    authGuard.guard,
+    validationMiddleware(filevalidation.getAllFilesInFolderValidation),
+    filecontroller.getAllFilesInFolder
+  );
+
+fileRouter
+  .route("/move-file/:fileId")
+  .patch(
+    authGuard.guard,
+    validationMiddleware(filevalidation.moveFileValidation),
+    filecontroller.moveFile
+  );
 
 export default fileRouter;

@@ -203,11 +203,80 @@ const fetchAllFilesInFolder = async ({
       description: "An error occurred, could not fetch files",
     });
   }
-  return allfiles
+  return allfiles;
+};
+
+const moveFile = async ({
+  fileId,
+  folderId,
+  userId,
+  orgId,
+}: {
+  fileId: string;
+  folderId?: string;
+  userId: string;
+  orgId: string;
+}) => {
+  await helperServices.checkUserPermission(userId, orgId);
+
+  await helperServices.checkIfUserBelongsToOrganization({
+    userId: userId,
+    orgId: orgId,
+  });
+
+  let updateQuery: { folderId?: string | null } = {};
+
+  if (folderId) {
+    const folderExist = await foldermodel.findOne({
+      _id: folderId,
+      orgId: orgId,
+    });
+
+    if (!folderExist) {
+      throw new AppError({
+        httpCode: httpStatus.NOT_FOUND,
+        description: "Folder does not exist",
+      });
+    }
+
+    updateQuery.folderId = folderId;
+  } else {
+    updateQuery.folderId = null;
+  }
+
+  const fileExist = await filemodel.findById({
+    _id: fileId,
+    orgId: orgId,
+  });
+
+  if (!fileExist) {
+    throw new AppError({
+      httpCode: httpStatus.CONFLICT,
+      description: "File does not exist",
+    });
+  }
+
+  const addFile = await filemodel
+    .findByIdAndUpdate(
+      fileId,
+      { $push: { files: fileId }, ...updateQuery },
+      { new: true }
+    )
+    .lean();
+
+  if (!addFile) {
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: "An error occurred, could not move File",
+    });
+  }
+
+  return addFile;
 };
 
 export default {
   uploadFile,
   addFiletoFolder,
   fetchAllFilesInFolder,
+  moveFile,
 };

@@ -62,8 +62,28 @@ const getAllFilesInFolder = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const moveFile = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { folderId, orgId } = req.body;
+  const { fileId } = req.params;
+
+  const response = await fileServices.moveFile({
+    userId: _id,
+    folderId: folderId,
+    orgId: orgId,
+    fileId: fileId,
+  });
+
+  res.status(httpStatus.CREATED).json({
+    status: true,
+    message: "file moved succesfully",
+    data: response,
+  });
+});
+
 export default {
   fileUpload,
   addFileToFolder,
   getAllFilesInFolder,
+  moveFile,
 };
