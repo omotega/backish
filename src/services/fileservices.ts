@@ -8,6 +8,7 @@ import cloudinaryservices from "../utils/cloudinary";
 import httpStatus from "http-status";
 import helperServices from "./helper-services";
 import foldermodel from "../database/model/folder";
+import organization from "../database/model/organization";
 
 const directoryPath = path.join("src", "uploads");
 
@@ -274,9 +275,51 @@ const moveFile = async ({
   return addFile;
 };
 
+const getAllFiles = async ({
+  orgId,
+  userId,
+  page,
+}: {
+  orgId: string;
+  userId: string;
+  page: number;
+}) => {
+  await helperServices.checkUserPermission(userId, orgId);
+
+  await helperServices.checkIfUserBelongsToOrganization({
+    userId: userId,
+    orgId: orgId,
+  });
+
+  const options = {
+    page: page,
+    sort: { createdAt: "desc" },
+    lean: true,
+  };
+
+  const allFiles = await filemodel.find({}, "filename format", options).exec();
+
+  await filemodel.countDocuments();
+  const total = allFiles.length;
+
+  if (!allFiles) {
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: "An error occurred, could not fetch files",
+    });
+  }
+
+  return {
+    total,
+    page,
+    allFiles,
+  };
+};
+
 export default {
   uploadFile,
   addFiletoFolder,
   fetchAllFilesInFolder,
   moveFile,
+  getAllFiles,
 };

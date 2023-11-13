@@ -51,9 +51,19 @@ const getAllFilesInFolderValidation = {
   }),
 };
 
+const getAllFilesValidation = {
+  params: joi.object({
+    orgId: joi.string().required().messages(validationMessages.orgId),
+  }),
+  query: joi.object({
+    page: joi.number().required(),
+  }),
+};
+
 export default {
   fileUploadValidation,
   addFileToFolderValidation,
   getAllFilesInFolderValidation,
   moveFileValidation,
+  getAllFilesValidation,
 };

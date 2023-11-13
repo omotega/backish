@@ -40,4 +40,12 @@ fileRouter
     filecontroller.moveFile
   );
 
+fileRouter
+  .route("/all-files/:orgId")
+  .get(
+    authGuard.guard,
+    validationMiddleware(filevalidation.getAllFilesValidation),
+    filecontroller.getAllFiles
+  );
+
 export default fileRouter;
