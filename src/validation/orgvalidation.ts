@@ -49,9 +49,24 @@ const upadateUserroleValidation = {
   }),
 };
 
+const removeUserFromOrgValidation = {
+  body: joi.object({
+    orgId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.orgId),
+    collaboratorId: joi
+      .string()
+      .required()
+      .messages(validationMessages.collaboratorId),
+  }),
+};
+
 export default {
   getAllUserValidation,
   getAUserValidation,
   leaveOrgUserValidation,
   upadateUserroleValidation,
+  removeUserFromOrgValidation,
 };

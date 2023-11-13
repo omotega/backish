@@ -73,10 +73,25 @@ const changeUserRole = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const removeUserFromOrg = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { orgId, collaboratorId } = req.body;
+  const response = await organizatioservices.deactivateUserFromOrg({
+    userId: _id,
+    orgId: orgId,
+    collaboratorId: collaboratorId,
+  });
+  res.status(httpStatus.OK).json({
+    success: true,
+    message: response,
+  });
+});
+
 export default {
   getAllUsersInOrganization,
   getAUser,
   signOutOfOrg,
   getAllUserOrgs,
   changeUserRole,
+  removeUserFromOrg,
 };

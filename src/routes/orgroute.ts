@@ -42,4 +42,12 @@ orgRouter
     organizationcontroller.changeUserRole
   );
 
+orgRouter
+  .route("/deactivate-user")
+  .put(
+    authGuard.guard,
+    validationMiddleware(orgValidations.removeUserFromOrgValidation),
+    organizationcontroller.removeUserFromOrg
+  );
+
 export default orgRouter;
