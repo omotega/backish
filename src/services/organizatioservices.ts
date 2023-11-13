@@ -6,6 +6,7 @@ import messages from "../utils/messages";
 import helperServices from "./helper-services";
 import organization from "../database/model/organization";
 import userRoles from "../utils/role";
+import mongoose from "mongoose";
 
 const listAllUsersInOrganization = async (orgId: string) => {
   const organization = await Organization.findOne({ _id: orgId }).select(
@@ -166,10 +167,54 @@ const updateUserRole = async ({
   return message;
 };
 
+const deactivateUserFromOrg = async ({
+  userId,
+  orgId,
+  collaboratorId,
+}: {
+  userId: string;
+  orgId: string;
+  collaboratorId: string;
+}) => {
+  await helperServices.checkUserPermission(userId, orgId);
+  await helperServices.checkIfUserBelongsToOrganization({
+    userId: collaboratorId,
+    orgId: orgId,
+  });
+  const isUser = await usermodel
+    .findOne({ _id: collaboratorId })
+    .select("_id name email");
+
+  if (!isUser)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: messages.USER_NOT_FOUND,
+    });
+  const [org, user] = await Promise.all([
+    await organization.findOneAndUpdate(
+      { invitedEmails: { $in: [isUser.email] } },
+      { $pull: { invitedEmails: { $in: [isUser.email] } } },
+      { new: true }
+    ),
+    await usermodel.findOneAndUpdate(
+      { orgStatus: { $elemMatch: { orgId: orgId } } },
+      { $pull: { orgStatus: { $elemMatch: { orgId: orgId } } } }
+    ),
+  ]);
+  if (!org || !user)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: `Could not remove ${isUser.name} from organization`,
+    });
+  const message = `${isUser.name} removed succesfully`;
+  return message;
+};
+
 export default {
   listAllUsersInOrganization,
   findUser,
   leaveOrganization,
   listUserOrganization,
   updateUserRole,
+  deactivateUserFromOrg
 };
