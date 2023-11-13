@@ -351,36 +351,41 @@ const starFile = async ({
   return updatedDetails;
 };
 
-// const starFile = async ({
-//   orgId,
-//   fileId,
-// }: {
-//   orgId: string;
-//   fileId: string;
-// }) => {
-//   const file = await filemodel.findOne({
-//     orgId: orgId,
-//     _id: fileId,
-//     isStarred: false,
-//   });
-//   if (!file)
-//     throw new AppError({
-//       httpCode: httpStatus.NOT_FOUND,
-//       description: "File not found",
-//     });
+const unstarFile = async ({
+  orgId,
+  fileId,
+  userId,
+}: {
+  orgId: string;
+  fileId: string;
+  userId: string;
+}) => {
+  await helperServices.checkUserPermission(userId, orgId);
 
-//   const updatedDetails = await filemodel.findByIdAndUpdate(
-//     { _id: fileId },
-//     { isStarred: true },
-//     { new: true }
-//   );
-//   if (!updatedDetails)
-//     throw new AppError({
-//       httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-//       description: "could not star file",
-//     });
-//   return updatedDetails;
-// };
+  const file = await filemodel.findOne({
+    _id: fileId,
+    isStarred: true,
+  });
+
+  if (!file)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: "File not found",
+    });
+
+  const updatedDetails = await filemodel.findByIdAndUpdate(
+    { _id: fileId },
+    { isStarred: false },
+    { new: true }
+  );
+
+  if (!updatedDetails)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: "could not unstar file",
+    });
+  return updatedDetails;
+};
 
 export default {
   uploadFile,
@@ -389,4 +394,5 @@ export default {
   moveFile,
   getAllFiles,
   starFile,
+  unstarFile,
 };

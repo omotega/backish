@@ -67,6 +67,13 @@ const starFileValidation = {
   }),
 };
 
+const unstarFileValidation = {
+  params: joi.object({
+    orgId: joi.string().required().messages(validationMessages.orgId),
+    fileId: joi.string().required().messages(validationMessages.fileId),
+  }),
+};
+
 export default {
   fileUploadValidation,
   addFileToFolderValidation,
@@ -74,4 +81,5 @@ export default {
   moveFileValidation,
   getAllFilesValidation,
   starFileValidation,
+  unstarFileValidation,
 };

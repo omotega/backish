@@ -116,6 +116,20 @@ const starFile = catchAsync(async (req: Request, res: Response) => {
     .json({ status: true, message: "file starred", data: response });
 });
 
+const unstarFile = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { fileId, orgId } = req.params;
+  const response = await fileservices.unstarFile({
+    orgId: orgId,
+    fileId: fileId,
+    userId: _id,
+  });
+
+  res
+    .status(httpStatus.OK)
+    .json({ status: true, message: "file unstarred", data: response });
+});
+
 export default {
   fileUpload,
   addFileToFolder,
@@ -123,4 +137,5 @@ export default {
   moveFile,
   getAllFiles,
   starFile,
+  unstarFile,
 };

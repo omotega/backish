@@ -56,4 +56,12 @@ fileRouter
     filecontroller.starFile
   );
 
+fileRouter
+  .route("/unstar-file/:orgId/:fileId")
+  .patch(
+    authGuard.guard,
+    validationMiddleware(filevalidation.unstarFileValidation),
+    filecontroller.unstarFile
+  );
+
 export default fileRouter;
