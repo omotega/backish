@@ -48,4 +48,12 @@ fileRouter
     filecontroller.getAllFiles
   );
 
+fileRouter
+  .route("/star-file/:orgId/:fileId")
+  .patch(
+    authGuard.guard,
+    validationMiddleware(filevalidation.starFileValidation),
+    filecontroller.starFile
+  );
+
 export default fileRouter;

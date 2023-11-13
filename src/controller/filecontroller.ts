@@ -2,6 +2,7 @@ import httpStatus from "http-status";
 import fileServices from "../services/fileservices";
 import { Request, Response } from "express";
 import catchAsync from "../utils/catchasync";
+import fileservices from "../services/fileservices";
 
 const fileUpload = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
@@ -101,10 +102,25 @@ const getAllFiles = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const starFile = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { fileId, orgId } = req.params;
+  const response = await fileservices.starFile({
+    orgId: orgId,
+    fileId: fileId,
+    userId: _id,
+  });
+
+  res
+    .status(httpStatus.OK)
+    .json({ status: true, message: "file starred", data: response });
+});
+
 export default {
   fileUpload,
   addFileToFolder,
   getAllFilesInFolder,
   moveFile,
   getAllFiles,
+  starFile,
 };

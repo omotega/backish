@@ -316,10 +316,77 @@ const getAllFiles = async ({
   };
 };
 
+const starFile = async ({
+  orgId,
+  fileId,
+  userId,
+}: {
+  orgId: string;
+  fileId: string;
+  userId: string;
+}) => {
+  await helperServices.checkUserPermission(userId, orgId);
+
+  const file = await filemodel.findOne({
+    _id: fileId,
+    isStarred: false,
+  });
+
+  if (!file)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: "File not found",
+    });
+
+  const updatedDetails = await filemodel.findByIdAndUpdate(
+    { _id: fileId },
+    { isStarred: true },
+    { new: true }
+  );
+  if (!updatedDetails)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: "could not star file",
+    });
+  return updatedDetails;
+};
+
+// const starFile = async ({
+//   orgId,
+//   fileId,
+// }: {
+//   orgId: string;
+//   fileId: string;
+// }) => {
+//   const file = await filemodel.findOne({
+//     orgId: orgId,
+//     _id: fileId,
+//     isStarred: false,
+//   });
+//   if (!file)
+//     throw new AppError({
+//       httpCode: httpStatus.NOT_FOUND,
+//       description: "File not found",
+//     });
+
+//   const updatedDetails = await filemodel.findByIdAndUpdate(
+//     { _id: fileId },
+//     { isStarred: true },
+//     { new: true }
+//   );
+//   if (!updatedDetails)
+//     throw new AppError({
+//       httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+//       description: "could not star file",
+//     });
+//   return updatedDetails;
+// };
+
 export default {
   uploadFile,
   addFiletoFolder,
   fetchAllFilesInFolder,
   moveFile,
   getAllFiles,
+  starFile,
 };

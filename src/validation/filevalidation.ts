@@ -60,10 +60,18 @@ const getAllFilesValidation = {
   }),
 };
 
+const starFileValidation = {
+  params: joi.object({
+    orgId: joi.string().required().messages(validationMessages.orgId),
+    fileId: joi.string().required().messages(validationMessages.fileId),
+  }),
+};
+
 export default {
   fileUploadValidation,
   addFileToFolderValidation,
   getAllFilesInFolderValidation,
   moveFileValidation,
   getAllFilesValidation,
+  starFileValidation,
 };
