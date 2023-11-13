@@ -8,6 +8,7 @@ import cloudinaryservices from "../utils/cloudinary";
 import httpStatus from "http-status";
 import helperServices from "./helper-services";
 import foldermodel from "../database/model/folder";
+import organization from "../database/model/organization";
 
 const directoryPath = path.join("src", "uploads");
 
@@ -203,11 +204,195 @@ const fetchAllFilesInFolder = async ({
       description: "An error occurred, could not fetch files",
     });
   }
-  return allfiles
+  return allfiles;
+};
+
+const moveFile = async ({
+  fileId,
+  folderId,
+  userId,
+  orgId,
+}: {
+  fileId: string;
+  folderId?: string;
+  userId: string;
+  orgId: string;
+}) => {
+  await helperServices.checkUserPermission(userId, orgId);
+
+  await helperServices.checkIfUserBelongsToOrganization({
+    userId: userId,
+    orgId: orgId,
+  });
+
+  let updateQuery: { folderId?: string | null } = {};
+
+  if (folderId) {
+    const folderExist = await foldermodel.findOne({
+      _id: folderId,
+      orgId: orgId,
+    });
+
+    if (!folderExist) {
+      throw new AppError({
+        httpCode: httpStatus.NOT_FOUND,
+        description: "Folder does not exist",
+      });
+    }
+
+    updateQuery.folderId = folderId;
+  } else {
+    updateQuery.folderId = null;
+  }
+
+  const fileExist = await filemodel.findById({
+    _id: fileId,
+    orgId: orgId,
+  });
+
+  if (!fileExist) {
+    throw new AppError({
+      httpCode: httpStatus.CONFLICT,
+      description: "File does not exist",
+    });
+  }
+
+  const addFile = await filemodel
+    .findByIdAndUpdate(
+      fileId,
+      { $push: { files: fileId }, ...updateQuery },
+      { new: true }
+    )
+    .lean();
+
+  if (!addFile) {
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: "An error occurred, could not move File",
+    });
+  }
+
+  return addFile;
+};
+
+const getAllFiles = async ({
+  orgId,
+  userId,
+  page,
+}: {
+  orgId: string;
+  userId: string;
+  page: number;
+}) => {
+  await helperServices.checkUserPermission(userId, orgId);
+
+  await helperServices.checkIfUserBelongsToOrganization({
+    userId: userId,
+    orgId: orgId,
+  });
+
+  const options = {
+    page: page,
+    sort: { createdAt: "desc" },
+    lean: true,
+  };
+
+  const allFiles = await filemodel.find({}, "filename format", options).exec();
+
+  await filemodel.countDocuments();
+  const total = allFiles.length;
+
+  if (!allFiles) {
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: "An error occurred, could not fetch files",
+    });
+  }
+
+  return {
+    total,
+    page,
+    allFiles,
+  };
+};
+
+const starFile = async ({
+  orgId,
+  fileId,
+  userId,
+}: {
+  orgId: string;
+  fileId: string;
+  userId: string;
+}) => {
+  await helperServices.checkUserPermission(userId, orgId);
+
+  const file = await filemodel.findOne({
+    _id: fileId,
+    isStarred: false,
+  });
+
+  if (!file)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: "File not found",
+    });
+
+  const updatedDetails = await filemodel.findByIdAndUpdate(
+    { _id: fileId },
+    { isStarred: true },
+    { new: true }
+  );
+  if (!updatedDetails)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: "could not star file",
+    });
+  return updatedDetails;
+};
+
+const unstarFile = async ({
+  orgId,
+  fileId,
+  userId,
+}: {
+  orgId: string;
+  fileId: string;
+  userId: string;
+}) => {
+  await helperServices.checkUserPermission(userId, orgId);
+
+  const file = await filemodel.findOne({
+    _id: fileId,
+    isStarred: true,
+  });
+
+  if (!file)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: "File not found",
+    });
+
+  const updatedDetails = await filemodel.findByIdAndUpdate(
+    { _id: fileId },
+    { isStarred: false },
+    { new: true }
+  );
+
+  if (!updatedDetails)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: "could not unstar file",
+    });
+  return updatedDetails;
 };
 
 export default {
   uploadFile,
   addFiletoFolder,
   fetchAllFilesInFolder,
+  moveFile,
+  getAllFiles,
+  starFile,
+  unstarFile,
 };

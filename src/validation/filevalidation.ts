@@ -27,6 +27,16 @@ const addFileToFolderValidation = {
   }),
 };
 
+const moveFileValidation = {
+  body: joi.object({
+    folderId: joi
+      .string()
+      .custom(JoiObjectId)
+      .messages(validationMessages.folderId),
+    orgId: joi.string().required().messages(validationMessages.orgId),
+  }),
+};
+
 const getAllFilesInFolderValidation = {
   params: joi.object({
     folderId: joi
@@ -41,8 +51,35 @@ const getAllFilesInFolderValidation = {
   }),
 };
 
+const getAllFilesValidation = {
+  params: joi.object({
+    orgId: joi.string().required().messages(validationMessages.orgId),
+  }),
+  query: joi.object({
+    page: joi.number().required(),
+  }),
+};
+
+const starFileValidation = {
+  params: joi.object({
+    orgId: joi.string().required().messages(validationMessages.orgId),
+    fileId: joi.string().required().messages(validationMessages.fileId),
+  }),
+};
+
+const unstarFileValidation = {
+  params: joi.object({
+    orgId: joi.string().required().messages(validationMessages.orgId),
+    fileId: joi.string().required().messages(validationMessages.fileId),
+  }),
+};
+
 export default {
   fileUploadValidation,
   addFileToFolderValidation,
   getAllFilesInFolderValidation,
+  moveFileValidation,
+  getAllFilesValidation,
+  starFileValidation,
+  unstarFileValidation,
 };

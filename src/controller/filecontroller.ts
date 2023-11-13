@@ -2,6 +2,7 @@ import httpStatus from "http-status";
 import fileServices from "../services/fileservices";
 import { Request, Response } from "express";
 import catchAsync from "../utils/catchasync";
+import fileservices from "../services/fileservices";
 
 const fileUpload = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
@@ -62,8 +63,79 @@ const getAllFilesInFolder = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const moveFile = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { folderId, orgId } = req.body;
+  const { fileId } = req.params;
+
+  const response = await fileServices.moveFile({
+    userId: _id,
+    folderId: folderId,
+    orgId: orgId,
+    fileId: fileId,
+  });
+
+  res.status(httpStatus.CREATED).json({
+    status: true,
+    message: "file moved succesfully",
+    data: response,
+  });
+});
+
+const getAllFiles = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { orgId } = req.params;
+  const { page } = req.query as unknown as {
+    page: number;
+  };
+
+  const response = await fileServices.getAllFiles({
+    userId: _id,
+    orgId: orgId,
+    page: page,
+  });
+
+  res.status(httpStatus.CREATED).json({
+    status: true,
+    message: "files fetched succesfully",
+    data: response,
+  });
+});
+
+const starFile = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { fileId, orgId } = req.params;
+  const response = await fileservices.starFile({
+    orgId: orgId,
+    fileId: fileId,
+    userId: _id,
+  });
+
+  res
+    .status(httpStatus.OK)
+    .json({ status: true, message: "file starred", data: response });
+});
+
+const unstarFile = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { fileId, orgId } = req.params;
+  const response = await fileservices.unstarFile({
+    orgId: orgId,
+    fileId: fileId,
+    userId: _id,
+  });
+
+  res
+    .status(httpStatus.OK)
+    .json({ status: true, message: "file unstarred", data: response });
+});
+
 export default {
   fileUpload,
   addFileToFolder,
   getAllFilesInFolder,
+  moveFile,
+  getAllFiles,
+  starFile,
+  unstarFile,
 };
