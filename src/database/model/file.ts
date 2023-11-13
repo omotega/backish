@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import { fileInterface } from "../../types/files";
+import mongoosePaginate from "mongoose-paginate-v2";
 
 const fileSchema = new mongoose.Schema(
   {
@@ -56,4 +58,9 @@ const fileSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model("File", fileSchema);
+fileSchema.plugin(mongoosePaginate);
+
+export default mongoose.model<
+  fileInterface,
+  mongoose.PaginateModel<fileInterface>
+>("File", fileSchema);

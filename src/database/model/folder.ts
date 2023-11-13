@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
-import { folderModel } from "../../types/folder";
+import { folderModelInterface } from "../../types/folder";
 
 const folderSchema = new mongoose.Schema(
   {
@@ -47,7 +47,7 @@ const folderSchema = new mongoose.Schema(
 );
 folderSchema.plugin(mongoosePaginate);
 
-export default mongoose.model<folderModel, mongoose.PaginateModel<folderModel>>(
+export default mongoose.model<folderModelInterface, mongoose.PaginateModel<folderModelInterface>>(
   "Folder",
   folderSchema
 );

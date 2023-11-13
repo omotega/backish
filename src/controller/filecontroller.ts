@@ -41,7 +41,29 @@ const addFileToFolder = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getAllFilesInFolder = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { folderId, orgId } = req.params;
+  const { page } = req.query as unknown as {
+    page: number;
+  };
+
+  const response = await fileServices.fetchAllFilesInFolder({
+    userId: _id,
+    folderId: folderId,
+    orgId: orgId,
+    page: page,
+  });
+
+  res.status(httpStatus.CREATED).json({
+    status: true,
+    message: "files fetched succesfully",
+    data: response,
+  });
+});
+
 export default {
   fileUpload,
   addFileToFolder,
+  getAllFilesInFolder,
 };
