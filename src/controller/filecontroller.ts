@@ -63,7 +63,7 @@ const getAllFilesInFolder = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const moveFiles = catchAsync(async (req: Request, res: Response) => {
+const moveFile = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
   const { folderId, orgId } = req.body;
 
@@ -135,7 +135,7 @@ export default {
   fileUpload,
   addFileToFolder,
   getAllFilesInFolder,
-  moveFiles,
+  moveFile,
   getAllFiles,
   starFile,
   unstarFile,

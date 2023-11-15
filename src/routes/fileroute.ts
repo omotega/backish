@@ -37,7 +37,7 @@ fileRouter
   .patch(
     authGuard.guard,
     validationMiddleware(filevalidation.moveFileValidation),
-    filecontroller.moveFiles
+    filecontroller.moveFile
   );
 
 fileRouter
