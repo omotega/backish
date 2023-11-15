@@ -64,4 +64,12 @@ fileRouter
     filecontroller.unstarFile
   );
 
+fileRouter
+  .route("/archive-file/:fileId")
+  .patch(
+    authGuard.guard,
+    validationMiddleware(filevalidation.archiveFileValidation),
+    filecontroller.archiveFile
+  );
+
 export default fileRouter;
