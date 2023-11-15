@@ -131,6 +131,34 @@ const unstarFile = catchAsync(async (req: Request, res: Response) => {
     .json({ status: true, message: "file unstarred", data: response });
 });
 
+const archiveFile = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { orgId } = req.body;
+  const { fileId } = req.params;
+  const response = await fileservices.archiveFile({
+    fileId: fileId,
+    orgId: orgId,
+    userId: _id,
+  });
+  res
+    .status(httpStatus.OK)
+    .json({ status: true, message: "file Archived", data: response });
+});
+
+const unarchiveFile = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { orgId } = req.body;
+  const { fileId } = req.params;
+  const response = await fileservices.unarchiveFile({
+    fileId: fileId,
+    orgId: orgId,
+    userId: _id,
+  });
+  res
+    .status(httpStatus.OK)
+    .json({ status: true, message: "file Unarchived", data: response });
+});
+
 export default {
   fileUpload,
   addFileToFolder,
@@ -139,4 +167,6 @@ export default {
   getAllFiles,
   starFile,
   unstarFile,
+  archiveFile,
+  unarchiveFile,
 };
