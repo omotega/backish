@@ -63,16 +63,17 @@ const getAllFilesInFolder = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const moveFile = catchAsync(async (req: Request, res: Response) => {
+const moveFiles = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
   const { folderId, orgId } = req.body;
-  const { fileId } = req.params;
 
-  const response = await fileServices.moveFile({
+  const fileId = req.params.fileIds.split(",");
+
+  const response = await fileServices.moveFiles({
     userId: _id,
     folderId: folderId,
     orgId: orgId,
-    fileId: fileId,
+    fileId: Array.isArray(fileId) ? fileId : [fileId],
   });
 
   res.status(httpStatus.CREATED).json({
@@ -134,7 +135,7 @@ export default {
   fileUpload,
   addFileToFolder,
   getAllFilesInFolder,
-  moveFile,
+  moveFiles,
   getAllFiles,
   starFile,
   unstarFile,
