@@ -420,7 +420,6 @@ const archiveFile = async ({
   return file;
 };
 
-
 const unarchiveFile = async ({
   userId,
   orgId,
@@ -445,11 +444,10 @@ const unarchiveFile = async ({
   if (!file)
     throw new AppError({
       httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-      description: "An error ocured, could not unarchive file",
+      description: "An error ocured, could not unarchive File",
     });
   return file;
 };
-
 
 export default {
   uploadFile,
