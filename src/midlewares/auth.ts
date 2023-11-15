@@ -43,7 +43,9 @@ export const guard = async (
   } catch (error: any) {
     console.error(error.message);
     if (error instanceof TokenExpiredError)
-      res.status(httpStatus.INTERNAL_SERVER_ERROR).json("Please Login");
+      res
+        .status(httpStatus.INTERNAL_SERVER_ERROR)
+        .json("Invalid bearer token. Please login.");
   }
 };
 

@@ -207,13 +207,13 @@ const fetchAllFilesInFolder = async ({
   return allfiles;
 };
 
-const moveFile = async ({
+const moveFiles = async ({
   fileId,
   folderId,
   userId,
   orgId,
 }: {
-  fileId: string;
+  fileId: string | string[];
   folderId?: string;
   userId: string;
   orgId: string;
@@ -245,34 +245,38 @@ const moveFile = async ({
     updateQuery.folderId = null;
   }
 
-  const fileExist = await filemodel.findById({
-    _id: fileId,
+  const fileExistQuery = {
+    _id: { $in: fileId },
     orgId: orgId,
-  });
+  };
 
-  if (!fileExist) {
+  const filesExist = await filemodel.find(fileExistQuery);
+
+  if (!filesExist) {
     throw new AppError({
       httpCode: httpStatus.CONFLICT,
-      description: "File does not exist",
+      description: "One or more files do not exist",
     });
   }
 
-  const addFile = await filemodel
-    .findByIdAndUpdate(
-      fileId,
-      { $push: { files: fileId }, ...updateQuery },
-      { new: true }
-    )
-    .lean();
+  const updateFileQuery = folderId
+    ? { $push: { files: { $each: fileId } }, ...updateQuery }
+    : updateQuery;
 
-  if (!addFile) {
+  const updateFiles = await filemodel.updateMany(
+    { _id: { $in: Array.isArray(fileId) ? fileId : [fileId] } },
+    updateFileQuery,
+    { new: true }
+  );
+
+  if (updateFiles.modifiedCount !== fileId.length) {
     throw new AppError({
       httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-      description: "An error occurred, could not move File",
+      description: "An error occurred, could not move file(s)",
     });
   }
 
-  return addFile;
+  return { userId, folderId, orgId, updateFiles };
 };
 
 const getAllFiles = async ({
@@ -391,7 +395,7 @@ export default {
   uploadFile,
   addFiletoFolder,
   fetchAllFilesInFolder,
-  moveFile,
+  moveFiles,
   getAllFiles,
   starFile,
   unstarFile,

@@ -33,7 +33,7 @@ fileRouter
   );
 
 fileRouter
-  .route("/move-file/:fileId")
+  .route("/move-files/:fileIds")
   .patch(
     authGuard.guard,
     validationMiddleware(filevalidation.moveFileValidation),
