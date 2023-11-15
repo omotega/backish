@@ -391,6 +391,35 @@ const unstarFile = async ({
   return updatedDetails;
 };
 
+const archiveFile = async ({
+  userId,
+  orgId,
+  fileId,
+}: {
+  userId: string;
+  orgId: string;
+  fileId: string;
+}) => {
+  await helperServices.checkUserPermission(userId, orgId);
+
+  await helperServices.checkIfUserBelongsToOrganization({
+    userId: userId,
+    orgId: orgId,
+  });
+
+  const file = await filemodel.findOneAndUpdate(
+    { _id: fileId, isarchived: false },
+    { isarchived: true },
+    { new: true }
+  );
+  if (!file)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: "An error ocured, could not archive file",
+    });
+  return file;
+};
+
 export default {
   uploadFile,
   addFiletoFolder,
@@ -399,4 +428,5 @@ export default {
   getAllFiles,
   starFile,
   unstarFile,
+  archiveFile,
 };
