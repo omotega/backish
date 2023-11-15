@@ -68,6 +68,14 @@ fileRouter
   .route("/archive-file/:fileId")
   .patch(
     authGuard.guard,
+    validationMiddleware(filevalidation.archiveValidation),
+    filecontroller.archiveFile
+  );
+
+fileRouter
+  .route("/unarchive-file/:fileId")
+  .patch(
+    authGuard.guard,
     validationMiddleware(filevalidation.archiveFileValidation),
     filecontroller.archiveFile
   );
