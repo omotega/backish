@@ -145,6 +145,7 @@ const archiveFile = catchAsync(async (req: Request, res: Response) => {
     .json({ status: true, message: "file Archived", data: response });
 });
 
+
 const unarchiveFile = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
   const { orgId } = req.body;
@@ -158,6 +159,7 @@ const unarchiveFile = catchAsync(async (req: Request, res: Response) => {
     .status(httpStatus.OK)
     .json({ status: true, message: "file Unarchived", data: response });
 });
+
 
 export default {
   fileUpload,

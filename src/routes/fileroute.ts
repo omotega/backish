@@ -76,8 +76,8 @@ fileRouter
   .route("/unarchive-file/:fileId")
   .patch(
     authGuard.guard,
-    validationMiddleware(filevalidation.archiveValidation),
-    filecontroller.unarchiveFile
+    validationMiddleware(filevalidation.archiveFileValidation),
+    filecontroller.archiveFile
   );
 
 export default fileRouter;
