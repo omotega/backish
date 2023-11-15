@@ -145,7 +145,6 @@ const archiveFile = catchAsync(async (req: Request, res: Response) => {
     .json({ status: true, message: "file Archived", data: response });
 });
 
-
 const unarchiveFile = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
   const { orgId } = req.body;
@@ -160,6 +159,24 @@ const unarchiveFile = catchAsync(async (req: Request, res: Response) => {
     .json({ status: true, message: "file Unarchived", data: response });
 });
 
+const deleteFiles = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { orgId } = req.body;
+
+  const fileId = req.params.fileIds.split(",");
+
+  const response = await fileServices.deleteFiles({
+    userId: _id,
+    orgId: orgId,
+    fileId: Array.isArray(fileId) ? fileId : [fileId],
+  });
+
+  res.status(httpStatus.CREATED).json({
+    status: true,
+    message: "file(s) deleted succesfully",
+    data: response,
+  });
+});
 
 export default {
   fileUpload,
@@ -171,4 +188,5 @@ export default {
   unstarFile,
   archiveFile,
   unarchiveFile,
+  deleteFiles,
 };

@@ -449,6 +449,50 @@ const unarchiveFile = async ({
   return file;
 };
 
+const deleteFiles = async ({
+  fileId,
+  userId,
+  orgId,
+}: {
+  fileId: string | string[];
+  userId: string;
+  orgId: string;
+}) => {
+  await helperServices.checkUserPermission(userId, orgId);
+
+  await helperServices.checkIfUserBelongsToOrganization({
+    userId: userId,
+    orgId: orgId,
+  });
+
+  const fileExistQuery = {
+    _id: { $in: fileId },
+    orgId: orgId,
+  };
+
+  const filesExist = await filemodel.find(fileExistQuery);
+
+  if (!filesExist) {
+    throw new AppError({
+      httpCode: httpStatus.CONFLICT,
+      description: "One or more files do not exist",
+    });
+  }
+
+  const deletedFile = await filemodel.deleteMany({
+    _id: { $in: Array.isArray(fileId) ? fileId : [fileId] },
+  });
+
+  if (deletedFile.deletedCount === 0) {
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: "An error occurred, could not delete file(s)",
+    });
+  }
+
+  return { userId, orgId, deletedFile };
+};
+
 export default {
   uploadFile,
   addFiletoFolder,
@@ -459,4 +503,5 @@ export default {
   unstarFile,
   archiveFile,
   unarchiveFile,
+  deleteFiles,
 };
