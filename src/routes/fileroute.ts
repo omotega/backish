@@ -80,4 +80,12 @@ fileRouter
     filecontroller.archiveFile
   );
 
+fileRouter
+  .route("/delete-files/:fileIds")
+  .delete(
+    authGuard.guard,
+    validationMiddleware(filevalidation.deleteFileValidation),
+    filecontroller.deleteFiles
+  );
+
 export default fileRouter;

@@ -83,6 +83,12 @@ const archiveValidation = {
   }),
 };
 
+const deleteFileValidation = {
+  body: joi.object({
+    orgId: joi.string().required().messages(validationMessages.orgId),
+  }),
+};
+
 export default {
   fileUploadValidation,
   addFileToFolderValidation,
@@ -92,4 +98,5 @@ export default {
   starFileValidation,
   unstarFileValidation,
   archiveValidation,
+  deleteFileValidation,
 };
