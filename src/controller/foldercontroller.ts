@@ -151,7 +151,8 @@ const folderAccess = catchAsync(async (req: Request, res: Response) => {
 
 const folderArchive = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
-  const { folderId, orgId } = req.body;
+  const { orgId } = req.body;
+  const { folderId } = req.params;
   const response = await folderservices.archiveFolder({
     folderId: folderId,
     orgId: orgId,
@@ -164,7 +165,8 @@ const folderArchive = catchAsync(async (req: Request, res: Response) => {
 
 const folderUnarchive = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
-  const { folderId, orgId } = req.body;
+  const { orgId } = req.body;
+  const { folderId } = req.params;
   const response = await folderservices.unarchiveFolder({
     folderId: folderId,
     orgId: orgId,
@@ -173,6 +175,34 @@ const folderUnarchive = catchAsync(async (req: Request, res: Response) => {
   res
     .status(httpStatus.OK)
     .json({ status: true, message: "folder unArchived", data: response });
+});
+
+const folderTrash = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { orgId } = req.body;
+  const { folderId } = req.params;
+  const response = await folderservices.trashFolder({
+    folderId: folderId,
+    orgId: orgId,
+    userId: _id,
+  });
+  res
+    .status(httpStatus.OK)
+    .json({ status: true, message: "folder trashed", data: response });
+});
+
+const folderunTrash = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { orgId } = req.body;
+  const { folderId } = req.params;
+  const response = await folderservices.untrashFolder({
+    folderId: folderId,
+    orgId: orgId,
+    userId: _id,
+  });
+  res
+    .status(httpStatus.OK)
+    .json({ status: true, message: "folder untrashed", data: response });
 });
 
 export default {
@@ -187,4 +217,6 @@ export default {
   deleteFolder,
   folderArchive,
   folderUnarchive,
+  folderTrash,
+  folderunTrash,
 };

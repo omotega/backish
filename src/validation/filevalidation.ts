@@ -83,6 +83,15 @@ const archiveValidation = {
   }),
 };
 
+const trashValidation = {
+  body: joi.object({
+    orgId: joi.string().required().messages(validationMessages.orgId),
+  }),
+  params: joi.object({
+    fileId: joi.string().required().messages(validationMessages.fileId),
+  }),
+};
+
 export default {
   fileUploadValidation,
   addFileToFolderValidation,
@@ -92,4 +101,5 @@ export default {
   starFileValidation,
   unstarFileValidation,
   archiveValidation,
+  trashValidation,
 };

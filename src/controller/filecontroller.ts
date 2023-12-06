@@ -145,7 +145,6 @@ const archiveFile = catchAsync(async (req: Request, res: Response) => {
     .json({ status: true, message: "file Archived", data: response });
 });
 
-
 const unarchiveFile = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
   const { orgId } = req.body;
@@ -160,6 +159,33 @@ const unarchiveFile = catchAsync(async (req: Request, res: Response) => {
     .json({ status: true, message: "file Unarchived", data: response });
 });
 
+const trashFiles = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { orgId } = req.body;
+  const { fileId } = req.params;
+  const response = await fileservices.trashFile({
+    fileId: fileId,
+    orgId: orgId,
+    userId: _id,
+  });
+  res
+    .status(httpStatus.OK)
+    .json({ status: true, message: "file trashed", data: response });
+});
+
+const untrashFiles = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { orgId } = req.body;
+  const { fileId } = req.params;
+  const response = await fileservices.untrashFile({
+    fileId: fileId,
+    orgId: orgId,
+    userId: _id,
+  });
+  res
+    .status(httpStatus.OK)
+    .json({ status: true, message: "file Untrashed", data: response });
+});
 
 export default {
   fileUpload,
@@ -171,4 +197,6 @@ export default {
   unstarFile,
   archiveFile,
   unarchiveFile,
+  trashFiles,
+  untrashFiles,
 };

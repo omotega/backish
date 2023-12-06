@@ -77,7 +77,23 @@ fileRouter
   .patch(
     authGuard.guard,
     validationMiddleware(filevalidation.archiveValidation),
-    filecontroller.archiveFile
+    filecontroller.unarchiveFile
+  );
+
+fileRouter
+  .route("/trash-file/:fileId")
+  .patch(
+    authGuard.guard,
+    validationMiddleware(filevalidation.trashValidation),
+    filecontroller.trashFiles
+  );
+
+fileRouter
+  .route("/untrash-file/:fileId")
+  .patch(
+    authGuard.guard,
+    validationMiddleware(filevalidation.trashValidation),
+    filecontroller.untrashFiles
   );
 
 export default fileRouter;
