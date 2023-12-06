@@ -3,6 +3,8 @@ import foldermodel from "../database/model/folder";
 import { AppError } from "../utils/errors";
 import helperServices from "./helper-services";
 import organization from "../database/model/organization";
+import { DateTime } from "luxon";
+import { folderModelInterface } from "../types/folder";
 
 const createFolder = async ({
   userId,
@@ -344,7 +346,7 @@ const archiveFolder = async ({
     { isarchived: true },
     { new: true }
   );
-  if (!archiveFolder)
+  if (!folderArchive)
     throw new AppError({
       httpCode: httpStatus.INTERNAL_SERVER_ERROR,
       description: "An error ocured, could not archive folder",
@@ -372,12 +374,92 @@ const unarchiveFolder = async ({
     { isarchived: false },
     { new: true }
   );
-  if (!archiveFolder)
+  if (!folderArchiveUpdate)
     throw new AppError({
       httpCode: httpStatus.INTERNAL_SERVER_ERROR,
       description: "An error ocured, could not unarchive folder",
     });
   return folderArchiveUpdate;
+};
+
+const trashFolder = async ({
+  userId,
+  orgId,
+  folderId,
+}: {
+  userId: string;
+  orgId: string;
+  folderId: string;
+}) => {
+  await helperServices.checkUserPermission(userId, orgId);
+  await helperServices.checkIfUserBelongsToOrganization({
+    userId: userId,
+    orgId: orgId,
+  });
+
+  const isExpired = DateTime.now().plus({ days: 30 }).toJSDate();
+
+  const trashFolderUpdate = await foldermodel.findOneAndUpdate(
+    { _id: folderId, isTrashed: false },
+    { isTrashed: true, isExpired: isExpired },
+    { new: true }
+  );
+  if (!trashFolderUpdate)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: "An error ocured, could not trash folder",
+    });
+
+  return trashFolderUpdate;
+};
+
+const untrashFolder = async ({
+  userId,
+  orgId,
+  folderId,
+}: {
+  userId: string;
+  orgId: string;
+  folderId: string;
+}) => {
+  await helperServices.checkUserPermission(userId, orgId);
+  await helperServices.checkIfUserBelongsToOrganization({
+    userId: userId,
+    orgId: orgId,
+  });
+
+  const untrashFolderUpdate = await foldermodel.findOneAndUpdate(
+    { _id: folderId, isTrashed: true },
+    { isTrashed: false },
+    { new: true }
+  );
+  if (!untrashFolderUpdate)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: "An error ocured, could not untrash folder",
+    });
+
+  return untrashFolderUpdate;
+};
+
+const cleanupFolders = async () => {
+  try {
+    const currentDate = new Date();
+
+    const expiredFolders = await foldermodel.find({
+      isTrashed: true,
+      isExpired: { $lte: currentDate },
+    });
+
+    for (const folder of expiredFolders) {
+      await foldermodel.findByIdAndDelete({ _id: folder._id });
+    }
+
+    return "Expired folders deleted successfully";
+  } catch (error) {
+    console.error(error);
+    throw new Error("Error cleaning up expired folders");
+  }
 };
 
 export default {
@@ -392,4 +474,7 @@ export default {
   deleteFolder,
   archiveFolder,
   unarchiveFolder,
+  trashFolder,
+  untrashFolder,
+  cleanupFolders,
 };

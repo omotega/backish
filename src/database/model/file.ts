@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { fileInterface } from "../../types/files";
 import mongoosePaginate from "mongoose-paginate-v2";
+import { DateTime } from "luxon";
 
 const fileSchema = new mongoose.Schema(
   {
@@ -35,10 +36,6 @@ const fileSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    isDeleted: {
-      type: Boolean,
-      default: false,
-    },
     md5Hash: {
       type: String,
     },
@@ -52,11 +49,25 @@ const fileSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.String,
       ref: "User",
     },
+    isTrashed: {
+      type: Boolean,
+      default: false,
+    },
+    isExpired: {
+      type: Date,
+    },
   },
   {
     timestamps: true,
   }
 );
+
+fileSchema.pre("save", function (next) {
+  if (this.isTrashed && !this.isExpired) {
+    this.isExpired = DateTime.now().plus({ days: 30 }).toJSDate();
+  }
+  next();
+});
 
 fileSchema.plugin(mongoosePaginate);
 

@@ -24,7 +24,7 @@ const starFolderValidation = {
       .custom(JoiObjectId)
       .required()
       .messages(validationMessages.orgId),
-      folderId: joi
+    folderId: joi
       .string()
       .custom(JoiObjectId)
       .required()
@@ -120,33 +120,21 @@ const folderAccessValidation = {
   }),
 };
 
-const folderArchiveValidation = {
+const archiveValidation = {
+  body: joi.object({
+    orgId: joi.string().required().messages(validationMessages.orgId),
+  }),
   params: joi.object({
-    orgId: joi
-      .string()
-      .custom(JoiObjectId)
-      .required()
-      .messages(validationMessages.orgId),
-    folderId: joi
-      .string()
-      .custom(JoiObjectId)
-      .required()
-      .messages(validationMessages.folderId),
+    folderId: joi.string().required().messages(validationMessages.folderId),
   }),
 };
 
-const folderUnarchiveValidation = {
+const trashValidation = {
+  body: joi.object({
+    orgId: joi.string().required().messages(validationMessages.orgId),
+  }),
   params: joi.object({
-    orgId: joi
-      .string()
-      .custom(JoiObjectId)
-      .required()
-      .messages(validationMessages.orgId),
-    folderId: joi
-      .string()
-      .custom(JoiObjectId)
-      .required()
-      .messages(validationMessages.folderId),
+    folderId: joi.string().required().messages(validationMessages.folderId),
   }),
 };
 
@@ -159,6 +147,6 @@ export default {
   listUnstarredFoldersValidation,
   updateFolderValidation,
   folderAccessValidation,
-  folderArchiveValidation,
-  folderUnarchiveValidation,
+  archiveValidation,
+  trashValidation,
 };
