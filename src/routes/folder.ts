@@ -3,7 +3,6 @@ import validationMiddleware from "../midlewares/validation";
 import folderValidation from "../validation/foldervalidation";
 import authGuard from "../midlewares/auth";
 import foldercontroller from "../controller/foldercontroller";
-import folderservices from "../services/folderservices";
 
 const folderRouter = Router();
 
@@ -75,22 +74,22 @@ folderRouter
   .delete(authGuard.guard, foldercontroller.deleteFolder);
 
 folderRouter
-  .route("/archive-folder/:folderId")
+  .route("/org/:orgId/archive-folder/:folderId")
   .patch(
     authGuard.guard,
-    validationMiddleware(folderValidation.archiveValidation),
+    validationMiddleware(folderValidation.folderArchiveValidation),
     foldercontroller.folderArchive
   );
 
 folderRouter
-  .route("/unarchive-folder/:folderId")
+  .route("/org/:orgId/unarchive-folder/:folderId")
   .patch(
     authGuard.guard,
-    validationMiddleware(folderValidation.archiveValidation),
+    validationMiddleware(folderValidation.folderUnarchiveValidation),
     foldercontroller.folderUnarchive
   );
 
-folderRouter
+  folderRouter
   .route("/trash-folder/:folderId")
   .patch(
     authGuard.guard,
@@ -106,4 +105,14 @@ folderRouter
     foldercontroller.folderunTrash
   );
 
+  folderRouter
+  .route("/copy-folder")
+  .post(
+    authGuard.guard,
+    validationMiddleware(folderValidation.folderCopyValidation),
+    foldercontroller.folderCopy
+  );
 export default folderRouter;
+
+
+

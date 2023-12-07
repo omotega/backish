@@ -10,6 +10,12 @@ const folderSchema = new mongoose.Schema(
       unique: true,
       required: true,
     },
+    folderId: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Folder",
+      },
+    ],
     content: {
       type: String,
     },
@@ -49,17 +55,17 @@ const folderSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-
 folderSchema.pre("save", function (next) {
   if (this.isTrashed && !this.isExpired) {
     this.isExpired = DateTime.now().plus({ days: 30 }).toJSDate();
   }
   next();
 });
-
 folderSchema.plugin(mongoosePaginate);
 
 export default mongoose.model<
   folderModelInterface,
   mongoose.PaginateModel<folderModelInterface>
 >("Folder", folderSchema);
+
+

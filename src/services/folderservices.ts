@@ -1,10 +1,12 @@
 import httpStatus from "http-status";
 import foldermodel from "../database/model/folder";
+import filemodel from "../database/model/file";
 import { AppError } from "../utils/errors";
 import helperServices from "./helper-services";
 import organization from "../database/model/organization";
+import messages from "../utils/messages";
+import mongoose from "mongoose";
 import { DateTime } from "luxon";
-import { folderModelInterface } from "../types/folder";
 
 const createFolder = async ({
   userId,
@@ -346,7 +348,7 @@ const archiveFolder = async ({
     { isarchived: true },
     { new: true }
   );
-  if (!folderArchive)
+  if (!archiveFolder)
     throw new AppError({
       httpCode: httpStatus.INTERNAL_SERVER_ERROR,
       description: "An error ocured, could not archive folder",
@@ -374,14 +376,13 @@ const unarchiveFolder = async ({
     { isarchived: false },
     { new: true }
   );
-  if (!folderArchiveUpdate)
+  if (!archiveFolder)
     throw new AppError({
       httpCode: httpStatus.INTERNAL_SERVER_ERROR,
       description: "An error ocured, could not unarchive folder",
     });
   return folderArchiveUpdate;
 };
-
 const trashFolder = async ({
   userId,
   orgId,
@@ -462,6 +463,64 @@ const cleanupFolders = async () => {
   }
 };
 
+const copyFolder = async ({
+  copiedToFolderId,
+  copiedFolderId,
+  orgId,
+  userId,
+}: {
+  copiedToFolderId: string;
+  copiedFolderId: string;
+  orgId: string;
+  userId: string;
+}) => {
+  await helperServices.checkIfUserBelongsToOrganization({
+    userId: userId,
+    orgId: orgId,
+  });
+  const [folderExist, isFolderExist] = await Promise.all([
+    await foldermodel.findOne({
+      _id: copiedToFolderId,
+      orgId: orgId,
+    }),
+    await foldermodel.findOne({
+      _id: copiedFolderId,
+      orgId: orgId,
+    }),
+  ]);
+  if (!folderExist || !isFolderExist)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: "folder not found",
+    });
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  const folderResponse = await foldermodel.findOneAndUpdate(
+    {
+      _id: copiedToFolderId,
+      orgId: orgId,
+    },
+    { $push: { folderId: [copiedFolderId] } },
+    { new: true, session }
+  );
+  const fileResponse = await filemodel.findOneAndUpdate(
+    { folderId: { $in: [copiedFolderId] } },
+    { $push: { folderId: [copiedToFolderId] } },
+    { new: true, session }
+  );
+
+  await session.commitTransaction();
+  session.endSession();
+  if (!folderResponse)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: "An error occured, could not copy folder",
+    });
+  const message = `Folder copied successfully`;
+  return message;
+};
+
 export default {
   createFolder,
   starFolder,
@@ -474,7 +533,13 @@ export default {
   deleteFolder,
   archiveFolder,
   unarchiveFolder,
-  trashFolder,
   untrashFolder,
+  trashFolder,
   cleanupFolders,
+  copyFolder,
 };
+
+
+
+
+

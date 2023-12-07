@@ -120,12 +120,33 @@ const folderAccessValidation = {
   }),
 };
 
-const archiveValidation = {
-  body: joi.object({
-    orgId: joi.string().required().messages(validationMessages.orgId),
-  }),
+const folderArchiveValidation = {
   params: joi.object({
-    folderId: joi.string().required().messages(validationMessages.folderId),
+    orgId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.orgId),
+    folderId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.folderId),
+  }),
+};
+
+const folderUnarchiveValidation = {
+  params: joi.object({
+    orgId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.orgId),
+    folderId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.folderId),
   }),
 };
 
@@ -138,6 +159,26 @@ const trashValidation = {
   }),
 };
 
+const folderCopyValidation = {
+  body: joi.object({
+    orgId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.orgId),
+    copiedFolderId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.folderId),
+    copiedToFolderId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.folderId),
+  }),
+};
+
 export default {
   createFolderValidation,
   starFolderValidation,
@@ -147,6 +188,8 @@ export default {
   listUnstarredFoldersValidation,
   updateFolderValidation,
   folderAccessValidation,
-  archiveValidation,
+  folderArchiveValidation,
+  folderUnarchiveValidation,
+  folderCopyValidation,
   trashValidation,
 };

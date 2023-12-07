@@ -151,8 +151,7 @@ const folderAccess = catchAsync(async (req: Request, res: Response) => {
 
 const folderArchive = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
-  const { orgId } = req.body;
-  const { folderId } = req.params;
+  const { folderId, orgId } = req.body;
   const response = await folderservices.archiveFolder({
     folderId: folderId,
     orgId: orgId,
@@ -165,8 +164,7 @@ const folderArchive = catchAsync(async (req: Request, res: Response) => {
 
 const folderUnarchive = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
-  const { orgId } = req.body;
-  const { folderId } = req.params;
+  const { folderId, orgId } = req.body;
   const response = await folderservices.unarchiveFolder({
     folderId: folderId,
     orgId: orgId,
@@ -175,6 +173,20 @@ const folderUnarchive = catchAsync(async (req: Request, res: Response) => {
   res
     .status(httpStatus.OK)
     .json({ status: true, message: "folder unArchived", data: response });
+});
+
+const folderCopy = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { copiedFolderId, copiedToFolderId, orgId } = req.body;
+  const response = await folderservices.copyFolder({
+    copiedFolderId: copiedFolderId,
+    copiedToFolderId: copiedToFolderId,
+    orgId: orgId,
+    userId: _id,
+  });
+  res
+    .status(httpStatus.OK)
+    .json({ status: true, message: "folder copied", data: response });
 });
 
 const folderTrash = catchAsync(async (req: Request, res: Response) => {
@@ -217,6 +229,8 @@ export default {
   deleteFolder,
   folderArchive,
   folderUnarchive,
+  folderCopy,
   folderTrash,
   folderunTrash,
 };
+
