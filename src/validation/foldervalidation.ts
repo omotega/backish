@@ -24,7 +24,7 @@ const starFolderValidation = {
       .custom(JoiObjectId)
       .required()
       .messages(validationMessages.orgId),
-      folderId: joi
+    folderId: joi
       .string()
       .custom(JoiObjectId)
       .required()
@@ -150,6 +150,26 @@ const folderUnarchiveValidation = {
   }),
 };
 
+const folderCopyValidation = {
+  body: joi.object({
+    orgId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.orgId),
+    copiedFolderId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.folderId),
+    copiedToFolderId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.folderId),
+  }),
+};
+
 export default {
   createFolderValidation,
   starFolderValidation,
@@ -161,4 +181,5 @@ export default {
   folderAccessValidation,
   folderArchiveValidation,
   folderUnarchiveValidation,
+  folderCopyValidation,
 };

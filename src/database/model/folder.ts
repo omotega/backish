@@ -9,6 +9,12 @@ const folderSchema = new mongoose.Schema(
       unique: true,
       required: true,
     },
+    folderId: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Folder",
+      },
+    ],
     content: {
       type: String,
     },
@@ -47,7 +53,7 @@ const folderSchema = new mongoose.Schema(
 );
 folderSchema.plugin(mongoosePaginate);
 
-export default mongoose.model<folderModelInterface, mongoose.PaginateModel<folderModelInterface>>(
-  "Folder",
-  folderSchema
-);
+export default mongoose.model<
+  folderModelInterface,
+  mongoose.PaginateModel<folderModelInterface>
+>("Folder", folderSchema);

@@ -175,6 +175,20 @@ const folderUnarchive = catchAsync(async (req: Request, res: Response) => {
     .json({ status: true, message: "folder unArchived", data: response });
 });
 
+const folderCopy = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { copiedFolderId, copiedToFolderId, orgId } = req.body;
+  const response = await folderservices.copyFolder({
+    copiedFolderId: copiedFolderId,
+    copiedToFolderId: copiedToFolderId,
+    orgId: orgId,
+    userId: _id,
+  });
+  res
+    .status(httpStatus.OK)
+    .json({ status: true, message: "folder copied", data: response });
+});
+
 export default {
   createFolder,
   unstarFolder,
@@ -187,4 +201,5 @@ export default {
   deleteFolder,
   folderArchive,
   folderUnarchive,
+  folderCopy,
 };

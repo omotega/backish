@@ -89,4 +89,11 @@ folderRouter
     foldercontroller.folderUnarchive
   );
 
+  folderRouter
+  .route("/copy-folder")
+  .post(
+    authGuard.guard,
+    validationMiddleware(folderValidation.folderCopyValidation),
+    foldercontroller.folderCopy
+  );
 export default folderRouter;
