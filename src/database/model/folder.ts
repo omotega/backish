@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
 import { folderModelInterface } from "../../types/folder";
+import { DateTime } from "luxon";
 
 const folderSchema = new mongoose.Schema(
   {
@@ -42,18 +43,29 @@ const folderSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    isDeleted: {
+    isTrashed: {
       type: Boolean,
       default: false,
+    },
+    isExpired: {
+      type: Date,
     },
   },
   {
     timestamps: true,
   }
 );
+folderSchema.pre("save", function (next) {
+  if (this.isTrashed && !this.isExpired) {
+    this.isExpired = DateTime.now().plus({ days: 30 }).toJSDate();
+  }
+  next();
+});
 folderSchema.plugin(mongoosePaginate);
 
 export default mongoose.model<
   folderModelInterface,
   mongoose.PaginateModel<folderModelInterface>
 >("Folder", folderSchema);
+
+

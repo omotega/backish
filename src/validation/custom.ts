@@ -31,6 +31,10 @@ export const validationMessages = {
     "number.empty": "file id  cannot be empty.",
     "any.required": '"file id" is required.',
   },
+  trashId: {
+    "number.empty": "trash id  cannot be empty.",
+    "any.required": '"trash id" is required.',
+  },
   reference: {
     "number.empty": "reference  cannot be empty.",
     "any.required": '"reference" is required.',

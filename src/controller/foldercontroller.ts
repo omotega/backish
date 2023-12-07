@@ -189,6 +189,34 @@ const folderCopy = catchAsync(async (req: Request, res: Response) => {
     .json({ status: true, message: "folder copied", data: response });
 });
 
+const folderTrash = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { orgId } = req.body;
+  const { folderId } = req.params;
+  const response = await folderservices.trashFolder({
+    folderId: folderId,
+    orgId: orgId,
+    userId: _id,
+  });
+  res
+    .status(httpStatus.OK)
+    .json({ status: true, message: "folder trashed", data: response });
+});
+
+const folderunTrash = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { orgId } = req.body;
+  const { folderId } = req.params;
+  const response = await folderservices.untrashFolder({
+    folderId: folderId,
+    orgId: orgId,
+    userId: _id,
+  });
+  res
+    .status(httpStatus.OK)
+    .json({ status: true, message: "folder untrashed", data: response });
+});
+
 export default {
   createFolder,
   unstarFolder,
@@ -202,4 +230,7 @@ export default {
   folderArchive,
   folderUnarchive,
   folderCopy,
+  folderTrash,
+  folderunTrash,
 };
+

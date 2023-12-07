@@ -21,3 +21,13 @@ export interface IOtp {
   createdAt?: Date;
   updatedAt?: Date;
 }
+
+export interface ITrash {
+  _id?: string;
+  trashId: string;
+  itemType: string;
+  originalLocation: string;
+  originalData: string;
+  type: string;
+  deletedat: Date;
+}

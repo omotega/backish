@@ -11,8 +11,17 @@ export const httpTerminator = createHttpTerminator({
   server,
 });
 
-connectDb();
-// cache.redisConnect();
-server.listen(port, () => {
-  console.log(`server connected on port ${port}`);
+(async () => {
+  console.log("Waiting for DATABASE Connection...");
+  await connectDb();
+  server.listen(port, () => {
+    console.log(`Server connected on port ${port}`);
+  });
+})();
+
+process.on("SIGINT", () => {
+  console.log("Shutting down gracefully");
+  server.close(() => {
+    process.exit(0);
+  });
 });

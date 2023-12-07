@@ -1,3 +1,4 @@
+
 import httpStatus from "http-status";
 import fileServices from "../services/fileservices";
 import { Request, Response } from "express";
@@ -159,23 +160,32 @@ const unarchiveFile = catchAsync(async (req: Request, res: Response) => {
     .json({ status: true, message: "file Unarchived", data: response });
 });
 
-const deleteFiles = catchAsync(async (req: Request, res: Response) => {
+const trashFiles = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
   const { orgId } = req.body;
-
-  const fileId = req.params.fileIds.split(",");
-
-  const response = await fileServices.deleteFiles({
-    userId: _id,
+  const { fileId } = req.params;
+  const response = await fileservices.trashFile({
+    fileId: fileId,
     orgId: orgId,
-    fileId: Array.isArray(fileId) ? fileId : [fileId],
+    userId: _id,
   });
+  res
+    .status(httpStatus.OK)
+    .json({ status: true, message: "file trashed", data: response });
+});
 
-  res.status(httpStatus.CREATED).json({
-    status: true,
-    message: "file(s) deleted succesfully",
-    data: response,
+const untrashFiles = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { orgId } = req.body;
+  const { fileId } = req.params;
+  const response = await fileservices.untrashFile({
+    fileId: fileId,
+    orgId: orgId,
+    userId: _id,
   });
+  res
+    .status(httpStatus.OK)
+    .json({ status: true, message: "file Untrashed", data: response });
 });
 
 export default {
@@ -188,5 +198,8 @@ export default {
   unstarFile,
   archiveFile,
   unarchiveFile,
-  deleteFiles,
+  trashFiles,
+  untrashFiles,
 };
+
+

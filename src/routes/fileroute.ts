@@ -1,3 +1,4 @@
+
 import filecontroller from "../controller/filecontroller";
 import { Router } from "express";
 import validationMiddleware from "../midlewares/validation";
@@ -77,15 +78,24 @@ fileRouter
   .patch(
     authGuard.guard,
     validationMiddleware(filevalidation.archiveValidation),
-    filecontroller.archiveFile
+    filecontroller.unarchiveFile
   );
 
 fileRouter
-  .route("/delete-files/:fileIds")
-  .delete(
+  .route("/trash-file/:fileId")
+  .patch(
     authGuard.guard,
-    validationMiddleware(filevalidation.deleteFileValidation),
-    filecontroller.deleteFiles
+    validationMiddleware(filevalidation.trashValidation),
+    filecontroller.trashFiles
+  );
+
+fileRouter
+  .route("/untrash-file/:fileId")
+  .patch(
+    authGuard.guard,
+    validationMiddleware(filevalidation.trashValidation),
+    filecontroller.untrashFiles
   );
 
 export default fileRouter;
+

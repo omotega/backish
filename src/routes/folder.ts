@@ -90,6 +90,22 @@ folderRouter
   );
 
   folderRouter
+  .route("/trash-folder/:folderId")
+  .patch(
+    authGuard.guard,
+    validationMiddleware(folderValidation.trashValidation),
+    foldercontroller.folderTrash
+  );
+
+folderRouter
+  .route("/untrash-folder/:folderId")
+  .patch(
+    authGuard.guard,
+    validationMiddleware(folderValidation.trashValidation),
+    foldercontroller.folderunTrash
+  );
+
+  folderRouter
   .route("/copy-folder")
   .post(
     authGuard.guard,
@@ -97,3 +113,6 @@ folderRouter
     foldercontroller.folderCopy
   );
 export default folderRouter;
+
+
+

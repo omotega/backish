@@ -1,3 +1,4 @@
+
 import path from "path";
 import fs from "fs/promises";
 import { AppError } from "../utils/errors";
@@ -9,6 +10,7 @@ import httpStatus from "http-status";
 import helperServices from "./helper-services";
 import foldermodel from "../database/model/folder";
 import organization from "../database/model/organization";
+import { DateTime } from "luxon";
 
 const directoryPath = path.join("src", "uploads");
 
@@ -449,48 +451,84 @@ const unarchiveFile = async ({
   return file;
 };
 
-const deleteFiles = async ({
-  fileId,
+const trashFile = async ({
   userId,
   orgId,
+  fileId,
 }: {
-  fileId: string | string[];
   userId: string;
   orgId: string;
+  fileId: string;
 }) => {
   await helperServices.checkUserPermission(userId, orgId);
-
   await helperServices.checkIfUserBelongsToOrganization({
     userId: userId,
     orgId: orgId,
   });
 
-  const fileExistQuery = {
-    _id: { $in: fileId },
-    orgId: orgId,
-  };
+  const isExpired = DateTime.now().plus({ days: 30 }).toJSDate();
 
-  const filesExist = await filemodel.find(fileExistQuery);
-
-  if (!filesExist) {
-    throw new AppError({
-      httpCode: httpStatus.CONFLICT,
-      description: "One or more files do not exist",
-    });
-  }
-
-  const deletedFile = await filemodel.deleteMany({
-    _id: { $in: Array.isArray(fileId) ? fileId : [fileId] },
-  });
-
-  if (deletedFile.deletedCount === 0) {
+  const trashFileUpdate = await filemodel.findOneAndUpdate(
+    { _id: fileId, isTrashed: false },
+    { isTrashed: true, isExpired: isExpired },
+    { new: true }
+  );
+  if (!trashFileUpdate)
     throw new AppError({
       httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-      description: "An error occurred, could not delete file(s)",
+      description: "An error ocured, could not trash file",
     });
-  }
 
-  return { userId, orgId, deletedFile };
+  return trashFileUpdate;
+};
+
+const untrashFile = async ({
+  userId,
+  orgId,
+  fileId,
+}: {
+  userId: string;
+  orgId: string;
+  fileId: string;
+}) => {
+  await helperServices.checkUserPermission(userId, orgId);
+  await helperServices.checkIfUserBelongsToOrganization({
+    userId: userId,
+    orgId: orgId,
+  });
+
+  const untrashFileUpdate = await filemodel.findOneAndUpdate(
+    { _id: fileId, isTrashed: true },
+    { isTrashed: false },
+    { new: true }
+  );
+  if (!untrashFileUpdate)
+    throw new AppError({
+      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      description: "An error ocured, could not untrash file",
+    });
+
+  return untrashFileUpdate;
+};
+
+const cleanupFiles = async () => {
+  try {
+    const currentDate = new Date();
+
+    const expiredFiles = await filemodel.find({
+      isTrashed: true,
+      isExpired: { $lte: currentDate },
+    });
+
+    for (const file of expiredFiles) {
+      await filemodel.findByIdAndDelete({ _id: file._id });
+    }
+
+    return "Expired Files deleted successfully";
+  } catch (error) {
+    console.error(error);
+    throw new Error("Error cleaning up expired Files");
+  }
 };
 
 export default {
@@ -503,5 +541,9 @@ export default {
   unstarFile,
   archiveFile,
   unarchiveFile,
-  deleteFiles,
+  trashFile,
+  untrashFile,
+  cleanupFiles,
 };
+
+

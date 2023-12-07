@@ -150,6 +150,15 @@ const folderUnarchiveValidation = {
   }),
 };
 
+const trashValidation = {
+  body: joi.object({
+    orgId: joi.string().required().messages(validationMessages.orgId),
+  }),
+  params: joi.object({
+    folderId: joi.string().required().messages(validationMessages.folderId),
+  }),
+};
+
 const folderCopyValidation = {
   body: joi.object({
     orgId: joi
@@ -182,4 +191,5 @@ export default {
   folderArchiveValidation,
   folderUnarchiveValidation,
   folderCopyValidation,
+  trashValidation,
 };
