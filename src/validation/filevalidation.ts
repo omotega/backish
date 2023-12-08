@@ -92,6 +92,20 @@ const trashValidation = {
   }),
 };
 
+const updateFilenameValidation = {
+  params: joi.object({
+    fileId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.fileId),
+    orgId: joi.string().required().messages(validationMessages.orgId),
+  }),
+  body: joi.object({
+    fileName: joi.string().required().messages(validationMessages.filename),
+  }),
+};
+
 export default {
   fileUploadValidation,
   addFileToFolderValidation,
@@ -102,4 +116,5 @@ export default {
   unstarFileValidation,
   archiveValidation,
   trashValidation,
+  updateFilenameValidation,
 };
