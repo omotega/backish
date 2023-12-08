@@ -216,6 +216,19 @@ const folderunTrash = catchAsync(async (req: Request, res: Response) => {
     .status(httpStatus.OK)
     .json({ status: true, message: "folder untrashed", data: response });
 });
+const removefolderAccess = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { folderId, orgId, collaboratorId } = req.params;
+  const response = await folderservices.removeCollaboratorFolderAccess({
+    collaboratorId: collaboratorId,
+    folderId: folderId,
+    orgId: orgId,
+    userId: _id,
+  });
+  res
+    .status(httpStatus.OK)
+    .json({ status: true, message: "collaborator removed", data: response });
+});
 
 export default {
   createFolder,
@@ -232,5 +245,5 @@ export default {
   folderCopy,
   folderTrash,
   folderunTrash,
+  removefolderAccess,
 };
-

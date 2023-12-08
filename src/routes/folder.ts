@@ -112,6 +112,15 @@ folderRouter
     validationMiddleware(folderValidation.folderCopyValidation),
     foldercontroller.folderCopy
   );
+
+
+  folderRouter
+  .route("/remove-folderaccess/:orgId/:folderId/:collaboratorId")
+  .patch(
+    authGuard.guard,
+    validationMiddleware(folderValidation.removeFolderAccessValidation),
+    foldercontroller.removefolderAccess
+  );
 export default folderRouter;
 
 
