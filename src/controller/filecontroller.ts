@@ -1,4 +1,3 @@
-
 import httpStatus from "http-status";
 import fileServices from "../services/fileservices";
 import { Request, Response } from "express";
@@ -188,6 +187,21 @@ const untrashFiles = catchAsync(async (req: Request, res: Response) => {
     .json({ status: true, message: "file Untrashed", data: response });
 });
 
+const updateFileName = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { fileName } = req.body;
+  const { fileId, orgId } = req.params;
+  const response = await fileservices.renameFile({
+    fileId: fileId,
+    orgId: orgId,
+    userId: _id,
+    fileName: fileName,
+  });
+  res
+    .status(httpStatus.OK)
+    .json({ status: true, message: "file renamed", data: response });
+});
+
 export default {
   fileUpload,
   addFileToFolder,
@@ -200,6 +214,5 @@ export default {
   unarchiveFile,
   trashFiles,
   untrashFiles,
+  updateFileName,
 };
-
-

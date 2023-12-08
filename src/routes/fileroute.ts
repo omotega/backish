@@ -1,4 +1,3 @@
-
 import filecontroller from "../controller/filecontroller";
 import { Router } from "express";
 import validationMiddleware from "../midlewares/validation";
@@ -97,5 +96,12 @@ fileRouter
     filecontroller.untrashFiles
   );
 
-export default fileRouter;
+fileRouter
+  .route("/rename-file/:fileId/:orgId")
+  .patch(
+    authGuard.guard,
+    validationMiddleware(filevalidation.updateFilenameValidation),
+    filecontroller.updateFileName
+  );
 
+export default fileRouter;
