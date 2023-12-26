@@ -1,4 +1,3 @@
-
 import httpStatus from "http-status";
 import fileServices from "../services/fileservices";
 import { Request, Response } from "express";
@@ -188,6 +187,24 @@ const untrashFiles = catchAsync(async (req: Request, res: Response) => {
     .json({ status: true, message: "file Untrashed", data: response });
 });
 
+const copyFiles = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { fileId, folderId, orgId } = req.query as {
+    fileId: string;
+    folderId: string;
+    orgId: string;
+  };
+  const response = await fileservices.fileCopy({
+    fileId: fileId,
+    orgId: orgId,
+    userId: _id,
+    copiedToFolderId: folderId,
+  });
+  res
+    .status(httpStatus.OK)
+    .json({ status: true, message: "File copied", data: response });
+});
+
 export default {
   fileUpload,
   addFileToFolder,
@@ -200,6 +217,5 @@ export default {
   unarchiveFile,
   trashFiles,
   untrashFiles,
+  copyFiles,
 };
-
-

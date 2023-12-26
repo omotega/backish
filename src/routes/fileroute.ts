@@ -97,5 +97,13 @@ fileRouter
     filecontroller.untrashFiles
   );
 
+  fileRouter
+  .route("/copy-file/")
+  .patch(
+    authGuard.guard,
+    validationMiddleware(filevalidation.fileCopyValidation),
+    filecontroller.copyFiles
+  );
+
 export default fileRouter;
 

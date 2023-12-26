@@ -1,4 +1,3 @@
-
 import path from "path";
 import fs from "fs/promises";
 import { AppError } from "../utils/errors";
@@ -9,7 +8,6 @@ import cloudinaryservices from "../utils/cloudinary";
 import httpStatus from "http-status";
 import helperServices from "./helper-services";
 import foldermodel from "../database/model/folder";
-import organization from "../database/model/organization";
 import { DateTime } from "luxon";
 
 const directoryPath = path.join("src", "uploads");
@@ -96,6 +94,7 @@ const uploadFile = async ({
           addedBy: userId,
           size: `${fileSize}(${response?.size} bytes)`,
           folderId: folderId,
+          orgId:orgId,
         });
         if (createFile) dataArray.push(createFile);
         filemanagement.deleteFileInDirectory(sortedFiles[i].path);
@@ -220,12 +219,17 @@ const moveFiles = async ({
   userId: string;
   orgId: string;
 }) => {
+  let fileIds = 0;
   await helperServices.checkUserPermission(userId, orgId);
 
   await helperServices.checkIfUserBelongsToOrganization({
     userId: userId,
     orgId: orgId,
   });
+
+  if (Array.isArray(fileId)) {
+    fileIds = fileId.length;
+  }
 
   let updateQuery: { folderId?: string | null } = {};
 
@@ -271,7 +275,7 @@ const moveFiles = async ({
     { new: true }
   );
 
-  if (updateFiles.modifiedCount !== fileId.length) {
+  if (updateFiles.modifiedCount !== fileIds) {
     throw new AppError({
       httpCode: httpStatus.INTERNAL_SERVER_ERROR,
       description: "An error occurred, could not move file(s)",
@@ -531,6 +535,70 @@ const cleanupFiles = async () => {
   }
 };
 
+const fileCopy = async ({
+  copiedToFolderId,
+  fileId,
+  orgId,
+  userId,
+}: {
+  copiedToFolderId: string;
+  fileId: string | string[];
+  orgId: string;
+  userId: string;
+}) => {
+  console.log(copiedToFolderId,'see the folder oo')
+  let fileIds = 0;
+  await helperServices.checkIfUserBelongsToOrganization({
+    userId: userId,
+    orgId: orgId,
+  });
+  if (Array.isArray(fileId)) {
+    fileIds = fileId.length;
+  }
+  if (!copiedToFolderId) {
+    const fileCopy = await filemodel.findOneAndUpdate(
+      {
+        _id: fileId,
+        orgId: orgId,
+      },
+      { $push: { folderId: [orgId] } },
+      { new: true }
+    );
+    if (!fileCopy)
+      throw new AppError({
+        httpCode: httpStatus.NOT_FOUND,
+        description: "could not copy file",
+      });
+    const message = `Folder copied successfully`;
+    return message;
+  } else {
+    const folderExist = await foldermodel.findOne({
+      _id: copiedToFolderId,
+      orgId: orgId,
+    });
+    if (!folderExist)
+      throw new AppError({
+        httpCode: httpStatus.NOT_FOUND,
+        description: "folder not found",
+      });
+    const fileCopy = await filemodel.updateMany(
+      {
+        _id: fileId,
+        orgId: orgId,
+      },
+      { $push: { folderId: [copiedToFolderId] } },
+      { new: true }
+    );
+    if (fileCopy.modifiedCount !== fileIds)
+      throw new AppError({
+        httpCode: httpStatus.NOT_FOUND,
+        description: "could not copy file(s)",
+      });
+    const message = `file copied into ${folderExist.foldername} folder`;
+    return message;
+  }
+};
+
 export default {
   uploadFile,
   addFiletoFolder,
@@ -544,6 +612,5 @@ export default {
   trashFile,
   untrashFile,
   cleanupFiles,
+  fileCopy,
 };
-
-
