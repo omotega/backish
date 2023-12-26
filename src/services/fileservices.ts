@@ -314,7 +314,7 @@ const getAllFiles = async ({
 
   if (!allFiles) {
     throw new AppError({
-      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      httpCode: httpStatus.NOT_FOUND,
       description: "An error occurred, could not fetch files",
     });
   }
@@ -355,7 +355,7 @@ const starFile = async ({
   );
   if (!updatedDetails)
     throw new AppError({
-      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      httpCode: httpStatus.NOT_FOUND,
       description: "could not star file",
     });
   return updatedDetails;
@@ -391,7 +391,7 @@ const unstarFile = async ({
 
   if (!updatedDetails)
     throw new AppError({
-      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      httpCode: httpStatus.NOT_FOUND,
       description: "could not unstar file",
     });
   return updatedDetails;
@@ -420,7 +420,7 @@ const archiveFile = async ({
   );
   if (!file)
     throw new AppError({
-      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      httpCode: httpStatus.NOT_FOUND,
       description: "An error ocured, could not archive file",
     });
   return file;
@@ -449,7 +449,7 @@ const unarchiveFile = async ({
   );
   if (!file)
     throw new AppError({
-      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      httpCode: httpStatus.NOT_FOUND,
       description: "An error ocured, could not unarchive File",
     });
   return file;
@@ -535,6 +535,34 @@ const cleanupFiles = async () => {
   }
 };
 
+const renameFile = async ({
+  fileId,
+  fileName,
+  orgId,
+  userId,
+}: {
+  fileId: string;
+  fileName: string;
+  orgId: string;
+  userId: string;
+}) => {
+  await helperServices.checkIfUserBelongsToOrganization({
+    userId: userId,
+    orgId: orgId,
+  });
+  const isFile = await filemodel.findOneAndUpdate(
+    { _id: fileId, orgId: orgId },
+    { filename: fileName },
+    { new: true }
+  );
+  if (!isFile)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: "An error ocured, could not rename File",
+    });
+  return isFile;
+};
+
 const fileCopy = async ({
   copiedToFolderId,
   fileId,
@@ -546,7 +574,6 @@ const fileCopy = async ({
   orgId: string;
   userId: string;
 }) => {
-  console.log(copiedToFolderId,'see the folder oo')
   let fileIds = 0;
   await helperServices.checkIfUserBelongsToOrganization({
     userId: userId,
@@ -597,6 +624,7 @@ const fileCopy = async ({
     const message = `file copied into ${folderExist.foldername} folder`;
     return message;
   }
+
 };
 
 export default {
@@ -613,4 +641,5 @@ export default {
   untrashFile,
   cleanupFiles,
   fileCopy,
+  renameFile,
 };

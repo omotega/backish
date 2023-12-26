@@ -203,6 +203,21 @@ const copyFiles = catchAsync(async (req: Request, res: Response) => {
   res
     .status(httpStatus.OK)
     .json({ status: true, message: "File copied", data: response });
+})
+
+const updateFileName = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { fileName } = req.body;
+  const { fileId, orgId } = req.params;
+  const response = await fileservices.renameFile({
+    fileId: fileId,
+    orgId: orgId,
+    userId: _id,
+    fileName: fileName,
+  });
+  res
+    .status(httpStatus.OK)
+    .json({ status: true, message: "file renamed", data: response });
 });
 
 export default {
@@ -218,4 +233,5 @@ export default {
   trashFiles,
   untrashFiles,
   copyFiles,
-};
+  updateFileName,
+}

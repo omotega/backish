@@ -521,6 +521,40 @@ const copyFolder = async ({
   return message;
 };
 
+const removeCollaboratorFolderAccess = async ({
+  userId,
+  folderId,
+  collaboratorId,
+  orgId,
+}: {
+  userId: string;
+  folderId: string;
+  collaboratorId: string;
+  orgId: string;
+}) => {
+  await helperServices.checkUserPermission(userId, orgId);
+  const isUser = await helperServices.getUserdetailsById(collaboratorId);
+  await helperServices.checkIfUserBelongsToOrganization({
+    userId: collaboratorId,
+    orgId: orgId,
+  });
+
+  const addAccess = await foldermodel
+    .findByIdAndUpdate(
+      { _id: folderId },
+      { $pull: { collaborators: [collaboratorId] } },
+      { new: true }
+    )
+    .select("foldername -_id");
+  if (!addAccess)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: "could not complete this operation",
+    });
+  const message = `Removed ${isUser.name} as collaborator on ${addAccess.foldername} Folder`;
+  return message;
+};
+
 export default {
   createFolder,
   starFolder,
@@ -537,4 +571,5 @@ export default {
   trashFolder,
   cleanupFolders,
   copyFolder,
+  removeCollaboratorFolderAccess,
 };
