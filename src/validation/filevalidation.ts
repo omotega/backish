@@ -129,6 +129,13 @@ const updateFilenameValidation = {
   }),
 };
 
+const getTrashedFilesValidation = {
+  query: joi.object({
+    orgId: joi.string().required().messages(validationMessages.orgId),
+    page: joi.number().required(),
+  }),
+};
+
 export default {
   fileUploadValidation,
   addFileToFolderValidation,
@@ -141,4 +148,5 @@ export default {
   trashValidation,
   fileCopyValidation,
   updateFilenameValidation,
+  getTrashedFilesValidation
 };

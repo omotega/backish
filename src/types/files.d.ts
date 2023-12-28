@@ -15,5 +15,6 @@ export interface fileInterface {
   md5Hash: string;
   permission?: string;
   password?: string;
+  isTrashed: boolean;
   addedBy: Iuser["_id"];
 }

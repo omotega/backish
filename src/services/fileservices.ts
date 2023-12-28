@@ -199,12 +199,7 @@ const fetchAllFilesInFolder = async ({
     options
   );
 
-  if (!allfiles) {
-    throw new AppError({
-      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-      description: "An error occurred, could not fetch files",
-    });
-  }
+  if (!allfiles) return {};
   return allfiles;
 };
 
@@ -312,12 +307,7 @@ const getAllFiles = async ({
   await filemodel.countDocuments();
   const total = allFiles.length;
 
-  if (!allFiles) {
-    throw new AppError({
-      httpCode: httpStatus.NOT_FOUND,
-      description: "An error occurred, could not fetch files",
-    });
-  }
+  if (!allFiles) return {};
 
   return {
     total,
@@ -563,6 +553,7 @@ const renameFile = async ({
   return isFile;
 };
 
+
 const fileCopy = async ({
   copiedToFolderId,
   fileId,
@@ -627,6 +618,32 @@ const fileCopy = async ({
 
 };
 
+const fetchAllThrashedFile = async ({
+  orgId,
+  userId,
+  page,
+}: {
+  orgId: string;
+  userId: string;
+  page: number;
+}) => {
+  await helperServices.checkIfUserBelongsToOrganization({
+    userId: userId,
+    orgId: orgId,
+  });
+  const options = {
+    page: page,
+    limit: 10,
+    sort: { createdAt: "desc" },
+    lean: true,
+  };
+  const allThrashedFiles = filemodel.paginate(
+    { orgId: orgId, isTrashed: true },
+    options
+  );
+  return allThrashedFiles;
+};
+
 export default {
   uploadFile,
   addFiletoFolder,
@@ -642,4 +659,5 @@ export default {
   cleanupFiles,
   fileCopy,
   renameFile,
+  fetchAllThrashedFile,
 };

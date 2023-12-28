@@ -132,11 +132,7 @@ const listAllStarredFolders = async ({
     { orgId: orgId, isStarred: true },
     options
   );
-  if (!result)
-    throw new AppError({
-      httpCode: httpStatus.NOT_FOUND,
-      description: "Organization not found",
-    });
+
   return result;
 };
 
@@ -159,11 +155,6 @@ const listAllUnstarredFolders = async ({
     { orgId: orgId, isStarred: false },
     options
   );
-  if (!result)
-    throw new AppError({
-      httpCode: httpStatus.NOT_FOUND,
-      description: "Organization not found",
-    });
   return result;
 };
 
@@ -252,12 +243,6 @@ const getAllFolders = async ({
   };
 
   const allFolders = await foldermodel.paginate({ orgId: orgId }, options);
-  if (!allFolders)
-    throw new AppError({
-      httpCode: httpStatus.NOT_FOUND,
-      description: "Organization not found",
-    });
-
   return allFolders;
 };
 

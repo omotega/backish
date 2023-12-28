@@ -116,4 +116,12 @@ fileRouter
   );
 >>>>>>> dffb0173a9b759ea4c71aa4b00ba3cc5b0c9da73
 
+  fileRouter
+  .route("/get-thrashed-files")
+  .get(
+    authGuard.guard,
+    validationMiddleware(filevalidation.getTrashedFilesValidation),
+    filecontroller.getAllThrashedFiles
+  );
+
 export default fileRouter;
