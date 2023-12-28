@@ -1,6 +1,7 @@
 import joi from "joi";
 import { validationMessages } from "./custom";
 import { JoiObjectId } from "./helper";
+import { query } from "express";
 
 const fileUploadValidation = {
   body: joi.object({
@@ -106,6 +107,13 @@ const updateFilenameValidation = {
   }),
 };
 
+const getTrashedFilesValidation = {
+  query: joi.object({
+    orgId: joi.string().required().messages(validationMessages.orgId),
+    page: joi.number().required(),
+  }),
+};
+
 export default {
   fileUploadValidation,
   addFileToFolderValidation,
@@ -117,4 +125,5 @@ export default {
   archiveValidation,
   trashValidation,
   updateFilenameValidation,
+  getTrashedFilesValidation
 };

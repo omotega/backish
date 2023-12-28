@@ -202,6 +202,22 @@ const updateFileName = catchAsync(async (req: Request, res: Response) => {
     .json({ status: true, message: "file renamed", data: response });
 });
 
+const getAllThrashedFiles = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { orgId, page } = req.query as unknown as {
+    orgId: string;
+    page: number;
+  };
+  const response = await fileservices.fetchAllThrashedFile({
+    orgId: orgId,
+    userId: _id,
+    page: page,
+  });
+  res
+    .status(httpStatus.OK)
+    .json({ status: true, message: "files fetched successfully", data: response });
+});
+
 export default {
   fileUpload,
   addFileToFolder,
@@ -215,4 +231,5 @@ export default {
   trashFiles,
   untrashFiles,
   updateFileName,
+  getAllThrashedFiles,
 };

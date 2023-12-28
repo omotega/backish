@@ -104,4 +104,12 @@ fileRouter
     filecontroller.updateFileName
   );
 
+  fileRouter
+  .route("/get-thrashed-files")
+  .get(
+    authGuard.guard,
+    validationMiddleware(filevalidation.getTrashedFilesValidation),
+    filecontroller.getAllThrashedFiles
+  );
+
 export default fileRouter;
