@@ -583,7 +583,7 @@ const fileCopy = async ({
     fileIds = fileId.length;
   }
   if (!copiedToFolderId) {
-    const fileCopy = await filemodel.findOneAndUpdate(
+    const fileCopy = await filemodel.updateMany(
       {
         _id: fileId,
         orgId: orgId,
