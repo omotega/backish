@@ -96,6 +96,17 @@ fileRouter
     filecontroller.untrashFiles
   );
 
+<<<<<<< HEAD
+  fileRouter
+  .route("/copy-file/")
+  .patch(
+    authGuard.guard,
+    validationMiddleware(filevalidation.fileCopyValidation),
+    filecontroller.copyFiles
+  );
+
+export default fileRouter;
+=======
 fileRouter
   .route("/rename-file/:fileId/:orgId")
   .patch(
@@ -103,6 +114,7 @@ fileRouter
     validationMiddleware(filevalidation.updateFilenameValidation),
     filecontroller.updateFileName
   );
+>>>>>>> dffb0173a9b759ea4c71aa4b00ba3cc5b0c9da73
 
   fileRouter
   .route("/get-thrashed-files")

@@ -1,7 +1,6 @@
 import joi from "joi";
 import { validationMessages } from "./custom";
 import { JoiObjectId } from "./helper";
-import { query } from "express";
 
 const fileUploadValidation = {
   body: joi.object({
@@ -92,6 +91,29 @@ const trashValidation = {
     fileId: joi.string().required().messages(validationMessages.fileId),
   }),
 };
+const fileCopyValidation = {
+  query: joi.object({
+    orgId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.orgId),
+    fileId: joi
+      .array()
+      .items(
+        joi
+          .string()
+          .custom(JoiObjectId)
+          .required()
+          .messages(validationMessages.fileId)
+      )
+      .single(),
+    folderId: joi
+      .string()
+      .custom(JoiObjectId)
+      .messages(validationMessages.folderId),
+  }),
+};
 
 const updateFilenameValidation = {
   params: joi.object({
@@ -124,6 +146,7 @@ export default {
   unstarFileValidation,
   archiveValidation,
   trashValidation,
+  fileCopyValidation,
   updateFilenameValidation,
   getTrashedFilesValidation
 };

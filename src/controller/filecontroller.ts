@@ -187,6 +187,24 @@ const untrashFiles = catchAsync(async (req: Request, res: Response) => {
     .json({ status: true, message: "file Untrashed", data: response });
 });
 
+const copyFiles = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { fileId, folderId, orgId } = req.query as {
+    fileId: string;
+    folderId: string;
+    orgId: string;
+  };
+  const response = await fileservices.fileCopy({
+    fileId: fileId,
+    orgId: orgId,
+    userId: _id,
+    copiedToFolderId: folderId,
+  });
+  res
+    .status(httpStatus.OK)
+    .json({ status: true, message: "File copied", data: response });
+})
+
 const updateFileName = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
   const { fileName } = req.body;
@@ -230,6 +248,11 @@ export default {
   unarchiveFile,
   trashFiles,
   untrashFiles,
+  copyFiles,
   updateFileName,
+<<<<<<< HEAD
   getAllThrashedFiles,
 };
+=======
+}
+>>>>>>> faa38c937d6c7a61c3dc67818e9c9a188fa3c030
