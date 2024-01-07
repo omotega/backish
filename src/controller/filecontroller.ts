@@ -250,9 +250,5 @@ export default {
   untrashFiles,
   copyFiles,
   updateFileName,
-<<<<<<< HEAD
   getAllThrashedFiles,
 };
-=======
-}
->>>>>>> faa38c937d6c7a61c3dc67818e9c9a188fa3c030

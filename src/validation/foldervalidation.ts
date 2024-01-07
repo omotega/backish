@@ -198,6 +198,23 @@ const removeFolderAccessValidation = {
   }),
 };
 
+const moveFolderAccessValidation = {
+  params: joi.object({
+    orgId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.orgId),
+    moveToFolderId: joi.string().messages(validationMessages.folderId),
+    moveFromFolderId: joi.string().messages(validationMessages.folderId),
+    folderId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.folderId),
+  }),
+};
+
 export default {
   createFolderValidation,
   starFolderValidation,
@@ -212,4 +229,5 @@ export default {
   folderCopyValidation,
   trashValidation,
   removeFolderAccessValidation,
+  moveFolderAccessValidation,
 };

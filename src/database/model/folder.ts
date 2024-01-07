@@ -50,6 +50,10 @@ const folderSchema = new mongoose.Schema(
     isExpired: {
       type: Date,
     },
+    existInHomeDirectory: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
@@ -67,5 +71,3 @@ export default mongoose.model<
   folderModelInterface,
   mongoose.PaginateModel<folderModelInterface>
 >("Folder", folderSchema);
-
-

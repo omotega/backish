@@ -56,6 +56,10 @@ const fileSchema = new mongoose.Schema(
     isExpired: {
       type: Date,
     },
+    existInHomeDirectory: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
