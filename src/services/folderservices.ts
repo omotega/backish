@@ -564,14 +564,21 @@ const moveFolder = async ({
   moveFromFolderId: string;
   folderId: string | string[];
 }) => {
+  let folderIds = 0;
+
   await helperServices.checkIfUserBelongsToOrganization({
     userId: userId,
     orgId: orgId,
   });
+
   const searchQuery = {
     orgId: orgId,
     folderId: { $in: [folderId] },
   };
+
+  if (Array.isArray(folderId)) {
+    folderIds = folderId.length;
+  }
 
   if (!moveToFolderId) {
     const folderMove = await foldermodel.updateMany(searchQuery, {
@@ -596,7 +603,10 @@ const moveFolder = async ({
         }),
       ]);
 
-      if (!fileUpdate || !folderUpdate)
+      if (
+        fileUpdate.modifiedCount !== folderIds ||
+        folderUpdate.modifiedCount !== folderIds
+      )
         throw new AppError({
           httpCode: httpStatus.NOT_FOUND,
           description: messages.MOVE_FOLDER_ERROR,
@@ -614,7 +624,10 @@ const moveFolder = async ({
         await filemodel.updateMany(searchQuery, updateQuery),
       ]);
 
-      if (!fileUpdate || !folderUpdate)
+      if (
+        fileUpdate.modifiedCount !== folderIds ||
+        folderUpdate.modifiedCount !== folderIds
+      )
         throw new AppError({
           httpCode: httpStatus.NOT_FOUND,
           description: messages.MOVE_FOLDER_ERROR,
