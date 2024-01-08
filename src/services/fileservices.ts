@@ -94,7 +94,7 @@ const uploadFile = async ({
           addedBy: userId,
           size: `${fileSize}(${response?.size} bytes)`,
           folderId: folderId,
-          orgId:orgId,
+          orgId: orgId,
         });
         if (createFile) dataArray.push(createFile);
         filemanagement.deleteFileInDirectory(sortedFiles[i].path);
@@ -553,7 +553,6 @@ const renameFile = async ({
   return isFile;
 };
 
-
 const fileCopy = async ({
   copiedToFolderId,
   fileId,
@@ -579,8 +578,7 @@ const fileCopy = async ({
         _id: fileId,
         orgId: orgId,
       },
-      { $push: { folderId: [orgId] } },
-      { new: true }
+      { $set: { existInHomeDirectory: true } }
     );
     if (!fileCopy)
       throw new AppError({
@@ -590,15 +588,6 @@ const fileCopy = async ({
     const message = `Folder copied successfully`;
     return message;
   } else {
-    const folderExist = await foldermodel.findOne({
-      _id: copiedToFolderId,
-      orgId: orgId,
-    });
-    if (!folderExist)
-      throw new AppError({
-        httpCode: httpStatus.NOT_FOUND,
-        description: "folder not found",
-      });
     const fileCopy = await filemodel.updateMany(
       {
         _id: fileId,
@@ -612,10 +601,9 @@ const fileCopy = async ({
         httpCode: httpStatus.NOT_FOUND,
         description: "could not copy file(s)",
       });
-    const message = `file copied into ${folderExist.foldername} folder`;
+    const message = `file copied successfully`;
     return message;
   }
-
 };
 
 const fetchAllThrashedFile = async ({

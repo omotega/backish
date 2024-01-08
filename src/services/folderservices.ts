@@ -13,11 +13,13 @@ const createFolder = async ({
   folderName,
   orgId,
   description,
+  folderId,
 }: {
   userId: string;
   folderName: string;
   orgId: string;
   description: string;
+  folderId: string;
 }) => {
   await helperServices.checkUserPermission(userId, orgId);
   const orgExist = await organization.findOne({ _id: orgId });
@@ -36,19 +38,30 @@ const createFolder = async ({
       description: `Folder with name ${folderName} already exist`,
     });
 
-  const folder = await foldermodel.create({
-    foldername: folderName,
-    orgId: orgExist._id,
-    description: description,
-    collaborators: [userId],
-  });
-
-  if (!folder)
-    throw new AppError({
-      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-      description: "an error occured,could not create folder",
+  if (folderId) {
+    const folder = await foldermodel.create({
+      foldername: folderName,
+      orgId: orgExist._id,
+      description: description,
+      collaborators: [userId],
+      $push: { folderId: [folderId] },
     });
-  return folder;
+  } else {
+    const folder = await foldermodel.create({
+      foldername: folderName,
+      orgId: orgExist._id,
+      description: description,
+      collaborators: [userId],
+      existInHomeDirectory: true,
+    });
+
+    if (!folder)
+      throw new AppError({
+        httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+        description: "an error occured,could not create folder",
+      });
+    return folder;
+  }
 };
 
 const starFolder = async ({
@@ -455,55 +468,53 @@ const copyFolder = async ({
   userId,
 }: {
   copiedToFolderId: string;
-  copiedFolderId: string;
+  copiedFolderId: string | string[];
   orgId: string;
   userId: string;
 }) => {
+  let folderIds = 0;
+
   await helperServices.checkIfUserBelongsToOrganization({
     userId: userId,
     orgId: orgId,
   });
-  const [folderExist, isFolderExist] = await Promise.all([
-    await foldermodel.findOne({
-      _id: copiedToFolderId,
-      orgId: orgId,
-    }),
-    await foldermodel.findOne({
-      _id: copiedFolderId,
-      orgId: orgId,
-    }),
-  ]);
-  if (!folderExist || !isFolderExist)
-    throw new AppError({
-      httpCode: httpStatus.NOT_FOUND,
-      description: "folder not found",
+  if (Array.isArray(copiedFolderId)) {
+    folderIds = copiedFolderId.length;
+  }
+  const filterQuery = {
+    _id: copiedToFolderId,
+    orgId: orgId,
+  };
+  const updateQuery = {
+    $push: { folderId: [copiedToFolderId] },
+  };
+  if (!copiedToFolderId) {
+    const folderCopy = await foldermodel.updateMany(filterQuery, {
+      existInHomeDirectory: true,
     });
-
-  const session = await mongoose.startSession();
-  session.startTransaction();
-  const folderResponse = await foldermodel.findOneAndUpdate(
-    {
-      _id: copiedToFolderId,
-      orgId: orgId,
-    },
-    { $push: { folderId: [copiedFolderId] } },
-    { new: true, session }
-  );
-  const fileResponse = await filemodel.findOneAndUpdate(
-    { folderId: { $in: [copiedFolderId] } },
-    { $push: { folderId: [copiedToFolderId] } },
-    { new: true, session }
-  );
-
-  await session.commitTransaction();
-  session.endSession();
-  if (!folderResponse)
-    throw new AppError({
-      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-      description: "An error occured, could not copy folder",
-    });
-  const message = `Folder copied successfully`;
-  return message;
+    if (!folderCopy)
+      throw new AppError({
+        httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+        description: "An error occured, could not copy folder",
+      });
+    const message = `Folder copied successfully`;
+    return message;
+  } else {
+    const [folderResponse, fileResponse] = await Promise.all([
+      await foldermodel.updateMany(filterQuery, updateQuery, { new: true }),
+      await filemodel.updateMany(filterQuery, updateQuery, { new: true }),
+    ]);
+    if (
+      folderResponse.modifiedCount !== folderIds ||
+      fileResponse.modifiedCount !== folderIds
+    )
+      throw new AppError({
+        httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+        description: "An error occured, could not copy folder",
+      });
+    const message = `Folder copied successfully`;
+    return message;
+  }
 };
 
 const removeCollaboratorFolderAccess = async ({
@@ -540,6 +551,94 @@ const removeCollaboratorFolderAccess = async ({
   return message;
 };
 
+const moveFolder = async ({
+  userId,
+  orgId,
+  moveToFolderId,
+  moveFromFolderId,
+  folderId,
+}: {
+  userId: string;
+  orgId: string;
+  moveToFolderId: string;
+  moveFromFolderId: string;
+  folderId: string | string[];
+}) => {
+  let folderIds = 0;
+
+  await helperServices.checkIfUserBelongsToOrganization({
+    userId: userId,
+    orgId: orgId,
+  });
+
+  const searchQuery = {
+    orgId: orgId,
+    folderId: { $in: [folderId] },
+  };
+
+  if (Array.isArray(folderId)) {
+    folderIds = folderId.length;
+  }
+
+  if (!moveToFolderId) {
+    const folderMove = await foldermodel.updateMany(searchQuery, {
+      $set: { existInHomeDirectory: true },
+    });
+    if (!folderMove)
+      throw new AppError({
+        httpCode: httpStatus.NOT_FOUND,
+        description: messages.MOVE_FOLDER_ERROR,
+      });
+    const message = "Folder moved succesfully";
+    return message;
+  } else {
+    if (moveToFolderId && !moveFromFolderId) {
+      const [folderUpdate, fileUpdate] = await Promise.all([
+        await foldermodel.updateMany(searchQuery, {
+          $push: { folderId: { $in: [moveToFolderId] } },
+          existInHomeDirectory: false,
+        }),
+        await filemodel.updateMany(searchQuery, {
+          $push: { folderId: { $in: [moveToFolderId] } },
+        }),
+      ]);
+
+      if (
+        fileUpdate.modifiedCount !== folderIds ||
+        folderUpdate.modifiedCount !== folderIds
+      )
+        throw new AppError({
+          httpCode: httpStatus.NOT_FOUND,
+          description: messages.MOVE_FOLDER_ERROR,
+        });
+
+      const message = "Folder moved succesfully";
+      return message;
+    } else {
+      const updateQuery = {
+        $pull: { folderId: { $in: [moveFromFolderId] } },
+        $push: { folderId: { $in: [moveToFolderId] } },
+      };
+      const [folderUpdate, fileUpdate] = await Promise.all([
+        await foldermodel.updateMany(searchQuery, updateQuery),
+        await filemodel.updateMany(searchQuery, updateQuery),
+      ]);
+
+      if (
+        fileUpdate.modifiedCount !== folderIds ||
+        folderUpdate.modifiedCount !== folderIds
+      )
+        throw new AppError({
+          httpCode: httpStatus.NOT_FOUND,
+          description: messages.MOVE_FOLDER_ERROR,
+        });
+
+      const message = "Folder moved succesfully";
+      return message;
+    }
+  }
+};
+
 export default {
   createFolder,
   starFolder,
@@ -557,4 +656,5 @@ export default {
   cleanupFolders,
   copyFolder,
   removeCollaboratorFolderAccess,
+  moveFolder,
 };

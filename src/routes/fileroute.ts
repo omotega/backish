@@ -95,7 +95,7 @@ fileRouter
     validationMiddleware(filevalidation.trashValidation),
     filecontroller.untrashFiles
   );
-
+  
   fileRouter
   .route("/copy-file/")
   .patch(
@@ -112,7 +112,7 @@ fileRouter
     filecontroller.updateFileName
   );
 
-  fileRouter
+fileRouter
   .route("/get-thrashed-files")
   .get(
     authGuard.guard,

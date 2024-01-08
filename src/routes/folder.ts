@@ -89,7 +89,7 @@ folderRouter
     foldercontroller.folderUnarchive
   );
 
-  folderRouter
+folderRouter
   .route("/trash-folder/:folderId")
   .patch(
     authGuard.guard,
@@ -105,7 +105,7 @@ folderRouter
     foldercontroller.folderunTrash
   );
 
-  folderRouter
+folderRouter
   .route("/copy-folder")
   .post(
     authGuard.guard,
@@ -113,15 +113,20 @@ folderRouter
     foldercontroller.folderCopy
   );
 
-
-  folderRouter
+folderRouter
   .route("/remove-folderaccess/:orgId/:folderId/:collaboratorId")
   .patch(
     authGuard.guard,
     validationMiddleware(folderValidation.removeFolderAccessValidation),
     foldercontroller.removefolderAccess
   );
+
+folderRouter
+  .route("/moveFolder/:orgId/:folderId/:moveFromFolderId/:moveToFolderId")
+  .patch(
+    authGuard.guard,
+    validationMiddleware(folderValidation.moveFolderAccessValidation),
+    foldercontroller.moveFolder
+  );
+
 export default folderRouter;
-
-
-

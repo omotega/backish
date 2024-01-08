@@ -5,9 +5,11 @@ import catchAsync from "../utils/catchasync";
 
 const createFolder = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
+  const { folderId } = req.params;
   const { foldername, orgId, description } = req.body;
   const response = await folderservices.createFolder({
     folderName: foldername,
+    folderId: folderId,
     orgId: orgId,
     description: description,
     userId: _id,
@@ -216,6 +218,7 @@ const folderunTrash = catchAsync(async (req: Request, res: Response) => {
     .status(httpStatus.OK)
     .json({ status: true, message: "folder untrashed", data: response });
 });
+
 const removefolderAccess = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
   const { folderId, orgId, collaboratorId } = req.params;
@@ -228,6 +231,19 @@ const removefolderAccess = catchAsync(async (req: Request, res: Response) => {
   res
     .status(httpStatus.OK)
     .json({ status: true, message: "collaborator removed", data: response });
+});
+
+const moveFolder = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { folderId, orgId, moveFromFolderId, moveToFolderId } = req.params;
+  const response = await folderservices.moveFolder({
+    moveFromFolderId: moveFromFolderId,
+    moveToFolderId: moveToFolderId,
+    folderId: folderId,
+    orgId: orgId,
+    userId: _id,
+  });
+  res.status(httpStatus.OK).json({ status: true, data: response });
 });
 
 export default {
@@ -246,4 +262,5 @@ export default {
   folderTrash,
   folderunTrash,
   removefolderAccess,
+  moveFolder,
 };

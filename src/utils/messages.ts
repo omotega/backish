@@ -17,6 +17,7 @@ const messages = {
   ACCOUNT_RECOVER_SUCCESS: "Account recovered successfully.",
   PASSWORD_MISMATCH: "Password mismatch",
   PASSWORD_RESET_SUCCESSFUL: "Password reset successful",
+  MOVE_FOLDER_ERROR: "unable to move folder",
 };
 
 export default messages;
