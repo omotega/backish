@@ -95,8 +95,8 @@ fileRouter
     validationMiddleware(filevalidation.trashValidation),
     filecontroller.untrashFiles
   );
-
-fileRouter
+  
+  fileRouter
   .route("/copy-file/")
   .patch(
     authGuard.guard,
