@@ -9,6 +9,7 @@ import httpStatus from "http-status";
 import helperServices from "./helper-services";
 import foldermodel from "../database/model/folder";
 import { DateTime } from "luxon";
+import messages from "../utils/messages";
 
 const directoryPath = path.join("src", "uploads");
 
@@ -632,6 +633,96 @@ const fetchAllThrashedFile = async ({
   return allThrashedFiles;
 };
 
+const addPasswordToFile = async ({
+  userId,
+  orgId,
+  fileId,
+  password,
+}: {
+  userId: string;
+  fileId: string;
+  orgId: string;
+  password: string;
+}) => {
+  await helperServices.checkIfUserBelongsToOrganization({
+    userId: userId,
+    orgId: orgId,
+  });
+  await helperServices.checkUserPermission(userId, orgId);
+  const hash = await Helper.hashPassword(password);
+  const lockFile = await filemodel.findOneAndUpdate(
+    { orgId: orgId, _id: fileId },
+    { $set: { password: hash } }
+  );
+  if (!lockFile)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: "could not lock file with password",
+    });
+  const message = "file locked with password";
+  return message;
+};
+
+const resetPassword = async ({
+  userId,
+  orgId,
+  fileId,
+  newPassword,
+  oldPassword,
+}: {
+  userId: string;
+  fileId: string;
+  orgId: string;
+  oldPassword: string;
+  newPassword: string;
+}) => {
+  await helperServices.checkIfUserBelongsToOrganization({
+    userId: userId,
+    orgId: orgId,
+  });
+  const isFile = await filemodel.findById(fileId);
+  if (!isFile) return;
+  await helperServices.checkUserPermission(userId, orgId);
+  const isPassword = await Helper.comparePassword(
+    isFile.password as string,
+    oldPassword
+  );
+  const hash = await Helper.hashPassword(newPassword);
+  const lockFile = await filemodel.findOneAndUpdate(
+    { orgId: orgId, _id: fileId },
+    { $set: { password: hash } }
+  );
+  if (!lockFile)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: "could not reset password",
+    });
+  const message = "file password reset succesfully";
+  return message;
+};
+
+const getFileDetails = async ({
+  orgId,
+  fileId,
+  userId,
+}: {
+  orgId: string;
+  fileId: string;
+  userId: string;
+}) => {
+  await helperServices.checkIfUserBelongsToOrganization({
+    userId: userId,
+    orgId: orgId,
+  });
+  const isFile = await filemodel.findById(fileId);
+  if (!isFile)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: "file not found",
+    });
+  return isFile
+};
+
 export default {
   uploadFile,
   addFiletoFolder,
@@ -648,4 +739,7 @@ export default {
   fileCopy,
   renameFile,
   fetchAllThrashedFile,
+  addPasswordToFile,
+  resetPassword,
+  getFileDetails,
 };
