@@ -209,7 +209,6 @@ const deactivateUserFromOrg = async ({
   const message = `${isUser.name} removed succesfully`;
   return message;
 };
-
 export default {
   listAllUsersInOrganization,
   findUser,

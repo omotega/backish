@@ -136,6 +136,35 @@ const getTrashedFilesValidation = {
   }),
 };
 
+const lockFileValidation = {
+  query: joi.object({
+    orgId: joi.string().required().messages(validationMessages.orgId),
+    fileId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.fileId),
+  }),
+  body: {
+    password: joi.string().required().messages(validationMessages.password),
+  },
+};
+
+const resetFilePasswordValidation = {
+  query: joi.object({
+    orgId: joi.string().required().messages(validationMessages.orgId),
+    fileId: joi
+      .string()
+      .custom(JoiObjectId)
+      .required()
+      .messages(validationMessages.fileId),
+  }),
+  body: {
+    newPassword: joi.string().required().messages(validationMessages.password),
+    oldPassword: joi.string().required().messages(validationMessages.password),
+  },
+};
+
 export default {
   fileUploadValidation,
   addFileToFolderValidation,
@@ -148,5 +177,7 @@ export default {
   trashValidation,
   fileCopyValidation,
   updateFilenameValidation,
-  getTrashedFilesValidation
+  getTrashedFilesValidation,
+  lockFileValidation,
+  resetFilePasswordValidation,
 };

@@ -95,8 +95,8 @@ fileRouter
     validationMiddleware(filevalidation.trashValidation),
     filecontroller.untrashFiles
   );
-  
-  fileRouter
+
+fileRouter
   .route("/copy-file/")
   .patch(
     authGuard.guard,
@@ -118,6 +118,22 @@ fileRouter
     authGuard.guard,
     validationMiddleware(filevalidation.getTrashedFilesValidation),
     filecontroller.getAllThrashedFiles
+  );
+
+fileRouter
+  .route("/lock-file")
+  .put(
+    authGuard.guard,
+    validationMiddleware(filevalidation.lockFileValidation),
+    filecontroller.lockFile
+  );
+
+fileRouter
+  .route("/reset-file-password")
+  .put(
+    authGuard.guard,
+    validationMiddleware(filevalidation.resetFilePasswordValidation),
+    filecontroller.resetFilePassword
   );
 
 export default fileRouter;

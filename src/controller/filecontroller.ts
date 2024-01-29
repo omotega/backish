@@ -203,7 +203,7 @@ const copyFiles = catchAsync(async (req: Request, res: Response) => {
   res
     .status(httpStatus.OK)
     .json({ status: true, message: "File copied", data: response });
-})
+});
 
 const updateFileName = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
@@ -231,9 +231,50 @@ const getAllThrashedFiles = catchAsync(async (req: Request, res: Response) => {
     userId: _id,
     page: page,
   });
-  res
-    .status(httpStatus.OK)
-    .json({ status: true, message: "files fetched successfully", data: response });
+  res.status(httpStatus.OK).json({
+    status: true,
+    message: "files fetched successfully",
+    data: response,
+  });
+});
+
+const lockFile = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { orgId, fileId } = req.query as unknown as {
+    orgId: string;
+    fileId: string;
+  };
+  const { password } = req.body;
+  const response = await fileservices.addPasswordToFile({
+    orgId: orgId,
+    userId: _id,
+    fileId: fileId,
+    password: password,
+  });
+  res.status(httpStatus.OK).json({
+    status: true,
+    data: response,
+  });
+});
+
+const resetFilePassword = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { orgId, fileId } = req.query as unknown as {
+    orgId: string;
+    fileId: string;
+  };
+  const { oldPassword, newPassword } = req.body;
+  const response = await fileservices.resetPassword({
+    orgId: orgId,
+    userId: _id,
+    fileId: fileId,
+    newPassword: newPassword,
+    oldPassword: oldPassword,
+  });
+  res.status(httpStatus.OK).json({
+    status: true,
+    data: response,
+  });
 });
 
 export default {
@@ -251,4 +292,6 @@ export default {
   copyFiles,
   updateFileName,
   getAllThrashedFiles,
+  lockFile,
+  resetFilePassword,
 };

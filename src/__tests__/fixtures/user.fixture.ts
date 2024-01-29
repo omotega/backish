@@ -17,7 +17,6 @@ export const userTwo = {
 };
 
 
-
 export const userSix = {
   name: faker.person.fullName(),
 };
