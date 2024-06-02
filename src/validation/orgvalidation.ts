@@ -1,65 +1,47 @@
-import joi from "joi";
-import { validationMessages } from "./custom";
-import { JoiObjectId } from "./helper";
+import joi from 'joi';
+import { validationMessages } from './custom';
+import { JoiObjectId } from './helper';
+import { query } from 'express';
 
 const getAllUserValidation = {
-  body: joi.object({
-    orgId: joi
-      .string()
-      .custom(JoiObjectId)
-      .required()
-      .messages(validationMessages.orgId),
+  query: joi.object({
+    page: joi.number().required(),
+    orgId: joi.string().custom(JoiObjectId).required().messages(validationMessages.orgId),
   }),
 };
 
 const getAUserValidation = {
-  params: joi.object({
-    orgId: joi
-      .string()
-      .custom(JoiObjectId)
-      .required()
-      .messages(validationMessages.orgId),
-  }),
   query: joi.object({
-    email: joi.string().email().required().messages(validationMessages.email),
+    orgId: joi.string().custom(JoiObjectId).required().messages(validationMessages.orgId),
   }),
 };
 
 const leaveOrgUserValidation = {
-  body: joi.object({
-    orgId: joi
-      .string()
-      .custom(JoiObjectId)
-      .required()
-      .messages(validationMessages.orgId),
+  params: joi.object({
+    orgId: joi.string().custom(JoiObjectId).required().messages(validationMessages.orgId),
+  }),
+};
+
+const getAllUserOrgsValidation = {
+  query: joi.object({
+    page: joi.number().required(),
   }),
 };
 
 const upadateUserroleValidation = {
-  body: joi.object({
-    orgId: joi
-      .string()
-      .custom(JoiObjectId)
-      .required()
-      .messages(validationMessages.orgId),
+  query: joi.object({
+    orgId: joi.string().custom(JoiObjectId).required().messages(validationMessages.orgId),
     collaboratorId: joi
-      .string()
+      .custom(JoiObjectId)
       .required()
       .messages(validationMessages.collaboratorId),
   }),
 };
 
 const removeUserFromOrgValidation = {
-  body: joi.object({
-    orgId: joi
-      .string()
-      .custom(JoiObjectId)
-      .required()
-      .messages(validationMessages.orgId),
-    collaboratorId: joi
-      .string()
-      .required()
-      .messages(validationMessages.collaboratorId),
+  query: joi.object({
+    orgId: joi.string().custom(JoiObjectId).required().messages(validationMessages.orgId),
+    collaboratorId: joi.string().required().messages(validationMessages.collaboratorId),
   }),
 };
 
@@ -69,4 +51,5 @@ export default {
   leaveOrgUserValidation,
   upadateUserroleValidation,
   removeUserFromOrgValidation,
+  getAllUserOrgsValidation,
 };

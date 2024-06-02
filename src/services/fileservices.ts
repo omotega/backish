@@ -1,17 +1,22 @@
-import path from "path";
-import fs from "fs/promises";
-import { AppError } from "../utils/errors";
-import filemanagement from "../utils/filemanagement";
-import filemodel from "../database/model/file";
-import Helper from "../utils/helpers";
-import cloudinaryservices from "../utils/cloudinary";
-import httpStatus from "http-status";
-import helperServices from "./helper-services";
-import foldermodel from "../database/model/folder";
-import { DateTime } from "luxon";
-import messages from "../utils/messages";
+import path from 'path';
+import fs from 'fs/promises';
+import { AppError } from '../utils/errors';
+import filemanagement from '../utils/filemanagement';
+import filemodel from '../database/model/file';
+import Helper from '../utils/helpers';
+import cloudinaryservices from '../utils/cloudinary';
+import httpStatus from 'http-status';
+import helperServices, {
+  sortFileNameInAscendingOrder,
+  sortFileNameInDescendingOrder,
+  sortRecentlyModifiedinAscendingOrder,
+  sortRecentlyModifiedinDescendingOrder,
+} from './helper-services';
+import foldermodel from '../database/model/folder';
+import { DateTime } from 'luxon';
+import errorMessages from '../utils/messages';
 
-const directoryPath = path.join("src", "uploads");
+const directoryPath = path.join('src', 'uploads');
 
 const uploadFile = async ({
   folderId,
@@ -29,16 +34,16 @@ const uploadFile = async ({
     orgId: orgId,
   });
   uploadedFile.map((item: any) => {
-    if (item.path.indexOf("\0") !== -1)
+    if (item.path.indexOf('\0') !== -1)
       throw new AppError({
         httpCode: httpStatus.BAD_REQUEST,
-        description: "Error: Filename must not contain null bytes",
+        description: 'Error: Filename must not contain null bytes',
       });
   });
   if (!uploadedFile)
     throw new AppError({
       httpCode: httpStatus.BAD_REQUEST,
-      description: "No file passed",
+      description: 'No file passed',
     });
 
   const fileInUploadDirectory = await fs.readdir(directoryPath);
@@ -58,7 +63,7 @@ const uploadFile = async ({
     );
     throw new AppError({
       httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-      description: "file upload error.Please try again",
+      description: 'file upload error.Please try again',
     });
   }
 
@@ -75,15 +80,8 @@ const uploadFile = async ({
     } else {
       if (sortedFiles[i].size === sortedFile[i].size) {
         const md5Hash = await Helper.md5Generator(sortedFiles[i].path);
-        const response = await cloudinaryservices.uploadImage(
-          sortedFiles[i].path
-        );
-        if (
-          !md5Hash &&
-          !response?.url &&
-          !response?.size &&
-          !response?.publicId
-        ) {
+        const response = await cloudinaryservices.uploadImage(sortedFiles[i].path);
+        if (!md5Hash && !response?.url && !response?.size && !response?.publicId) {
           fileArray.push(sortedFiles[i].filename);
         }
         const fileSize = Helper.formatFileSize(response?.size);
@@ -104,7 +102,7 @@ const uploadFile = async ({
   }
   return {
     status: true,
-    message: "files uploaded succesfully",
+    message: 'files uploaded succesfully',
     data: dataArray,
     failedUploadedFiles: fileArray,
   };
@@ -128,20 +126,6 @@ const addFiletoFolder = async ({
     orgId: orgId,
   });
 
-  const folderExist = await foldermodel
-    .findOne({
-      _id: folderId,
-      orgId: orgId,
-    })
-    .lean();
-
-  if (!folderExist) {
-    throw new AppError({
-      httpCode: httpStatus.NOT_FOUND,
-      description: "Folder does not exist",
-    });
-  }
-
   const fileExist = await filemodel
     .findById({
       _id: fileId,
@@ -152,7 +136,7 @@ const addFiletoFolder = async ({
   if (!fileExist) {
     throw new AppError({
       httpCode: httpStatus.CONFLICT,
-      description: "File does not exist",
+      description: 'File does not exist',
     });
   }
 
@@ -166,8 +150,8 @@ const addFiletoFolder = async ({
 
   if (!addFile) {
     throw new AppError({
-      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-      description: "An error occurred, could not add File to new Folder",
+      httpCode: httpStatus.NOT_FOUND,
+      description: 'An error occurred, could not add File to new Folder',
     });
   }
 
@@ -192,15 +176,10 @@ const fetchAllFilesInFolder = async ({
   const options = {
     page: page,
     limit: 10,
-    sort: { createdAt: "desc" },
+    sort: { createdAt: 'desc' },
     lean: true,
   };
-  const allfiles = await filemodel.paginate(
-    { folderId: { $in: [folderId] } },
-    options
-  );
-
-  if (!allfiles) return {};
+  const allfiles = await filemodel.paginate({ folderId: { $in: [folderId] } }, options);
   return allfiles;
 };
 
@@ -238,7 +217,7 @@ const moveFiles = async ({
     if (!folderExist) {
       throw new AppError({
         httpCode: httpStatus.NOT_FOUND,
-        description: "Folder does not exist",
+        description: 'Folder does not exist',
       });
     }
 
@@ -257,7 +236,7 @@ const moveFiles = async ({
   if (!filesExist) {
     throw new AppError({
       httpCode: httpStatus.CONFLICT,
-      description: "One or more files do not exist",
+      description: 'One or more files do not exist',
     });
   }
 
@@ -274,7 +253,7 @@ const moveFiles = async ({
   if (updateFiles.modifiedCount !== fileIds) {
     throw new AppError({
       httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-      description: "An error occurred, could not move file(s)",
+      description: 'An error occurred, could not move file(s)',
     });
   }
 
@@ -299,11 +278,11 @@ const getAllFiles = async ({
 
   const options = {
     page: page,
-    sort: { createdAt: "desc" },
+    sort: { createdAt: 'desc' },
     lean: true,
   };
 
-  const allFiles = await filemodel.find({}, "filename format", options).exec();
+  const allFiles = await filemodel.find({}, 'filename format', options).exec();
 
   await filemodel.countDocuments();
   const total = allFiles.length;
@@ -328,17 +307,6 @@ const starFile = async ({
 }) => {
   await helperServices.checkUserPermission(userId, orgId);
 
-  const file = await filemodel.findOne({
-    _id: fileId,
-    isStarred: false,
-  });
-
-  if (!file)
-    throw new AppError({
-      httpCode: httpStatus.NOT_FOUND,
-      description: "File not found",
-    });
-
   const updatedDetails = await filemodel.findByIdAndUpdate(
     { _id: fileId },
     { isStarred: true },
@@ -347,7 +315,7 @@ const starFile = async ({
   if (!updatedDetails)
     throw new AppError({
       httpCode: httpStatus.NOT_FOUND,
-      description: "could not star file",
+      description: 'could not star file',
     });
   return updatedDetails;
 };
@@ -363,17 +331,6 @@ const unstarFile = async ({
 }) => {
   await helperServices.checkUserPermission(userId, orgId);
 
-  const file = await filemodel.findOne({
-    _id: fileId,
-    isStarred: true,
-  });
-
-  if (!file)
-    throw new AppError({
-      httpCode: httpStatus.NOT_FOUND,
-      description: "File not found",
-    });
-
   const updatedDetails = await filemodel.findByIdAndUpdate(
     { _id: fileId },
     { isStarred: false },
@@ -383,7 +340,7 @@ const unstarFile = async ({
   if (!updatedDetails)
     throw new AppError({
       httpCode: httpStatus.NOT_FOUND,
-      description: "could not unstar file",
+      description: 'could not unstar file',
     });
   return updatedDetails;
 };
@@ -412,7 +369,7 @@ const archiveFile = async ({
   if (!file)
     throw new AppError({
       httpCode: httpStatus.NOT_FOUND,
-      description: "An error ocured, could not archive file",
+      description: 'An error ocured, could not archive file',
     });
   return file;
 };
@@ -441,7 +398,7 @@ const unarchiveFile = async ({
   if (!file)
     throw new AppError({
       httpCode: httpStatus.NOT_FOUND,
-      description: "An error ocured, could not unarchive File",
+      description: 'An error ocured, could not unarchive File',
     });
   return file;
 };
@@ -471,10 +428,10 @@ const trashFile = async ({
   if (!trashFileUpdate)
     throw new AppError({
       httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-      description: "An error ocured, could not trash file",
+      description: 'An error ocured, could not trash file',
     });
 
-  return trashFileUpdate;
+  return { status: true, message: 'File moved from trash' };
 };
 
 const untrashFile = async ({
@@ -500,10 +457,10 @@ const untrashFile = async ({
   if (!untrashFileUpdate)
     throw new AppError({
       httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-      description: "An error ocured, could not untrash file",
+      description: 'An error ocured, could not untrash file',
     });
 
-  return untrashFileUpdate;
+  return { status: true, message: 'File removed from trash' };
 };
 
 const cleanupFiles = async () => {
@@ -519,10 +476,10 @@ const cleanupFiles = async () => {
       await filemodel.findByIdAndDelete({ _id: file._id });
     }
 
-    return "Expired Files deleted successfully";
+    return 'Expired Files deleted successfully';
   } catch (error) {
     console.error(error);
-    throw new Error("Error cleaning up expired Files");
+    throw new Error('Error cleaning up expired Files');
   }
 };
 
@@ -549,9 +506,9 @@ const renameFile = async ({
   if (!isFile)
     throw new AppError({
       httpCode: httpStatus.NOT_FOUND,
-      description: "An error ocured, could not rename File",
+      description: 'An error ocured, could not rename File',
     });
-  return isFile;
+  return { status: 'true', message: 'File renamed successfully' };
 };
 
 const fileCopy = async ({
@@ -584,9 +541,9 @@ const fileCopy = async ({
     if (!fileCopy)
       throw new AppError({
         httpCode: httpStatus.NOT_FOUND,
-        description: "could not copy file",
+        description: 'could not copy file',
       });
-    const message = `Folder copied successfully`;
+    const message = { status: true, message: `file copied successfully` };
     return message;
   } else {
     const fileCopy = await filemodel.updateMany(
@@ -600,9 +557,9 @@ const fileCopy = async ({
     if (fileCopy.modifiedCount !== fileIds)
       throw new AppError({
         httpCode: httpStatus.NOT_FOUND,
-        description: "could not copy file(s)",
+        description: 'could not copy file(s)',
       });
-    const message = `file copied successfully`;
+    const message = { status: true, message: `file copied successfully` };
     return message;
   }
 };
@@ -623,13 +580,10 @@ const fetchAllThrashedFile = async ({
   const options = {
     page: page,
     limit: 10,
-    sort: { createdAt: "desc" },
+    sort: { createdAt: 'desc' },
     lean: true,
   };
-  const allThrashedFiles = filemodel.paginate(
-    { orgId: orgId, isTrashed: true },
-    options
-  );
+  const allThrashedFiles = filemodel.paginate({ orgId: orgId, isTrashed: true }, options);
   return allThrashedFiles;
 };
 
@@ -657,36 +611,37 @@ const addPasswordToFile = async ({
   if (!lockFile)
     throw new AppError({
       httpCode: httpStatus.NOT_FOUND,
-      description: "could not lock file with password",
+      description: errorMessages.FILE_NOT_FOUND,
     });
-  const message = "file locked with password";
+  const message = { status: true, message: 'file locked with password' };
   return message;
 };
+
 
 const resetPassword = async ({
   userId,
   orgId,
   fileId,
   newPassword,
-  oldPassword,
+  token,
 }: {
   userId: string;
   fileId: string;
   orgId: string;
-  oldPassword: string;
+  token: string;
   newPassword: string;
 }) => {
+  await helperServices.checkUserPermission(userId, orgId);
   await helperServices.checkIfUserBelongsToOrganization({
     userId: userId,
     orgId: orgId,
   });
-  const isFile = await filemodel.findById(fileId);
-  if (!isFile) return;
-  await helperServices.checkUserPermission(userId, orgId);
-  const isPassword = await Helper.comparePassword(
-    isFile.password as string,
-    oldPassword
-  );
+  // const result = await redis.client.get(token);
+  // if (!result)
+  //   throw new AppError({
+  //     httpCode: httpStatus.NOT_FOUND,
+  //     description: 'Invalid token',
+  //   });
   const hash = await Helper.hashPassword(newPassword);
   const lockFile = await filemodel.findOneAndUpdate(
     { orgId: orgId, _id: fileId },
@@ -695,9 +650,9 @@ const resetPassword = async ({
   if (!lockFile)
     throw new AppError({
       httpCode: httpStatus.NOT_FOUND,
-      description: "could not reset password",
+      description: errorMessages.FILE_NOT_FOUND,
     });
-  const message = "file password reset succesfully";
+  const message = { status: true, message: 'file password reset succesfully' };
   return message;
 };
 
@@ -705,10 +660,12 @@ const getFileDetails = async ({
   orgId,
   fileId,
   userId,
+  password,
 }: {
   orgId: string;
   fileId: string;
   userId: string;
+  password?: string;
 }) => {
   await helperServices.checkIfUserBelongsToOrganization({
     userId: userId,
@@ -718,9 +675,51 @@ const getFileDetails = async ({
   if (!isFile)
     throw new AppError({
       httpCode: httpStatus.NOT_FOUND,
-      description: "file not found",
+      description: errorMessages.FILE_NOT_FOUND,
     });
-  return isFile
+  return { status: true, message: isFile };
+};
+
+const sortFields = {
+  recentlyModified: {
+    ascending: 'recentlyModifiedInAscendingOrder',
+    descending: 'recentlyModifiedIndescendingOrder',
+  },
+  fileName: {
+    ascending: 'FileNameInAscendingOrder',
+    descending: 'FileNameInDescendingOrder',
+  },
+  size: {
+    ascending: 'A-Z',
+    descending: 'Z-A',
+  },
+};
+
+const sortFiles = async ({
+  orgId,
+  userId,
+  sortType,
+}: {
+  orgId: string;
+  userId: string;
+  sortType: string;
+}) => {
+  await helperServices.checkIfUserBelongsToOrganization({
+    userId: userId,
+    orgId: orgId,
+  });
+  switch (sortType) {
+    case (sortType = sortFields.fileName.ascending):
+      return await sortFileNameInAscendingOrder();
+    case (sortType = sortFields.fileName.descending):
+      return await sortFileNameInDescendingOrder();
+    case (sortType = sortFields.recentlyModified.descending):
+      return await sortRecentlyModifiedinDescendingOrder();
+    case (sortType = sortFields.recentlyModified.ascending):
+      return await sortRecentlyModifiedinAscendingOrder();
+    default:
+      break;
+  }
 };
 
 export default {
@@ -742,4 +741,5 @@ export default {
   addPasswordToFile,
   resetPassword,
   getFileDetails,
+  sortFiles,
 };

@@ -136,4 +136,12 @@ fileRouter
     filecontroller.resetFilePassword
   );
 
+fileRouter
+  .route("/sort-files")
+  .put(
+    authGuard.guard,
+    validationMiddleware(filevalidation.sortFilePasswordValidation),
+    filecontroller.sortedFile
+  );
+
 export default fileRouter;

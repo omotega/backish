@@ -36,7 +36,7 @@ class Helper {
    * @params  the user payload
    */
 
-  static generateToken(payload: any, secret = config.tokenSecret) {
+  static generateToken(payload: any, secret = config.jwtSecret) {
     const token = jwt.sign(payload, secret, {
       expiresIn: "5h",
     });
@@ -50,7 +50,7 @@ class Helper {
    * @returns payload
    */
 
-  static decodeToken(token: any, secret = config.tokenSecret) {
+  static decodeToken(token: any, secret = config.jwtSecret) {
     const payload = jwt.verify(token, secret);
     return payload;
   }

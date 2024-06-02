@@ -1,11 +1,11 @@
-import mongoose from "mongoose";
-import mongoosePaginate from "mongoose-paginate-v2";
-import { folderModelInterface } from "../../types/folder";
-import { DateTime } from "luxon";
+import mongoose from 'mongoose';
+import mongoosePaginate from 'mongoose-paginate-v2';
+import { folderModelInterface } from '../../types/folder';
+import { DateTime } from 'luxon';
 
 const folderSchema = new mongoose.Schema(
   {
-    foldername: {
+    folderName: {
       type: String,
       unique: true,
       required: true,
@@ -13,7 +13,7 @@ const folderSchema = new mongoose.Schema(
     folderId: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Folder",
+        ref: 'Folder',
       },
     ],
     content: {
@@ -22,18 +22,19 @@ const folderSchema = new mongoose.Schema(
     collaborators: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: 'User',
       },
     ],
     orgId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Organization",
+      ref: 'Organization',
     },
     description: {
       type: String,
     },
     isPinned: {
       type: String,
+      default: false,
     },
     isarchived: {
       type: Boolean,
@@ -50,6 +51,14 @@ const folderSchema = new mongoose.Schema(
     isExpired: {
       type: Date,
     },
+    isLocked: {
+      type: Boolean,
+      default: false,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
     existInHomeDirectory: {
       type: Boolean,
       default: false,
@@ -59,7 +68,7 @@ const folderSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-folderSchema.pre("save", function (next) {
+folderSchema.pre('save', function (next) {
   if (this.isTrashed && !this.isExpired) {
     this.isExpired = DateTime.now().plus({ days: 30 }).toJSDate();
   }
@@ -70,4 +79,4 @@ folderSchema.plugin(mongoosePaginate);
 export default mongoose.model<
   folderModelInterface,
   mongoose.PaginateModel<folderModelInterface>
->("Folder", folderSchema);
+>('Folder', folderSchema);

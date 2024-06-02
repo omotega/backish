@@ -1,11 +1,10 @@
 import supertest from "supertest";
 import app from "../../app";
-import { userOne } from "../fixtures/user.fixture";
+import { userOne } from "../fixtures/testData";
 import httpStatus from "http-status";
 import Helper from "../../utils/helpers";
 import messages from "../../utils/messages";
 import { faker } from "@faker-js/faker";
-import testDb from "../testdb";
 import * as sendEmailService from "../../utils/sendemail";
 import {
   createInvite,
@@ -22,14 +21,7 @@ import { AppError } from "../../utils/errors";
 
 const api = supertest(app);
 
-beforeAll(async () => {
-  testDb.dbConnect();
-});
-
-afterAll(async () => {
-  testDb.dbDisconnect();
-  testdb.dbCleanUp();
-});
+testdb()
 
 describe(" POST api/user/signup", () => {
   test.skip("Should register a user when the body is correct", async () => {
@@ -223,7 +215,7 @@ describe(" POST /api/user/login", () => {
      const url = "/api/user/update-profile";
      const { body } = await api.put(url).send({}).expect(httpStatus.BAD_REQUEST);
 
-     expect(body.message).toBe("authorization not found");
+     expect(body.message).toBe("Authorization not found");
    });
  });
 
@@ -300,7 +292,7 @@ describe(" POST /api/user/invite-user", () => {
       .send({})
       .expect(httpStatus.BAD_REQUEST);
 
-    expect(body.message).toBe("authorization not found");
+    expect(body.message).toBe("Authorization not found");
   });
 
   test("Should return an error if organId field is empty ", async () => {

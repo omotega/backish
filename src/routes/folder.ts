@@ -7,7 +7,7 @@ import foldercontroller from "../controller/foldercontroller";
 const folderRouter = Router();
 
 folderRouter
-  .route("/create-folder")
+  .route("/create-folder/:orgId")
   .post(
     authGuard.guard,
     validationMiddleware(folderValidation.createFolderValidation),

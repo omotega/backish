@@ -25,8 +25,11 @@ const fileUpload = catchAsync(async (req: Request, res: Response) => {
 
 const addFileToFolder = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
-  const { folderId, orgId } = req.body;
-  const { fileId } = req.params;
+  const { fileId, orgId, folderId } = req.query as unknown as {
+    fileId: string;
+    orgId: string;
+    folderId: string;
+  };
 
   const response = await fileServices.addFiletoFolder({
     userId: _id,
@@ -263,13 +266,30 @@ const resetFilePassword = catchAsync(async (req: Request, res: Response) => {
     orgId: string;
     fileId: string;
   };
-  const { oldPassword, newPassword } = req.body;
+  const { oldPassword, newPassword,token } = req.body;
   const response = await fileservices.resetPassword({
     orgId: orgId,
     userId: _id,
     fileId: fileId,
     newPassword: newPassword,
-    oldPassword: oldPassword,
+    token
+  });
+  res.status(httpStatus.OK).json({
+    status: true,
+    data: response,
+  });
+});
+
+const sortedFile = catchAsync(async (req: Request, res: Response) => {
+  const { _id } = req.User;
+  const { orgId, sortType } = req.query as unknown as {
+    orgId: string;
+    sortType: string;
+  };
+  const response = await fileservices.sortFiles({
+    orgId: orgId,
+    userId: _id,
+    sortType: sortType,
   });
   res.status(httpStatus.OK).json({
     status: true,
@@ -294,4 +314,5 @@ export default {
   getAllThrashedFiles,
   lockFile,
   resetFilePassword,
+  sortedFile,
 };

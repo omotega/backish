@@ -15,6 +15,7 @@
     "@sendgrid/mail": "^7.7.0",
     "agenda": "^5.0.0",
     "argon2": "^0.31.1",
+    "bullmq": "^5.7.14",
     "cloudinary": "^1.41.0",
     "cron": "^3.0.0",
     "dotenv": "^16.3.1",
@@ -22,6 +23,7 @@
     "express-rate-limit": "^6.9.0",
     "http-status": "^1.6.2",
     "http-terminator": "^3.2.0",
+    "ioredis": "^5.4.1",
     "joi": "^17.10.0",
     "jsonwebtoken": "^9.0.2",
     "luxon": "^3.4.4",
@@ -29,10 +31,12 @@
     "mongoose-paginate-v2": "^1.7.31",
     "multer": "^1.4.5-lts.1",
     "node-cron": "^3.0.3",
+    "nodemailer": "^6.9.13",
     "redis": "^4.6.10",
     "short-uuid": "^4.2.2",
     "swagger-ui-express": "^5.0.0",
-    "yamljs": "^0.3.0"
+    "yamljs": "^0.3.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@faker-js/faker": "^8.0.2",

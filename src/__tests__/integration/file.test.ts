@@ -4,7 +4,7 @@ import httpStatus from "http-status";
 import messages from "../../utils/messages";
 import { faker } from "@faker-js/faker";
 import testDb from "../testdb";
-import { fileDataOne } from "../fixtures/file";
+import { fileDataOne } from "../fixtures/testData";
 import { userOne } from "../fixtures/user.fixture";
 import {
   createUser,
@@ -53,7 +53,6 @@ describe(" POST api/file/upload-request", () => {
   });
 
   afterEach(async () => {
-    jest.clearAllMocks();
     await deleteUsers();
     await deleteOrganization();
   });
@@ -90,4 +89,14 @@ describe(" POST api/file/upload-request", () => {
 
     expect(body.message).toBe("authorization not found");
   });
+});
+
+describe("add-to-folder/:fileId", () => {
+  beforeEach(async() => {
+
+  })
+
+  afterEach(async() => {
+    
+  })
 });

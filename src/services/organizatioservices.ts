@@ -1,68 +1,40 @@
-import Organization from "../database/model/organization";
-import usermodel from "../database/model/usermodel";
-import { AppError } from "../utils/errors";
-import httpStatus from "http-status";
-import messages from "../utils/messages";
-import helperServices from "./helper-services";
-import organization from "../database/model/organization";
-import userRoles from "../utils/role";
-import mongoose from "mongoose";
+import { AppError } from '../utils/errors';
+import httpStatus from 'http-status';
+import messages from '../utils/messages';
+import helperServices from './helper-services';
+import { userRoles } from '../utils/role';
+import orgMembers from '../database/model/orgMembers';
+import errorMessages from '../utils/messages';
 
-const listAllUsersInOrganization = async (orgId: string) => {
-  const organization = await Organization.findOne({ _id: orgId }).select(
-    "invitedEmails"
+const listAllUsersInOrganization = async ({
+  orgId,
+  page,
+}: {
+  orgId: string;
+  page: number;
+}) => {
+  const limit = 20;
+  const orgUsers = await orgMembers.paginate(
+    { orgId: orgId },
+    {
+      page,
+      limit,
+      populate: [
+        {
+          path: 'memberId',
+          select: 'email name',
+        },
+      ],
+    }
   );
-  if (!organization)
-    throw new AppError({
-      httpCode: httpStatus.NOT_FOUND,
-      description: `Organization with ID ${orgId} not found`,
-    });
-
-  if (!organization.invitedEmails) {
-    return [];
-  }
-  const result = await Promise.all(
-    await organization.invitedEmails.map(async (item: any) => {
-      try {
-        const user = await usermodel
-          .findOne({ email: item })
-          .select("name -_id");
-        if (user) {
-          return user;
-        } else {
-          throw new AppError({
-            httpCode: httpStatus.NOT_FOUND,
-            description: "User not found",
-          });
-        }
-      } catch (error) {
-        console.error(`Error querying user with email ${item}: ${error}`);
-      }
-    })
-  );
-  if (!result.length) {
-    throw new AppError({
-      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-      description: "No users found for the provided email addresses",
-    });
-  }
-
-  return result;
+  return orgUsers;
 };
 
-const findUser = async ({ orgId, email }: { orgId: string; email: string }) => {
-  const userExistinOrg = await Organization.findOne({
-    _id: orgId,
-    invitedEmails: { $in: [email] },
-  });
-  if (!userExistinOrg)
-    throw new AppError({
-      httpCode: httpStatus.NOT_FOUND,
-      description: messages.USER_NOT_FOUND,
-    });
-  const userDetails = await usermodel
-    .findOne({ email: email })
-    .select("name -_id");
+const findUserinOrg = async ({ orgId, userId }: { orgId: string; userId: string }) => {
+  await helperServices.checkIfUserBelongsToOrganization({ userId, orgId });
+  const userDetails = await orgMembers
+    .findOne({ memberId: userId, orgId: orgId })
+    .populate([{ path: 'memberId', select: 'email name username' }]);
   if (!userDetails)
     throw new AppError({
       httpCode: httpStatus.NOT_FOUND,
@@ -78,55 +50,39 @@ const leaveOrganization = async ({
   orgId: string;
   userId: string;
 }) => {
-  const isUser = await helperServices.getUserdetailsById(userId);
-  const result: any = isUser.orgStatus.find(
-    (item) => item.orgId?.toString() === orgId.toString()
+  await helperServices.checkIfUserBelongsToOrganization({ userId, orgId });
+  await orgMembers.findOneAndUpdate(
+    {
+      memberId: userId,
+      orgId: orgId,
+    },
+    { $set: { active: false } }
   );
-  if (!result) return;
-  const index = isUser.orgStatus.indexOf(result);
-  if (index !== -1) {
-    isUser.orgStatus.splice(index, 1);
-  }
-  isUser.save();
-
-  const userExistinOrg = await Organization.findOne({
-    _id: orgId,
-    invitedEmails: { $in: [isUser.email] },
-  }).select("invitedEmails");
-  if (!userExistinOrg)
-    throw new AppError({
-      httpCode: httpStatus.NOT_FOUND,
-      description: messages.USER_NOT_FOUND,
-    });
-  if (!userExistinOrg.invitedEmails) return;
-  const results: any = userExistinOrg.invitedEmails.find(
-    (item) => item === isUser.email
-  );
-  if (!results) return;
-  const emailIndex = userExistinOrg.invitedEmails.indexOf(results);
-  if (emailIndex !== -1) {
-    userExistinOrg.invitedEmails.splice(emailIndex, 1);
-  }
-  userExistinOrg.save();
-  const message = `you have left ${userExistinOrg.orgName} organization`;
-
-  return message;
+  return { status: true, message: 'You have left the organization' };
 };
 
-const listUserOrganization = async ({ userId }: { userId: string }) => {
-  const isUser = await helperServices.getUserdetailsById(userId);
-  if (!isUser) return;
-  const result = await Promise.all(
-    await isUser.orgStatus.map(async (item: any) => {
-      const orgs = await organization
-        .findOne({ _id: item.orgId })
-        .select("orgName -_id");
-      return orgs;
-    })
+const listUserOrganization = async ({
+  userId,
+  page,
+}: {
+  userId: string;
+  page: number;
+}) => {
+  const limit = 20;
+  const userOrgs = await orgMembers.paginate(
+    { memberId: userId },
+    {
+      page,
+      limit,
+      populate: [
+        {
+          path: 'orgId',
+          select: 'orgName',
+        },
+      ],
+    }
   );
-
-  if (!result) return;
-  return result;
+  return userOrgs;
 };
 
 const updateUserRole = async ({
@@ -143,28 +99,18 @@ const updateUserRole = async ({
     userId: collaboratorId,
     orgId: orgId,
   });
-
-  const updateRole = await usermodel.findOneAndUpdate(
-    {
-      _id: collaboratorId,
-      "orgStatus.roleInOrg": userRoles.guest,
-      "orgStatus.orgId": orgId,
-    },
-    {
-      $set: {
-        "orgStatus.$.roleInOrg": userRoles.admin,
-      },
-    },
-    { new: true }
-  );
-  if (!updateRole)
+  const updatedUserRole = await orgMembers
+    .findOneAndUpdate(
+      { memberId: collaboratorId, orgId: orgId },
+      { $set: { role: userRoles.admin } }
+    )
+    .populate([{ path: 'memberId', select: 'name' }]);
+  if (!updatedUserRole)
     throw new AppError({
-      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-      description: "Could not upadate role",
+      httpCode: httpStatus.NOT_FOUND,
+      description: errorMessages.USER_NOT_FOUND,
     });
-  const message = `${updateRole.name} is now an Admin `;
-
-  return message;
+  return { status: true, message: 'user role updated' };
 };
 
 const deactivateUserFromOrg = async ({
@@ -181,39 +127,31 @@ const deactivateUserFromOrg = async ({
     userId: collaboratorId,
     orgId: orgId,
   });
-  const isUser = await usermodel
-    .findOne({ _id: collaboratorId })
-    .select("_id name email");
 
-  if (!isUser)
+  const deactivateUser = await orgMembers
+    .findOneAndUpdate(
+      { memberId: collaboratorId, orgId: orgId },
+      { $set: { active: false } }
+    )
+    .populate([{ path: 'memberId', select: 'name' }]);
+
+  if (!deactivateUser)
     throw new AppError({
       httpCode: httpStatus.NOT_FOUND,
-      description: messages.USER_NOT_FOUND,
+      description: `Could not deactivate  user from organization`,
     });
-  const [org, user] = await Promise.all([
-    await organization.findOneAndUpdate(
-      { invitedEmails: { $in: [isUser.email] } },
-      { $pull: { invitedEmails: { $in: [isUser.email] } } },
-      { new: true }
-    ),
-    await usermodel.findOneAndUpdate(
-      { orgStatus: { $elemMatch: { orgId: orgId } } },
-      { $pull: { orgStatus: { $elemMatch: { orgId: orgId } } } }
-    ),
-  ]);
-  if (!org || !user)
-    throw new AppError({
-      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-      description: `Could not remove ${isUser.name} from organization`,
-    });
-  const message = `${isUser.name} removed succesfully`;
+  const message = {
+    status: true,
+    message: `user deactivated succesfully`,
+  };
   return message;
 };
+
 export default {
   listAllUsersInOrganization,
-  findUser,
+  findUserinOrg,
   leaveOrganization,
   listUserOrganization,
   updateUserRole,
-  deactivateUserFromOrg
+  deactivateUserFromOrg,
 };

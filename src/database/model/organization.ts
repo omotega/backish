@@ -7,11 +7,6 @@ const organizationSchema = new mongoose.Schema(
       type: "string",
       unique: true,
     },
-    invitedEmails: [
-      {
-        type: String,
-      },
-    ],
   },
   {
     timestamps: true,

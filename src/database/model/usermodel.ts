@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import { Iuser } from "../../types/user";
+import mongoose from 'mongoose';
+import { Iuser } from '../../types/user';
 
 const userSchema = new mongoose.Schema(
   {
@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
     email: {
-      type: "String",
+      type: 'String',
       unique: true,
       required: true,
     },
@@ -16,25 +16,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    orgStatus: [
-      {
-        orgId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Organization",
-          required:true,
-        },
-        roleInOrg: {
-          type: String,
-          enum: ["super-admin", "admin", "guest"],
-          default: "super-admin",
-          
-        },
-      },
-    ],
   },
   {
     timestamps: true,
   }
 );
 
-export default mongoose.model<Iuser>("User", userSchema);
+export default mongoose.model<Iuser>('User', userSchema);

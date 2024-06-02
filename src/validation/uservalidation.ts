@@ -1,9 +1,10 @@
-import joi from "joi";
-import { validationMessages } from "./custom";
+import joi from 'joi';
+import { validationMessages } from './custom';
 
 const createUserValidation = {
   body: joi.object({
     name: joi.string().required().messages(validationMessages.name),
+    userName: joi.string().required(),
     email: joi.string().email().required().messages(validationMessages.email),
     password: joi.string().required().messages(validationMessages.password),
     organizationName: joi
@@ -36,6 +37,10 @@ const inviteUserValidation = {
 const confirmInviteValidation = {
   body: joi.object({
     reference: joi.string().required().messages(validationMessages.reference),
+    username: joi.string().required(),
+  }),
+  query: joi.object({
+    orgId: joi.string().required().messages(validationMessages.orgId),
   }),
 };
 

@@ -1,90 +1,77 @@
-import { Request, Response } from "express";
-import httpStatus from "http-status";
-import catchAsync from "../utils/catchasync";
-import messages from "../utils/messages";
-import organizatioservices from "../services/organizatioservices";
+import { Request, Response } from 'express';
+import httpStatus from 'http-status';
+import catchAsync from '../utils/catchasync';
+import organizatioservices from '../services/organizatioservices';
 
-const getAllUsersInOrganization = catchAsync(
-  async (req: Request, res: Response) => {
-    const { orgId } = req.body;
-    const response = await organizatioservices.listAllUsersInOrganization(
-      orgId
-    );
-    res.status(httpStatus.OK).json({
-      success: true,
-      message: messages.DATA_FETCHED_SUCCESS,
-      data: response,
-    });
-  }
-);
+const getAllUsersInOrganization = catchAsync(async (req: Request, res: Response) => {
+  const { orgId, page } = req.query as unknown as {
+    orgId: string;
+    page: number;
+  };
+  const response = await organizatioservices.listAllUsersInOrganization({ orgId, page });
+  res.status(httpStatus.OK).send(response);
+});
 
 const getAUser = catchAsync(async (req: Request, res: Response) => {
-  const { orgId } = req.params;
-  const { email } = req.query as unknown as {
-    email: string;
+  const { _id } = req.User;
+  const { orgId } = req.query as unknown as {
+    orgId: string;
   };
-  const response = await organizatioservices.findUser({
+  const response = await organizatioservices.findUserinOrg({
     orgId: orgId,
-    email: email,
+    userId: _id,
   });
-  res.status(httpStatus.OK).json({
-    success: true,
-    message: messages.DATA_FETCHED_SUCCESS,
-    data: response,
-  });
+  res.status(httpStatus.OK).send(response);
 });
 
 const signOutOfOrg = catchAsync(async (req: Request, res: Response) => {
-  const { orgId } = req.body;
+  const { orgId } = req.params;
   const { _id } = req.User;
   const response = await organizatioservices.leaveOrganization({
     orgId: orgId,
     userId: _id,
   });
-  res.status(httpStatus.OK).json({
-    success: true,
-    message: response,
-  });
+  res.status(httpStatus.OK).send(response);
 });
 
 const getAllUserOrgs = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
+  const { page } = req.query as unknown as {
+    page: number;
+  };
   const response = await organizatioservices.listUserOrganization({
+    page,
     userId: _id,
   });
-  res.status(httpStatus.OK).json({
-    success: true,
-    message: response,
-  });
+  res.status(httpStatus.OK).send(response);
 });
 
 const changeUserRole = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
-  const { orgId, collaboratorId } = req.body;
+  const { orgId, collaboratorId } = req.query as unknown as {
+    orgId: string;
+    collaboratorId: string;
+  };
   const response = await organizatioservices.updateUserRole({
     userId: _id,
     orgId: orgId,
     collaboratorId: collaboratorId,
   });
-  res.status(httpStatus.OK).json({
-    success: true,
-    message: "Role updates succesfully",
-    data: response,
-  });
+  res.status(httpStatus.OK).send(response);
 });
 
-const removeUserFromOrg = catchAsync(async (req: Request, res: Response) => {
+const deactivateUserFromOrg = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
-  const { orgId, collaboratorId } = req.body;
+  const { orgId, collaboratorId } = req.query as {
+    orgId: string;
+    collaboratorId: string;
+  };
   const response = await organizatioservices.deactivateUserFromOrg({
     userId: _id,
     orgId: orgId,
     collaboratorId: collaboratorId,
   });
-  res.status(httpStatus.OK).json({
-    success: true,
-    message: response,
-  });
+  res.status(httpStatus.OK).send(response);
 });
 
 export default {
@@ -93,5 +80,5 @@ export default {
   signOutOfOrg,
   getAllUserOrgs,
   changeUserRole,
-  removeUserFromOrg,
+  deactivateUserFromOrg
 };
