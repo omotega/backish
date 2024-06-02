@@ -2,7 +2,7 @@ import express from "express";
 import cron from "node-cron";
 import route from "./routes";
 import docRouter from "./docs";
-import { CustomRequest } from "./types/customrequest";
+import { CustomRequest } from "./types/customrequest.";
 import folderservices from "./services/folderservices";
 import fileservices from "./services/fileservices";
 

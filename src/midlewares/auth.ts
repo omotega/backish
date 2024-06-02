@@ -20,7 +20,7 @@ export const guard = async (
         const credentials = parts[1];
         if (/^Bearer$/i.test(scheme)) {
           const token = credentials;
-          const decode: any = Helper.decodeToken(token, config.tokenSecret);
+          const decode: any = Helper.decodeToken(token, config.jwtSecret);
           const user = await usermodel.findById(decode.userId);
           if (!user)
             throw new AppError({

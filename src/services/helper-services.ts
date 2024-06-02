@@ -1,9 +1,10 @@
-import httpStatus from "http-status";
-import { AppError } from "../utils/errors";
-import messages from "../utils/messages";
-import usermodel from "../database/model/usermodel";
-import organization from "../database/model/organization";
-import userRoles from "../utils/role";
+import httpStatus from 'http-status';
+import { AppError } from '../utils/errors';
+import messages from '../utils/messages';
+import usermodel from '../database/model/usermodel';
+import fileModel from '../database/model/file';
+import { userRoles } from '../utils/role';
+import orgMembers from '../database/model/orgMembers';
 
 async function getUserdetailsById(userId: string) {
   const user = await usermodel.findOne({ _id: userId });
@@ -16,23 +17,17 @@ async function getUserdetailsById(userId: string) {
 }
 
 async function checkUserPermission(userId: string, orgId: any) {
-  const user = await getUserdetailsById(userId);
-  const response = user.orgStatus.find(
-    (item) => item.orgId?.toString() === orgId.toString()
-  );
-  if (!response?.roleInOrg) return;
-  if (
-    response.roleInOrg !== userRoles.superAdmin &&
-    response.roleInOrg !== userRoles.admin
-  )
+  const response = await orgMembers.findOne({
+    memberId: userId,
+    orgId: orgId,
+    role: userRoles.superAdmin || userRoles.admin,
+  });
+  if (!response)
     throw new AppError({
       httpCode: httpStatus.NOT_ACCEPTABLE,
-      description:
-        "You are not authorized to carry out this operation. Contact admin for help.",
+      description: 'You are not authorized to carry out this operation.',
     });
-  return true;
 }
-
 
 async function checkIfUserBelongsToOrganization({
   userId,
@@ -41,18 +36,29 @@ async function checkIfUserBelongsToOrganization({
   userId: string;
   orgId: string;
 }) {
-  const isUser = await getUserdetailsById(userId);
-  if (!isUser) return;
-  const result = isUser.orgStatus.find(
-    (item) => item.orgId?.toString() === orgId
-  );
+  const result = await orgMembers.findOne({ memberId: userId, orgId: orgId });
   if (!result)
     throw new AppError({
       httpCode: httpStatus.NOT_FOUND,
-      description: "User does not belong this organization",
+      description: 'User does not belong this organization',
     });
-  return true;
 }
+
+export const sortRecentlyModifiedinAscendingOrder = async () => {
+  return await fileModel.find().sort({ updatedAt: 1 });
+};
+
+export const sortRecentlyModifiedinDescendingOrder = async () => {
+  return await fileModel.find().sort({ updatedAt: -1 });
+};
+
+export const sortFileNameInAscendingOrder = async () => {
+  return await fileModel.find().sort({ filename: -1 });
+};
+
+export const sortFileNameInDescendingOrder = async () => {
+  return await fileModel.find().sort({ filename: 1 });
+};
 
 export default {
   getUserdetailsById,

@@ -17,13 +17,14 @@ const fileUploadValidation = {
 };
 
 const addFileToFolderValidation = {
-  body: joi.object({
+  query: joi.object({
     folderId: joi
       .string()
       .custom(JoiObjectId)
       .required()
       .messages(validationMessages.folderId),
     orgId: joi.string().required().messages(validationMessages.orgId),
+    fileId: joi.string().required().messages(validationMessages.fileId),
   }),
 };
 
@@ -165,6 +166,13 @@ const resetFilePasswordValidation = {
   },
 };
 
+const sortFilePasswordValidation = {
+  query: joi.object({
+    orgId: joi.string().required().messages(validationMessages.orgId),
+    sortType: joi.string().required(),
+  }),
+};
+
 export default {
   fileUploadValidation,
   addFileToFolderValidation,
@@ -180,4 +188,5 @@ export default {
   getTrashedFilesValidation,
   lockFileValidation,
   resetFilePasswordValidation,
+  sortFilePasswordValidation
 };

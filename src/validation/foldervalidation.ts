@@ -3,12 +3,15 @@ import { validationMessages } from "./custom";
 import { JoiObjectId } from "./helper";
 
 const createFolderValidation = {
-  body: joi.object({
+  params: joi.object({
     orgId: joi
       .string()
       .custom(JoiObjectId)
       .required()
       .messages(validationMessages.orgId),
+    folderId: joi.string().custom(JoiObjectId),
+  }),
+  body: joi.object({
     foldername: joi.string().required().messages(validationMessages.foldername),
     description: joi
       .string()
@@ -18,7 +21,7 @@ const createFolderValidation = {
 };
 
 const starFolderValidation = {
-  body: joi.object({
+  query: joi.object({
     orgId: joi
       .string()
       .custom(JoiObjectId)
@@ -33,7 +36,7 @@ const starFolderValidation = {
 };
 
 const unstarFolderValidation = {
-  body: joi.object({
+  query: joi.object({
     orgId: joi
       .string()
       .custom(JoiObjectId)
@@ -48,30 +51,26 @@ const unstarFolderValidation = {
 };
 
 const liststarredFoldersValidation = {
-  params: joi.object({
+  query: joi.object({
+    page: joi.number().required(),
+    limit: joi.number().required(),
     orgId: joi
       .string()
       .custom(JoiObjectId)
       .required()
       .messages(validationMessages.orgId),
-  }),
-  query: joi.object({
-    page: joi.number().required(),
-    limit: joi.number().required(),
   }),
 };
 
 const listUnstarredFoldersValidation = {
-  params: joi.object({
+  query: joi.object({
+    page: joi.number().required(),
+    limit: joi.number().required(),
     orgId: joi
       .string()
       .custom(JoiObjectId)
       .required()
       .messages(validationMessages.orgId),
-  }),
-  query: joi.object({
-    page: joi.number().required(),
-    limit: joi.number().required(),
   }),
 };
 

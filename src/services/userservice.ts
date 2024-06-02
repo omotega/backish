@@ -1,30 +1,34 @@
-import httpStatus from "http-status";
-import userquery from "../database/queries/userquery";
-import { AppError } from "../utils/errors";
-import Helper from "../utils/helpers";
-import messages from "../utils/messages";
-import organizationquery from "../database/queries/organization";
-import sendEmail from "../utils/sendemail";
-import membership from "../database/model/membership";
-import usermodel from "../database/model/usermodel";
-import helperServices from "./helper-services";
-import Organization from "../database/model/organization";
-import mongoose from "mongoose";
-import otpmodel from "../database/model/otpmodel";
-import { Request, Response } from "express";
+import httpStatus from 'http-status';
+import { AppError } from '../utils/errors';
+import Helper from '../utils/helpers';
+import messages from '../utils/messages';
+import sendEmail from '../utils/email';
+import membership from '../database/model/membership';
+import usermodel from '../database/model/usermodel';
+import helperServices from './helper-services';
+import Organization from '../database/model/organization';
+import mongoose from 'mongoose';
+import otpmodel from '../database/model/otpmodel';
+import { Request, Response } from 'express';
+import organization from '../database/model/organization';
+import orgMembers from '../database/model/orgMembers';
+import { userRoles } from '../utils/role';
+import { valid } from 'joi';
 
 const registerUser = async ({
   name,
   email,
   password,
   organizationName,
+  userName,
 }: {
   name: string;
   email: string;
   password: string;
   organizationName: string;
+  userName: string;
 }) => {
-  const isUser = await userquery.findUserByEmail(email);
+  const isUser = await usermodel.findOne({ email: email });
   if (isUser)
     throw new AppError({
       httpCode: httpStatus.CONFLICT,
@@ -37,7 +41,7 @@ const registerUser = async ({
   if (orgNameExist)
     throw new AppError({
       httpCode: httpStatus.CONFLICT,
-      description: "Organization with this name already exist",
+      description: 'Organization with this name already exist',
     });
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -53,18 +57,19 @@ const registerUser = async ({
   const user = await usermodel.create(
     [
       {
-        orgStatus: [
-          {
-            orgId: orgId,
-            roleInOrg: "super-admin",
-          },
-        ],
         name: name,
         email: email,
         password: hash,
       },
     ],
     { session }
+  );
+  const userId = user.map((item) => item._id);
+  await orgMembers.create(
+    [{ orgId: orgId, memberId: userId, userName: userName, role: userRoles.superAdmin }],
+    {
+      session,
+    }
   );
   await session.commitTransaction();
   session.endSession();
@@ -73,17 +78,11 @@ const registerUser = async ({
       httpCode: httpStatus.INTERNAL_SERVER_ERROR,
       description: messages.USER_CREATION_ERROR,
     });
-  return user;
+  return { status: true, meassage: user };
 };
 
-const loginUser = async ({
-  email,
-  password,
-}: {
-  email: string;
-  password: string;
-}) => {
-  const isUser = await userquery.findUserByEmail(email);
+const loginUser = async ({ email, password }: { email: string; password: string }) => {
+  const isUser = await usermodel.findOne({ email: email });
   if (!isUser)
     throw new AppError({
       httpCode: httpStatus.NOT_FOUND,
@@ -103,24 +102,21 @@ const loginUser = async ({
   return result;
 };
 
-const updateUser = async ({
-  userId,
-  name,
-}: {
-  userId: string;
-  name: string;
-}) => {
+const updateUser = async ({ userId, name }: { userId: string; name: string }) => {
   const isUser = await helperServices.getUserdetailsById(userId);
-  const updateUser = await userquery.updateUserDetails({
-    userId: isUser._id,
-    name: name,
-  });
+  const updateUser = await usermodel.findByIdAndUpdate(
+    {
+      userId: isUser._id,
+    },
+    { $set: { name: name } },
+    { new: true }
+  );
   if (!updateUser)
     throw new AppError({
-      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
+      httpCode: httpStatus.NOT_FOUND,
       description: messages.USER_UPDATE_ERROR,
     });
-  return updateUser;
+  return { status: true, messages: 'User details updated succesfully' };
 };
 
 const inviteUserToOrg = async ({
@@ -132,101 +128,63 @@ const inviteUserToOrg = async ({
   userId: string;
   invitedEmail: string;
 }) => {
-  const isOrganization = await organizationquery.find({
+  await helperServices.checkUserPermission(userId, orgId);
+  await helperServices.checkIfUserBelongsToOrganization({ userId, orgId });
+  const isOrganization = await organization.findOne({
     _id: orgId,
   });
   if (!isOrganization)
     throw new AppError({
       httpCode: httpStatus.NOT_FOUND,
-      description: "organization not found",
+      description: 'organization not found',
     });
   await helperServices.getUserdetailsById(userId);
-  await helperServices.checkUserPermission(userId, isOrganization._id);
   const referenceToken: any = Helper.generateRef();
   const expires_at = new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000);
-  const invite = await membership.create({
-    email: invitedEmail,
+  const inviteData = {
     token: referenceToken,
+    userId: userId,
+    orgId: orgId,
     expiresAt: expires_at,
-    orgName: isOrganization.orgName,
-  });
-  if (!invite)
-    throw new AppError({
-      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-      description: messages.SOMETHING_HAPPENED,
-    });
-  await sendEmail({
     email: invitedEmail,
+  };
+  await membership.create({ ...inviteData });
+  await sendEmail({
+    toEmail: invitedEmail,
     subject: `${isOrganization.orgName} organization invite`,
-    message: `you are invited to join the ${isOrganization.orgName} organization on backish, this is the reference token ${invite.token}`,
+    message: `you are invited to join the ${isOrganization.orgName} organization on backish, this is the reference token ${inviteData.token}`,
   });
-
-  return "invite sent succesful";
+  return { status: true, message: 'invite sent succesful' };
 };
 
-const confirmUserInvite = async (reference: string) => {
-  const ismember = await membership.findOne({ token: reference });
-  if (!ismember)
-    throw new AppError({
-      httpCode: httpStatus.NOT_FOUND,
-      description: "invite not found",
-    });
-  const userHasAccount = await userquery.findUserByEmail(
-    ismember.email as string
-  );
-  if (!userHasAccount)
-    throw new AppError({
-      httpCode: httpStatus.NOT_FOUND,
-      description:
-        "You do not have an account. Please signup before you can confirm invite.",
-    });
-  const isOrganization = await organizationquery.find({
-    orgName: ismember.orgName,
+const confirmUserInvite = async ({
+  reference,
+  username,
+  userId,
+  orgId,
+}: {
+  reference: string;
+  userId: string;
+  username: string;
+  orgId: string;
+}) => {
+  const data = await membership.findOne({
+    userId: userId,
+    token: reference,
+    valid: true,
   });
-  if (!isOrganization)
+  if (!data)
     throw new AppError({
       httpCode: httpStatus.NOT_FOUND,
-      description: "Organization not found",
+      description: 'invite not found',
     });
-  const updateQuery = {
-    $push: { invitedEmails: [userHasAccount.email] },
-  };
-
-  const userUpdateQuery = {
-    $push: {
-      orgStatus: [
-        {
-          orgId: isOrganization._id,
-          roleInOrg: "guest",
-        },
-      ],
-    },
-  };
-  const response = await Promise.all([
-    await Organization.findByIdAndUpdate(
-      { _id: isOrganization._id },
-      updateQuery
-    ),
-    await usermodel.findByIdAndUpdate(
-      { _id: userHasAccount._id },
-      userUpdateQuery
-    ),
-    await ismember.deleteOne({ id: ismember.id, token: ismember.token }),
-  ]);
-  if (!response.length)
-    throw new AppError({
-      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-      description: messages.SOMETHING_HAPPENED,
-    });
-  const message = `you have succesfully joined ${isOrganization.orgName} organization`;
-  return message;
+  await orgMembers.create({ orgId: orgId, memberId: userId, userName: username });
+  await membership.deleteMany({ userId: userId, orgId: orgId });
+  return { status: true };
 };
 
-const recoverAccount = async (
-  req: Request,
-  res: Response,
-  reqEmail: string
-) => {
+
+const recoverAccount = async (req: Request, res: Response, reqEmail: string) => {
   const { email } = req.body;
 
   const isUser = await usermodel.findOne({ email: reqEmail });
@@ -239,16 +197,13 @@ const recoverAccount = async (
   }
 
   const otp = Helper.generateOtp();
-  await otpmodel.findOneAndUpdate(
-    { email: email },
-    { token: otp, expired: false }
-  );
+  await otpmodel.findOneAndUpdate({ email: email }, { token: otp, expired: false });
 
-  const subject: string = "Reset password otp";
+  const subject: string = 'Reset password otp';
   const message = `Hi, Kindly use this ${otp} to reset your password`;
 
   await sendEmail({
-    email: email,
+    toEmail: email,
     subject: subject,
     message: message,
   });

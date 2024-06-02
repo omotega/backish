@@ -6,7 +6,7 @@ dotenv.config();
 
 const connectDb = async () => {
   try {
-    const conn = await mongoose.connect(config.mongoUri);
+    const conn = await mongoose.connect(config.databaseUrl);
     return conn;
   } catch (error) {
     console.error(error);
