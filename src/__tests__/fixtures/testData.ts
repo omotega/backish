@@ -1,7 +1,6 @@
 import { faker } from '@faker-js/faker';
 import mongoose from 'mongoose';
 import { userRoles } from '../../utils/role';
-import { genToken } from '../helper/testhelper';
 
 export const fileDataOne = {
   filename: faker.lorem.word(),
@@ -42,21 +41,15 @@ export const orgDataTwo = {
   orgName: faker.company.name(),
 };
 
-// const orgMemberData = {
-//   orgId: orgDataOne._id,
-//   memberId: userOne._id,
-//   role: userRoles.guest,
-// };
-
 export const folderDataOne = {
-  foldername: faker.commerce.product(),
+  folderName: faker.commerce.product(),
   orgId: orgDataOne._id,
   description: faker.lorem.word(),
   isStarred: false,
 };
 
 export const folderDataTwo = {
-  foldername: faker.commerce.product(),
+  folderName: faker.lorem.word(),
   orgId: orgDataTwo._id,
   description: faker.lorem.word(),
   isStarred: false,

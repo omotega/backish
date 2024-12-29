@@ -2,7 +2,7 @@ import httpStatus from 'http-status';
 import { AppError } from '../utils/errors';
 import Helper from '../utils/helpers';
 import messages from '../utils/messages';
-import sendEmail from '../utils/email';
+import * as emailService from '../utils/email';
 import membership from '../database/model/membership';
 import usermodel from '../database/model/usermodel';
 import helperServices from './helper-services';
@@ -13,7 +13,6 @@ import { Request, Response } from 'express';
 import organization from '../database/model/organization';
 import orgMembers from '../database/model/orgMembers';
 import { userRoles } from '../utils/role';
-import { valid } from 'joi';
 
 const registerUser = async ({
   name,
@@ -66,7 +65,7 @@ const registerUser = async ({
   );
   const userId = user.map((item) => item._id);
   await orgMembers.create(
-    [{ orgId: orgId, memberId: userId, userName: userName, role: userRoles.superAdmin }],
+    [{ orgId: orgId, memberId: userId, userName: userName, role: userRoles.admin }],
     {
       session,
     }
@@ -78,7 +77,7 @@ const registerUser = async ({
       httpCode: httpStatus.INTERNAL_SERVER_ERROR,
       description: messages.USER_CREATION_ERROR,
     });
-  return { status: true, meassage: user };
+  return { status: true, message: user };
 };
 
 const loginUser = async ({ email, password }: { email: string; password: string }) => {
@@ -99,15 +98,12 @@ const loginUser = async ({ email, password }: { email: string; password: string 
     email: isUser.email,
   });
   const result = { isUser, token };
-  return result;
+  return { status: true, message: messages.LOGIN_SUCCESS };
 };
 
 const updateUser = async ({ userId, name }: { userId: string; name: string }) => {
-  const isUser = await helperServices.getUserdetailsById(userId);
   const updateUser = await usermodel.findByIdAndUpdate(
-    {
-      userId: isUser._id,
-    },
+    userId,
     { $set: { name: name } },
     { new: true }
   );
@@ -149,7 +145,7 @@ const inviteUserToOrg = async ({
     email: invitedEmail,
   };
   await membership.create({ ...inviteData });
-  await sendEmail({
+  await emailService.sendEmail({
     toEmail: invitedEmail,
     subject: `${isOrganization.orgName} organization invite`,
     message: `you are invited to join the ${isOrganization.orgName} organization on backish, this is the reference token ${inviteData.token}`,
@@ -160,29 +156,26 @@ const inviteUserToOrg = async ({
 const confirmUserInvite = async ({
   reference,
   username,
-  userId,
   orgId,
 }: {
   reference: string;
-  userId: string;
   username: string;
   orgId: string;
 }) => {
   const data = await membership.findOne({
-    userId: userId,
     token: reference,
     valid: true,
+    orgId: orgId,
   });
   if (!data)
     throw new AppError({
       httpCode: httpStatus.NOT_FOUND,
       description: 'invite not found',
     });
-  await orgMembers.create({ orgId: orgId, memberId: userId, userName: username });
-  await membership.deleteMany({ userId: userId, orgId: orgId });
-  return { status: true };
+  await orgMembers.create({ orgId: orgId, memberId: data.userId, userName: username });
+  await membership.deleteMany({ userId: data.userId, orgId: orgId });
+  return;
 };
-
 
 const recoverAccount = async (req: Request, res: Response, reqEmail: string) => {
   const { email } = req.body;
@@ -202,7 +195,7 @@ const recoverAccount = async (req: Request, res: Response, reqEmail: string) => 
   const subject: string = 'Reset password otp';
   const message = `Hi, Kindly use this ${otp} to reset your password`;
 
-  await sendEmail({
+  await emailService.sendEmail({
     toEmail: email,
     subject: subject,
     message: message,

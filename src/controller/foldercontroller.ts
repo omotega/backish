@@ -1,11 +1,14 @@
-import httpStatus from "http-status";
-import folderservices from "../services/folderservices";
-import { Request, Response } from "express";
-import catchAsync from "../utils/catchasync";
+import httpStatus from 'http-status';
+import folderservices from '../services/folderservices';
+import { Request, Response } from 'express';
+import catchAsync from '../utils/catchasync';
 
 const createFolder = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
-  const { folderId, orgId } = req.params;
+  const { orgId } = req.params;
+  const { folderId } = req.query as unknown as {
+    folderId: string;
+  };
   const { foldername, description } = req.body;
   const response = await folderservices.createFolder({
     folderName: foldername,
@@ -14,7 +17,7 @@ const createFolder = catchAsync(async (req: Request, res: Response) => {
     description: description,
     userId: _id,
   });
-  res.status(httpStatus.CREATED).json(response);
+  res.status(httpStatus.CREATED).send(response);
 });
 
 const starFolder = catchAsync(async (req: Request, res: Response) => {
@@ -29,7 +32,7 @@ const starFolder = catchAsync(async (req: Request, res: Response) => {
     folderId: folderId,
   });
 
-  res.status(httpStatus.OK).json(response);
+  res.status(httpStatus.OK).send(response);
 });
 
 const unstarFolder = catchAsync(async (req: Request, res: Response) => {
@@ -43,37 +46,37 @@ const unstarFolder = catchAsync(async (req: Request, res: Response) => {
     orgId: orgId,
     folderId: folderId,
   });
-  res.status(httpStatus.OK).json(response);
+  res.status(httpStatus.OK).send(response);
 });
 
 const getAllStarredFolders = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
-  const { page = 1, limit = 10 } = req.query as unknown as {
+  const { page, limit, orgId } = req.query as unknown as {
     page: number;
     limit: number;
+    orgId: string;
   };
-  const { orgId } = req.params;
   const response = await folderservices.listAllStarredFolders({
     orgId: orgId,
     page: page,
     limit: limit,
   });
-  res.status(httpStatus.OK).json(response);
+  res.status(httpStatus.OK).send(response);
 });
 
 const updateFolder = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
   const { folderId } = req.params;
-  const { orgId, foldername, description } = req.body;
+  const { orgId, folderName, description } = req.body;
 
   const response = await folderservices.updateFolder({
     folderId,
-    foldername,
+    folderName,
     description,
     userId: _id,
     orgId,
   });
-  res.status(httpStatus.OK).json(response);
+  res.status(httpStatus.OK).send(response);
 });
 
 const deleteFolder = catchAsync(async (req: Request, res: Response) => {
@@ -84,64 +87,64 @@ const deleteFolder = catchAsync(async (req: Request, res: Response) => {
     folderId: folderId,
     userId: _id,
   });
-  res.status(httpStatus.OK).json(response);
+  res.status(httpStatus.OK).send(response);
 });
 
-const getAllUnstarredFolders = catchAsync(
-  async (req: Request, res: Response) => {
-    const { _id } = req.User;
-    const { page = 1, limit = 10 } = req.query as unknown as {
-      page: number;
-      limit: number;
-    };
-
-    const { orgId } = req.params;
-
-    const response = await folderservices.listAllUnstarredFolders({
-      orgId: orgId,
-      page: page,
-      limit: limit,
-    });
-
-    res.status(httpStatus.OK).json(response);
-  }
-);
-
-const getAllFolders = catchAsync(async (req: Request, res: Response) => {
-  const { page = 1, limit = 10 } = req.query as unknown as {
+const getAllUnstarredFolders = catchAsync(async (req: Request, res: Response) => {
+  const { page = 1, orgId } = req.query as unknown as {
     page: number;
     limit: number;
+    orgId: string;
   };
-  const { orgId } = req.params;
+
+  const response = await folderservices.listAllUnstarredFolders({
+    orgId: orgId,
+    page: page,
+  });
+
+  res.status(httpStatus.OK).send(response);
+});
+
+const getAllFolders = catchAsync(async (req: Request, res: Response) => {
+  const {
+    page = 1,
+    limit = 10,
+    orgId,
+  } = req.query as unknown as {
+    page: number;
+    limit: number;
+    orgId: string;
+  };
   const response = await folderservices.getAllFolders({
     orgId: orgId,
     page: page,
     limit: limit,
   });
-  res.status(httpStatus.OK).json(response);
+  res.status(httpStatus.OK).send(response);
 });
 
 const folderAccess = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
-  const { folderId, orgId, collaboratorId } = req.body;
+  const { folderId } = req.params;
+  const { orgId, collaboratorId } = req.body;
   const response = await folderservices.addFolderAccess({
     collaboratorId: collaboratorId,
     folderId: folderId,
     orgId: orgId,
     userId: _id,
   });
-  res.status(httpStatus.OK).json(response);
+  res.status(httpStatus.OK).send(response);
 });
 
 const folderArchive = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
-  const { folderId, orgId } = req.body;
+  const { orgId, folderId } = req.body;
   const response = await folderservices.archiveFolder({
     folderId: folderId,
     orgId: orgId,
     userId: _id,
   });
-  res.status(httpStatus.OK).json(response);
+  res.status(httpStatus.OK).send(response);
 });
 
 const folderUnarchive = catchAsync(async (req: Request, res: Response) => {
@@ -152,7 +155,7 @@ const folderUnarchive = catchAsync(async (req: Request, res: Response) => {
     orgId: orgId,
     userId: _id,
   });
-  res.status(httpStatus.OK).json(response);
+  res.status(httpStatus.OK).send(response);
 });
 
 const folderCopy = catchAsync(async (req: Request, res: Response) => {
@@ -164,48 +167,46 @@ const folderCopy = catchAsync(async (req: Request, res: Response) => {
     orgId: orgId,
     userId: _id,
   });
-  res.status(httpStatus.OK).json(response);
+  res.status(httpStatus.OK).send(response);
 });
 
 const folderTrash = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
-  const { orgId } = req.body;
-  const { folderId } = req.params;
+  const { folderId, orgId } = req.body;
   const response = await folderservices.trashFolder({
     folderId: folderId,
     orgId: orgId,
     userId: _id,
   });
-  res.status(httpStatus.OK).json(response);
+  res.status(httpStatus.OK).send(response);
 });
 
-const folderunTrash = catchAsync(async (req: Request, res: Response) => {
+const untrashFolder = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
-  const { orgId } = req.body;
-  const { folderId } = req.params;
+  const { orgId, folderId } = req.body;
   const response = await folderservices.untrashFolder({
     folderId: folderId,
     orgId: orgId,
     userId: _id,
   });
-  res.status(httpStatus.OK).json(response);
+  res.status(httpStatus.OK).send(response);
 });
 
 const removefolderAccess = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
-  const { folderId, orgId, collaboratorId } = req.params;
+  const { folderId, orgId, collaboratorId } = req.body;
   const response = await folderservices.removeCollaboratorFolderAccess({
     collaboratorId: collaboratorId,
     folderId: folderId,
     orgId: orgId,
     userId: _id,
   });
-  res.status(httpStatus.OK).json(response);
+  res.status(httpStatus.OK).send(response);
 });
 
 const moveFolder = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
-  const { folderId, orgId, moveFromFolderId, moveToFolderId } = req.params;
+  const { folderId, orgId, moveFromFolderId, moveToFolderId } = req.body;
   const response = await folderservices.moveFolder({
     moveFromFolderId: moveFromFolderId,
     moveToFolderId: moveToFolderId,
@@ -213,7 +214,25 @@ const moveFolder = catchAsync(async (req: Request, res: Response) => {
     orgId: orgId,
     userId: _id,
   });
-  res.status(httpStatus.OK).json(response);
+  res.status(httpStatus.OK).send(response);
+});
+
+const pinFolder = catchAsync(async (req: Request, res: Response) => {
+  const { folderId, orgId } = req.body;
+  const response = await folderservices.pinFolder({
+    folderId: folderId,
+    orgId: orgId,
+  });
+  res.status(httpStatus.OK).send(response);
+});
+
+const unpinFolder = catchAsync(async (req: Request, res: Response) => {
+  const { folderId, orgId } = req.body;
+  const response = await folderservices.unPinFolder({
+    folderId: folderId,
+    orgId: orgId,
+  });
+  res.status(httpStatus.OK).send(response);
 });
 
 export default {
@@ -230,7 +249,9 @@ export default {
   folderUnarchive,
   folderCopy,
   folderTrash,
-  folderunTrash,
+  untrashFolder,
   removefolderAccess,
   moveFolder,
+  pinFolder,
+  unpinFolder,
 };

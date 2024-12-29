@@ -2,7 +2,6 @@ import userservice from '../services/userservice';
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 import catchAsync from '../utils/catchasync';
-import messages from '../utils/messages';
 
 const signUp = catchAsync(async (req: Request, res: Response) => {
   const { name, email, password, organizationName, userName } = req.body;
@@ -13,11 +12,7 @@ const signUp = catchAsync(async (req: Request, res: Response) => {
     organizationName,
     userName,
   });
-  res.status(httpStatus.CREATED).json({
-    success: true,
-    message: messages.SIGN_UP_SUCCESS,
-    data: response,
-  });
+  res.status(httpStatus.CREATED).send(response);
 });
 
 const login = catchAsync(async (req: Request, res: Response) => {
@@ -26,11 +21,7 @@ const login = catchAsync(async (req: Request, res: Response) => {
     email,
     password,
   });
-  res.status(httpStatus.OK).json({
-    success: true,
-    message: messages.LOGIN_SUCCESS,
-    data: response,
-  });
+  res.status(httpStatus.OK).send(response);
 });
 
 const updateUser = catchAsync(async (req: Request, res: Response) => {
@@ -39,56 +30,41 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
 
   const response = await userservice.updateUser({ userId: _id, name: name });
 
-  res.status(httpStatus.OK).json({
-    success: true,
-    message: messages.USER_UPDATE_SUCCESFUL,
-    data: response,
-  });
+  res.status(httpStatus.OK).send(response);
 });
 
 const inviteUser = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
   const { email, orgId } = req.body;
 
-  await userservice.inviteUserToOrg({
+  const response = await userservice.inviteUserToOrg({
     userId: _id,
     orgId: orgId,
     invitedEmail: email,
   });
 
-  res.status(httpStatus.OK).json({
-    success: true,
-    message: messages.ORG_INVITATION_SUCCESS,
-  });
+  res.status(httpStatus.OK).send(response);
 });
 
 const confirmInvite = catchAsync(async (req: Request, res: Response) => {
-  const { _id } = req.User;
   const { reference, username } = req.body;
   const { orgId } = req.query as unknown as {
     orgId: string;
   };
   const response = await userservice.confirmUserInvite({
-    userId: _id,
     reference,
     username,
     orgId,
   });
-  res.status(httpStatus.OK).json({
-    success: true,
-    message: response,
-  });
+  res.status(httpStatus.OK).send(response);
 });
 
 const recover = catchAsync(async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
 
-    await userservice.recoverAccount(req, res, email);
-    res.status(httpStatus.OK).json({
-      success: true,
-      message: 'Password reset email sent successfully.',
-    });
+    const response = await userservice.recoverAccount(req, res, email);
+    res.status(httpStatus.OK).send(response);
   } catch (error) {
     console.error(error);
   }
@@ -97,16 +73,12 @@ const recover = catchAsync(async (req: Request, res: Response) => {
 const passwordReset = catchAsync(async (req: Request, res: Response) => {
   const { confirmPassword, password, token } = req.body;
 
-  await userservice.reset({
+  const response = await userservice.reset({
     token,
     password,
     confirmPassword,
   });
-
-  res.status(httpStatus.OK).json({
-    success: true,
-    message: messages.PASSWORD_RESET_SUCCESSFUL,
-  });
+  res.status(httpStatus.OK).send(response);
 });
 
 export default {

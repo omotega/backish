@@ -1,12 +1,20 @@
+import { Iorganization } from './organization';
+import { Iuser } from './user';
+
 export interface folderModelInterface {
   _id: string;
-  foldername: string;
+  folderName: string;
   content: string;
-  orgId: string;
+  orgId: Iorganization['id'];
+  collaborators: [Iuser['_id']];
   description: string;
   permission?: string;
-  isPinned?: string;
-  isStarred?: string;
-  isDeleted?:string
-  isLocked?:string
+  isPinned?: boolean;
+  isStarred?: boolean;
+  isDeleted?: boolean;
+  isLocked?: boolean;
+  createdBy: string;
+  isArchived?: boolean;
+  isTrashed?: boolean;
+  existInHomeDirectory?: boolean;
 }

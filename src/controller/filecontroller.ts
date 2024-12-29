@@ -1,8 +1,8 @@
-import httpStatus from "http-status";
-import fileServices from "../services/fileservices";
-import { Request, Response } from "express";
-import catchAsync from "../utils/catchasync";
-import fileservices from "../services/fileservices";
+import httpStatus from 'http-status';
+import fileServices from '../services/fileservices';
+import { Request, Response } from 'express';
+import catchAsync from '../utils/catchasync';
+import fileservices from '../services/fileservices';
 
 const fileUpload = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
@@ -15,21 +15,12 @@ const fileUpload = catchAsync(async (req: Request, res: Response) => {
     uploadedFile: uploadedFile,
     orgId: orgId,
   });
-
-  res.status(httpStatus.CREATED).json({
-    status: true,
-    message: "file uploaded succesfully",
-    data: response,
-  });
+  res.status(httpStatus.OK).send(response);
 });
 
 const addFileToFolder = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
-  const { fileId, orgId, folderId } = req.query as unknown as {
-    fileId: string;
-    orgId: string;
-    folderId: string;
-  };
+  const { fileId, orgId, folderId } = req.body;
 
   const response = await fileServices.addFiletoFolder({
     userId: _id,
@@ -38,18 +29,15 @@ const addFileToFolder = catchAsync(async (req: Request, res: Response) => {
     fileId: fileId,
   });
 
-  res.status(httpStatus.CREATED).json({
-    status: true,
-    message: "file added succesfully",
-    data: response,
-  });
+  res.status(httpStatus.OK).send(response);
 });
 
 const getAllFilesInFolder = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
-  const { folderId, orgId } = req.params;
-  const { page } = req.query as unknown as {
+  const { page, folderId, orgId } = req.query as unknown as {
     page: number;
+    folderId: string;
+    orgId: string;
   };
 
   const response = await fileServices.fetchAllFilesInFolder({
@@ -59,18 +47,14 @@ const getAllFilesInFolder = catchAsync(async (req: Request, res: Response) => {
     page: page,
   });
 
-  res.status(httpStatus.CREATED).json({
-    status: true,
-    message: "files fetched succesfully",
-    data: response,
-  });
+  res.status(httpStatus.OK).send(response);
 });
 
 const moveFile = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
   const { folderId, orgId } = req.body;
 
-  const fileId = req.params.fileIds.split(",");
+  const fileId = req.params.fileIds.split(',');
 
   const response = await fileServices.moveFiles({
     userId: _id,
@@ -79,18 +63,14 @@ const moveFile = catchAsync(async (req: Request, res: Response) => {
     fileId: Array.isArray(fileId) ? fileId : [fileId],
   });
 
-  res.status(httpStatus.CREATED).json({
-    status: true,
-    message: "file moved succesfully",
-    data: response,
-  });
+  res.status(httpStatus.OK).send(response);
 });
 
 const getAllFiles = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
-  const { orgId } = req.params;
-  const { page } = req.query as unknown as {
+  const { page, orgId } = req.query as unknown as {
     page: number;
+    orgId: string;
   };
 
   const response = await fileServices.getAllFiles({
@@ -99,39 +79,31 @@ const getAllFiles = catchAsync(async (req: Request, res: Response) => {
     page: page,
   });
 
-  res.status(httpStatus.CREATED).json({
-    status: true,
-    message: "files fetched succesfully",
-    data: response,
-  });
+  res.status(httpStatus.OK).send(response);
 });
 
 const starFile = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
-  const { fileId, orgId } = req.params;
+  const { fileId, orgId } = req.body;
   const response = await fileservices.starFile({
     orgId: orgId,
     fileId: fileId,
     userId: _id,
   });
 
-  res
-    .status(httpStatus.OK)
-    .json({ status: true, message: "file starred", data: response });
+  res.status(httpStatus.OK).send(response);
 });
 
 const unstarFile = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
-  const { fileId, orgId } = req.params;
+  const { fileId, orgId } = req.body;
   const response = await fileservices.unstarFile({
     orgId: orgId,
     fileId: fileId,
     userId: _id,
   });
 
-  res
-    .status(httpStatus.OK)
-    .json({ status: true, message: "file unstarred", data: response });
+  res.status(httpStatus.OK).send(response);
 });
 
 const archiveFile = catchAsync(async (req: Request, res: Response) => {
@@ -143,9 +115,7 @@ const archiveFile = catchAsync(async (req: Request, res: Response) => {
     orgId: orgId,
     userId: _id,
   });
-  res
-    .status(httpStatus.OK)
-    .json({ status: true, message: "file Archived", data: response });
+  res.status(httpStatus.OK).send(response);
 });
 
 const unarchiveFile = catchAsync(async (req: Request, res: Response) => {
@@ -157,9 +127,7 @@ const unarchiveFile = catchAsync(async (req: Request, res: Response) => {
     orgId: orgId,
     userId: _id,
   });
-  res
-    .status(httpStatus.OK)
-    .json({ status: true, message: "file Unarchived", data: response });
+  res.status(httpStatus.OK).send(response);
 });
 
 const trashFiles = catchAsync(async (req: Request, res: Response) => {
@@ -171,9 +139,7 @@ const trashFiles = catchAsync(async (req: Request, res: Response) => {
     orgId: orgId,
     userId: _id,
   });
-  res
-    .status(httpStatus.OK)
-    .json({ status: true, message: "file trashed", data: response });
+  res.status(httpStatus.OK).send(response);
 });
 
 const untrashFiles = catchAsync(async (req: Request, res: Response) => {
@@ -185,9 +151,7 @@ const untrashFiles = catchAsync(async (req: Request, res: Response) => {
     orgId: orgId,
     userId: _id,
   });
-  res
-    .status(httpStatus.OK)
-    .json({ status: true, message: "file Untrashed", data: response });
+  res.status(httpStatus.OK).send(response);
 });
 
 const copyFiles = catchAsync(async (req: Request, res: Response) => {
@@ -203,9 +167,7 @@ const copyFiles = catchAsync(async (req: Request, res: Response) => {
     userId: _id,
     copiedToFolderId: folderId,
   });
-  res
-    .status(httpStatus.OK)
-    .json({ status: true, message: "File copied", data: response });
+  res.status(httpStatus.OK).send(response);
 });
 
 const updateFileName = catchAsync(async (req: Request, res: Response) => {
@@ -218,9 +180,7 @@ const updateFileName = catchAsync(async (req: Request, res: Response) => {
     userId: _id,
     fileName: fileName,
   });
-  res
-    .status(httpStatus.OK)
-    .json({ status: true, message: "file renamed", data: response });
+  res.status(httpStatus.OK).send(response);
 });
 
 const getAllThrashedFiles = catchAsync(async (req: Request, res: Response) => {
@@ -234,11 +194,7 @@ const getAllThrashedFiles = catchAsync(async (req: Request, res: Response) => {
     userId: _id,
     page: page,
   });
-  res.status(httpStatus.OK).json({
-    status: true,
-    message: "files fetched successfully",
-    data: response,
-  });
+  res.status(httpStatus.OK).send(response);
 });
 
 const lockFile = catchAsync(async (req: Request, res: Response) => {
@@ -254,10 +210,7 @@ const lockFile = catchAsync(async (req: Request, res: Response) => {
     fileId: fileId,
     password: password,
   });
-  res.status(httpStatus.OK).json({
-    status: true,
-    data: response,
-  });
+  res.status(httpStatus.OK).send(response);
 });
 
 const resetFilePassword = catchAsync(async (req: Request, res: Response) => {
@@ -266,18 +219,15 @@ const resetFilePassword = catchAsync(async (req: Request, res: Response) => {
     orgId: string;
     fileId: string;
   };
-  const { oldPassword, newPassword,token } = req.body;
+  const { oldPassword, newPassword, token } = req.body;
   const response = await fileservices.resetPassword({
     orgId: orgId,
     userId: _id,
     fileId: fileId,
     newPassword: newPassword,
-    token
+    token,
   });
-  res.status(httpStatus.OK).json({
-    status: true,
-    data: response,
-  });
+  res.status(httpStatus.OK).send(response);
 });
 
 const sortedFile = catchAsync(async (req: Request, res: Response) => {
@@ -291,10 +241,7 @@ const sortedFile = catchAsync(async (req: Request, res: Response) => {
     userId: _id,
     sortType: sortType,
   });
-  res.status(httpStatus.OK).json({
-    status: true,
-    data: response,
-  });
+  res.status(httpStatus.OK).send(response);
 });
 
 export default {

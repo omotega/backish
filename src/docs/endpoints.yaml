@@ -125,7 +125,7 @@ paths:
   
   /api/user/confirm-invite:
     post:
-      summary: Confirm an invite ro an organization.
+      summary: Confirm an invite to an organization.
       tags:
         - User
       description: Endpoint to confirm an invite to an organization.

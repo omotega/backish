@@ -1,23 +1,16 @@
-import joi from "joi";
-import { validationMessages } from "./custom";
-import { JoiObjectId } from "./helper";
+import joi from 'joi';
+import { validationMessages } from './custom';
+import { JoiObjectId } from './helper';
 
 const fileUploadValidation = {
   body: joi.object({
-    orgId: joi
-      .string()
-      .custom(JoiObjectId)
-      .required()
-      .messages(validationMessages.orgId),
-    folderId: joi
-      .string()
-      .custom(JoiObjectId)
-      .messages(validationMessages.folderId),
+    orgId: joi.string().custom(JoiObjectId).required().messages(validationMessages.orgId),
+    folderId: joi.string().custom(JoiObjectId).messages(validationMessages.folderId),
   }),
 };
 
 const addFileToFolderValidation = {
-  query: joi.object({
+  body: joi.object({
     folderId: joi
       .string()
       .custom(JoiObjectId)
@@ -30,16 +23,14 @@ const addFileToFolderValidation = {
 
 const moveFileValidation = {
   body: joi.object({
-    folderId: joi
-      .string()
-      .custom(JoiObjectId)
-      .messages(validationMessages.folderId),
+    folderId: joi.string().custom(JoiObjectId).messages(validationMessages.folderId),
     orgId: joi.string().required().messages(validationMessages.orgId),
   }),
 };
 
 const getAllFilesInFolderValidation = {
-  params: joi.object({
+  query: joi.object({
+    page: joi.number().required(),
     folderId: joi
       .string()
       .custom(JoiObjectId)
@@ -47,29 +38,24 @@ const getAllFilesInFolderValidation = {
       .messages(validationMessages.folderId),
     orgId: joi.string().required().messages(validationMessages.orgId),
   }),
-  query: joi.object({
-    page: joi.number().required(),
-  }),
 };
 
 const getAllFilesValidation = {
-  params: joi.object({
-    orgId: joi.string().required().messages(validationMessages.orgId),
-  }),
   query: joi.object({
     page: joi.number().required(),
+    orgId: joi.string().required().messages(validationMessages.orgId),
   }),
 };
 
 const starFileValidation = {
-  params: joi.object({
+  body: joi.object({
     orgId: joi.string().required().messages(validationMessages.orgId),
     fileId: joi.string().required().messages(validationMessages.fileId),
   }),
 };
 
 const unstarFileValidation = {
-  params: joi.object({
+  body: joi.object({
     orgId: joi.string().required().messages(validationMessages.orgId),
     fileId: joi.string().required().messages(validationMessages.fileId),
   }),
@@ -94,25 +80,14 @@ const trashValidation = {
 };
 const fileCopyValidation = {
   query: joi.object({
-    orgId: joi
-      .string()
-      .custom(JoiObjectId)
-      .required()
-      .messages(validationMessages.orgId),
+    orgId: joi.string().custom(JoiObjectId).required().messages(validationMessages.orgId),
     fileId: joi
       .array()
       .items(
-        joi
-          .string()
-          .custom(JoiObjectId)
-          .required()
-          .messages(validationMessages.fileId)
+        joi.string().custom(JoiObjectId).required().messages(validationMessages.fileId)
       )
       .single(),
-    folderId: joi
-      .string()
-      .custom(JoiObjectId)
-      .messages(validationMessages.folderId),
+    folderId: joi.string().custom(JoiObjectId).messages(validationMessages.folderId),
   }),
 };
 
@@ -188,5 +163,5 @@ export default {
   getTrashedFilesValidation,
   lockFileValidation,
   resetFilePasswordValidation,
-  sortFilePasswordValidation
+  sortFilePasswordValidation,
 };

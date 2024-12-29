@@ -120,42 +120,25 @@ const addFiletoFolder = async ({
   orgId: string;
 }) => {
   await helperServices.checkUserPermission(userId, orgId);
-
   await helperServices.checkIfUserBelongsToOrganization({
     userId: userId,
     orgId: orgId,
   });
 
-  const fileExist = await filemodel
-    .findById({
-      _id: fileId,
-      orgId: orgId,
-    })
-    .lean();
-
-  if (!fileExist) {
-    throw new AppError({
-      httpCode: httpStatus.CONFLICT,
-      description: 'File does not exist',
-    });
-  }
-
-  const addFile = await filemodel
-    .findOneAndUpdate(
-      { folderId: { $in: [folderId] } },
-      { $push: { files: fileId } },
-      { new: true }
-    )
-    .lean();
+  const addFile = await filemodel.findOneAndUpdate(
+    { orgId: orgId, _id: fileId },
+    { $push: { folderId: folderId } },
+    { new: true }
+  );
 
   if (!addFile) {
     throw new AppError({
       httpCode: httpStatus.NOT_FOUND,
-      description: 'An error occurred, could not add File to new Folder',
+      description: errorMessages.FILE_NOT_FOUND,
     });
   }
 
-  return addFile;
+  return { status: true };
 };
 
 const fetchAllFilesInFolder = async ({
@@ -315,7 +298,7 @@ const starFile = async ({
   if (!updatedDetails)
     throw new AppError({
       httpCode: httpStatus.NOT_FOUND,
-      description: 'could not star file',
+      description: errorMessages.FILE_NOT_FOUND,
     });
   return updatedDetails;
 };
@@ -617,7 +600,6 @@ const addPasswordToFile = async ({
   return message;
 };
 
-
 const resetPassword = async ({
   userId,
   orgId,
@@ -636,18 +618,12 @@ const resetPassword = async ({
     userId: userId,
     orgId: orgId,
   });
-  // const result = await redis.client.get(token);
-  // if (!result)
-  //   throw new AppError({
-  //     httpCode: httpStatus.NOT_FOUND,
-  //     description: 'Invalid token',
-  //   });
   const hash = await Helper.hashPassword(newPassword);
-  const lockFile = await filemodel.findOneAndUpdate(
+  const file = await filemodel.findOneAndUpdate(
     { orgId: orgId, _id: fileId },
     { $set: { password: hash } }
   );
-  if (!lockFile)
+  if (!file)
     throw new AppError({
       httpCode: httpStatus.NOT_FOUND,
       description: errorMessages.FILE_NOT_FOUND,

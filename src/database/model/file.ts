@@ -21,8 +21,9 @@ const fileSchema = new mongoose.Schema(
     },
     url: {
       type: String,
+      required: true,
     },
-    Format: {
+    format: {
       type: String,
     },
     size: {
@@ -46,8 +47,7 @@ const fileSchema = new mongoose.Schema(
       type: String,
     },
     addedBy: {
-      type: mongoose.Schema.Types.String,
-      ref: 'User',
+      type: String,
     },
     isTrashed: {
       type: Boolean,
