@@ -6,52 +6,46 @@ import organizationcontroller from '../controller/organizationcontroller';
 
 const orgRouter = Router();
 
-orgRouter
-  .route('/org-users')
-  .get(
-    authGuard.guard,
-    validationMiddleware(orgValidations.getAllUserValidation),
-    organizationcontroller.getAllUsersInOrganization
-  );
+orgRouter.get(
+  '/org-users',
+  authGuard.guard,
+  validationMiddleware(orgValidations.getAllUserValidation),
+  organizationcontroller.getAllUsersInOrganization
+);
 
-orgRouter
-  .route('/get-a-user/')
-  .get(
-    authGuard.guard,
-    validationMiddleware(orgValidations.getAUserValidation),
-    organizationcontroller.getAUser
-  );
+orgRouter.get(
+  '/get-a-user/',
+  authGuard.guard,
+  validationMiddleware(orgValidations.getAUserValidation),
+  organizationcontroller.getAUser
+);
 
-orgRouter
-  .route('/leave-org/:orgId')
-  .put(
-    authGuard.guard,
-    validationMiddleware(orgValidations.leaveOrgUserValidation),
-    organizationcontroller.signOutOfOrg
-  );
+orgRouter.put(
+  '/leave-org/:orgId',
+  authGuard.guard,
+  validationMiddleware(orgValidations.leaveOrgUserValidation),
+  organizationcontroller.signOutOfOrg
+);
 
-orgRouter
-  .route('/userorgs')
-  .get(
-    authGuard.guard,
-    validationMiddleware(orgValidations.getAllUserOrgsValidation),
-    organizationcontroller.getAllUserOrgs
-  );
+orgRouter.get(
+  '/userorgs',
+  authGuard.guard,
+  validationMiddleware(orgValidations.getAllUserOrgsValidation),
+  organizationcontroller.getAllUserOrgs
+);
 
-orgRouter
-  .route('/update-user-role')
-  .put(
-    authGuard.guard,
-    validationMiddleware(orgValidations.upadateUserroleValidation),
-    organizationcontroller.changeUserRole
-  );
+orgRouter.put(
+  '/update-user-role',
+  authGuard.guard,
+  validationMiddleware(orgValidations.upadateUserroleValidation),
+  organizationcontroller.changeUserRole
+);
 
-orgRouter
-  .route('/deactivate-user')
-  .put(
-    authGuard.guard,
-    validationMiddleware(orgValidations.removeUserFromOrgValidation),
-    organizationcontroller.deactivateUserFromOrg
-  );
+orgRouter.put(
+  '/deactivate-user',
+  authGuard.guard,
+  validationMiddleware(orgValidations.removeUserFromOrgValidation),
+  organizationcontroller.deactivateUserFromOrg
+);
 
 export default orgRouter;

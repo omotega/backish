@@ -19,6 +19,7 @@ const errorMessages = {
   PASSWORD_RESET_SUCCESSFUL: 'Password reset successful',
   MOVE_FOLDER_ERROR: 'unable to move folder',
   FILE_NOT_FOUND: 'File not found',
+  FOLDER_NOT_FOUND:'Folder not found'
 };
 
 export default errorMessages;

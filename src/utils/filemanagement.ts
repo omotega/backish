@@ -1,5 +1,4 @@
 import fs from "fs";
-import path from "path";
 
 function createDirectory(directoryPath: string) {
   fs.access(directoryPath, fs.constants.F_OK, (err) => {

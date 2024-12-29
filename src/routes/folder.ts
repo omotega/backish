@@ -1,132 +1,135 @@
-import { Router } from "express";
-import validationMiddleware from "../midlewares/validation";
-import folderValidation from "../validation/foldervalidation";
-import authGuard from "../midlewares/auth";
-import foldercontroller from "../controller/foldercontroller";
+import { Router } from 'express';
+import validationMiddleware from '../midlewares/validation';
+import folderValidation from '../validation/foldervalidation';
+import authGuard from '../midlewares/auth';
+import foldercontroller from '../controller/foldercontroller';
 
 const folderRouter = Router();
 
-folderRouter
-  .route("/create-folder/:orgId")
-  .post(
-    authGuard.guard,
-    validationMiddleware(folderValidation.createFolderValidation),
-    foldercontroller.createFolder
-  );
+folderRouter.post(
+  '/:orgId/create-folder',
+  authGuard.guard,
+  validationMiddleware(folderValidation.createFolderValidation),
+  foldercontroller.createFolder
+);
+
+folderRouter.post(
+  '/star-folder',
+  authGuard.guard,
+  validationMiddleware(folderValidation.starFolderValidation),
+  foldercontroller.starFolder
+);
+
+folderRouter.post(
+  '/unstar-folder',
+  authGuard.guard,
+  validationMiddleware(folderValidation.unstarFolderValidation),
+  foldercontroller.unstarFolder
+);
+
+folderRouter.get(
+  '/starred-folders',
+  authGuard.guard,
+  validationMiddleware(folderValidation.liststarredFoldersValidation),
+  foldercontroller.getAllStarredFolders
+);
+
+folderRouter.get(
+  '/folders',
+  authGuard.guard,
+  validationMiddleware(folderValidation.listAllFoldersValidation),
+  foldercontroller.getAllFolders
+);
+
+folderRouter.get(
+  '/unstarred-folders',
+  authGuard.guard,
+  validationMiddleware(folderValidation.listUnstarredFoldersValidation),
+  foldercontroller.getAllUnstarredFolders
+);
+
+folderRouter.put(
+  '/:folderId/update-folder',
+  authGuard.guard,
+  validationMiddleware(folderValidation.updateFolderValidation),
+  foldercontroller.updateFolder
+);
+
+folderRouter.put(
+  '/:folderId/add-folder-access',
+  authGuard.guard,
+  validationMiddleware(folderValidation.folderAccessValidation),
+  foldercontroller.folderAccess
+);
+
+folderRouter.delete(
+  '/delete-folder/:folderId',
+  authGuard.guard,
+  foldercontroller.deleteFolder
+);
+
+folderRouter.put(
+  '/archive-folder',
+  authGuard.guard,
+  validationMiddleware(folderValidation.folderArchiveValidation),
+  foldercontroller.folderArchive
+);
+
+folderRouter.put(
+  '/unarchive-folder',
+  authGuard.guard,
+  validationMiddleware(folderValidation.folderUnarchiveValidation),
+  foldercontroller.folderUnarchive
+);
+
+folderRouter.put(
+  '/trash-folder',
+  authGuard.guard,
+  validationMiddleware(folderValidation.trashFolderValidation),
+  foldercontroller.folderTrash
+);
+
+folderRouter.put(
+  '/untrash-folder',
+  authGuard.guard,
+  validationMiddleware(folderValidation.unTrashFolderValidation),
+  foldercontroller.untrashFolder
+);
 
 folderRouter
-  .route("/star-folder")
-  .post(
-    authGuard.guard,
-    validationMiddleware(folderValidation.starFolderValidation),
-    foldercontroller.starFolder
-  );
-
-folderRouter
-  .route("/unstar-folder")
-  .post(
-    authGuard.guard,
-    validationMiddleware(folderValidation.unstarFolderValidation),
-    foldercontroller.unstarFolder
-  );
-
-folderRouter
-  .route("/get-starred-folders/:orgId")
-  .get(
-    authGuard.guard,
-    validationMiddleware(folderValidation.liststarredFoldersValidation),
-    foldercontroller.getAllStarredFolders
-  );
-
-folderRouter
-  .route("/get-all-folders/:orgId")
-  .get(
-    authGuard.guard,
-    validationMiddleware(folderValidation.listAllFoldersValidation),
-    foldercontroller.getAllFolders
-  );
-folderRouter
-  .route("/get-unstarred-folders/:orgId")
-  .get(
-    authGuard.guard,
-    validationMiddleware(folderValidation.listUnstarredFoldersValidation),
-    foldercontroller.getAllUnstarredFolders
-  );
-
-folderRouter
-  .route("/:folderId")
-  .patch(
-    authGuard.guard,
-    validationMiddleware(folderValidation.updateFolderValidation),
-    foldercontroller.updateFolder
-  );
-
-folderRouter
-  .route("/add-folderaccess")
-  .post(
-    authGuard.guard,
-    validationMiddleware(folderValidation.folderAccessValidation),
-    foldercontroller.folderAccess
-  );
-
-folderRouter
-  .route("/org/:orgId/delete-folder/:folderId")
-  .delete(authGuard.guard, foldercontroller.deleteFolder);
-
-folderRouter
-  .route("/org/:orgId/archive-folder/:folderId")
-  .patch(
-    authGuard.guard,
-    validationMiddleware(folderValidation.folderArchiveValidation),
-    foldercontroller.folderArchive
-  );
-
-folderRouter
-  .route("/org/:orgId/unarchive-folder/:folderId")
-  .patch(
-    authGuard.guard,
-    validationMiddleware(folderValidation.folderUnarchiveValidation),
-    foldercontroller.folderUnarchive
-  );
-
-folderRouter
-  .route("/trash-folder/:folderId")
-  .patch(
-    authGuard.guard,
-    validationMiddleware(folderValidation.trashValidation),
-    foldercontroller.folderTrash
-  );
-
-folderRouter
-  .route("/untrash-folder/:folderId")
-  .patch(
-    authGuard.guard,
-    validationMiddleware(folderValidation.trashValidation),
-    foldercontroller.folderunTrash
-  );
-
-folderRouter
-  .route("/copy-folder")
-  .post(
+  .route('/copy-folder')
+  .put(
     authGuard.guard,
     validationMiddleware(folderValidation.folderCopyValidation),
     foldercontroller.folderCopy
   );
 
-folderRouter
-  .route("/remove-folderaccess/:orgId/:folderId/:collaboratorId")
-  .patch(
-    authGuard.guard,
-    validationMiddleware(folderValidation.removeFolderAccessValidation),
-    foldercontroller.removefolderAccess
-  );
+folderRouter.put(
+  '/remove-folderaccess',
+  authGuard.guard,
+  validationMiddleware(folderValidation.removeFolderAccessValidation),
+  foldercontroller.removefolderAccess
+);
 
-folderRouter
-  .route("/moveFolder/:orgId/:folderId/:moveFromFolderId/:moveToFolderId")
-  .patch(
-    authGuard.guard,
-    validationMiddleware(folderValidation.moveFolderAccessValidation),
-    foldercontroller.moveFolder
-  );
+folderRouter.put(
+  '/moveFolder',
+  authGuard.guard,
+  validationMiddleware(folderValidation.moveFolderAccessValidation),
+  foldercontroller.moveFolder
+);
+
+folderRouter.put(
+  '/pin-folder',
+  authGuard.guard,
+  validationMiddleware(folderValidation.pinFolderValidation),
+  foldercontroller.pinFolder
+);
+
+folderRouter.put(
+  '/unpin-folder',
+  authGuard.guard,
+  validationMiddleware(folderValidation.unpinFolderValidation),
+  foldercontroller.unpinFolder
+);
 
 export default folderRouter;

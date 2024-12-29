@@ -23,26 +23,16 @@ const sendEmail = async ({
   try {
     await transporter.sendMail({
       from: config.smtpEmail,
-      to:toEmail,
+      to: toEmail,
       subject,
       html: message,
     });
     console.info(`Email sent to ${toEmail} to ${subject}`);
+    return true
   } catch (e: any) {
-    // console.log(e);
     console.error(`Error sending email: ${e.message}`);
-    return false;
+    return false
   }
 };
 
-// // send mail with defined transport object
-// let info = await transporter.sendMail({
-//   from: 'tomoyibo@gmail.com',
-//   to: 'onarogheneomoyibo@gmail.com',
-//   subject: 'Hello ✔',
-//   text: 'Hello tega , This is an SMTP message with customizations',
-// });
-
-// console.log('Message sent: %s', info.messageId);
-
-export default sendEmail 
+export { sendEmail };

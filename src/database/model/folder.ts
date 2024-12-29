@@ -16,7 +16,10 @@ const folderSchema = new mongoose.Schema(
         ref: 'Folder',
       },
     ],
-    content: {
+    size: {
+      type: String,
+    },
+    createdBy: {
       type: String,
     },
     collaborators: [
@@ -33,10 +36,10 @@ const folderSchema = new mongoose.Schema(
       type: String,
     },
     isPinned: {
-      type: String,
+      type: Boolean,
       default: false,
     },
-    isarchived: {
+    isArchived: {
       type: Boolean,
       default: false,
     },

@@ -3,8 +3,11 @@ import foldermodel from '../database/model/folder';
 import filemodel from '../database/model/file';
 import { AppError } from '../utils/errors';
 import helperServices from './helper-services';
-import messages from '../utils/messages';
 import { DateTime } from 'luxon';
+import mongoose from 'mongoose';
+import errorMessages from '../utils/messages';
+import Folder from '../database/model/folder';
+import { response } from 'express';
 
 const createFolder = async ({
   userId,
@@ -20,9 +23,9 @@ const createFolder = async ({
   folderId: string;
 }) => {
   await helperServices.checkIfUserBelongsToOrganization({ userId, orgId });
-  await helperServices.checkUserPermission(userId, orgId);
+  const user = await helperServices.getUserdetailsById(userId);
   const folderExist = await foldermodel.findOne({
-    foldername: folderName,
+    folderName: folderName,
     orgId: orgId,
   });
   if (folderExist)
@@ -31,35 +34,17 @@ const createFolder = async ({
       description: `Folder with name ${folderName} already exist`,
     });
 
-  if (folderId) {
-    const folder = await foldermodel.create({
-      foldername: folderName,
-      orgId: orgId,
-      description: description,
-      collaborators: [userId],
-      $push: { folderId: [folderId] },
-    });
-    if (!folder)
-      throw new AppError({
-        httpCode: httpStatus.NOT_IMPLEMENTED,
-        description: 'an error occured,could not create folder',
-      });
-    return folder;
-  } else {
-    const folder = await foldermodel.create({
-      foldername: folderName,
-      orgId: orgId,
-      description: description,
-      collaborators: [userId],
-      existInHomeDirectory: true,
-    });
-    if (!folder)
-      throw new AppError({
-        httpCode: httpStatus.NOT_IMPLEMENTED,
-        description: 'an error occured,could not create folder',
-      });
-    return folder;
-  }
+  const folderData = {
+    folderName: folderName,
+    orgId: orgId,
+    description: description,
+    collaborators: [userId],
+    createdBy: user.name,
+    existInHomeDirectory: folderId ? false : true,
+    folderId: folderId ? [folderId] : [],
+  };
+  await foldermodel.create(folderData);
+  return { status: true, response: 'folder created succesfully' };
 };
 
 const starFolder = async ({
@@ -73,16 +58,16 @@ const starFolder = async ({
 }) => {
   await helperServices.checkIfUserBelongsToOrganization({ userId, orgId });
   const updatedDetails = await foldermodel.findByIdAndUpdate(
-    { _id: folderId },
+    { _id: folderId, isStarred: false },
     { isStarred: true },
     { new: true }
   );
   if (!updatedDetails)
     throw new AppError({
-      httpCode: httpStatus.NOT_IMPLEMENTED,
-      description: 'could not star folder',
+      httpCode: httpStatus.NOT_FOUND,
+      description: errorMessages.FOLDER_NOT_FOUND,
     });
-  return { status: 'OK', message: 'Folder starred successfully' };
+  return { status: true, message: 'Folder starred successfully' };
 };
 
 const unstarFolder = async ({
@@ -95,17 +80,17 @@ const unstarFolder = async ({
   userId: string;
 }) => {
   await helperServices.checkIfUserBelongsToOrganization({ userId, orgId });
-  const updatedDetails = await foldermodel.findByIdAndUpdate(
+  const updatedFolder = await foldermodel.findByIdAndUpdate(
     { _id: folderId },
     { isStarred: false },
     { new: true }
   );
-  if (!updatedDetails)
+  if (!updatedFolder)
     throw new AppError({
-      httpCode: httpStatus.NOT_IMPLEMENTED,
+      httpCode: httpStatus.UNPROCESSABLE_ENTITY,
       description: 'could not unstar folder',
     });
-  return { status: 'OK', message: 'Folder unstarred successfully' };
+  return { status: true, message: 'Folder unstarred successfully' };
 };
 
 const listAllStarredFolders = async ({
@@ -119,44 +104,42 @@ const listAllStarredFolders = async ({
 }) => {
   const options = {
     page,
-    limit,
+    limit: 10,
     sort: { createdAt: 'desc' },
     lean: true,
   };
   const result = await foldermodel.paginate({ orgId: orgId, isStarred: true }, options);
 
-  return result;
+  return { status: true, response: result };
 };
 
 const listAllUnstarredFolders = async ({
   orgId,
   page,
-  limit,
 }: {
   orgId: string;
   page: number;
-  limit: number;
 }) => {
   const options = {
     page,
-    limit,
+    limit: 10,
     sort: { createdAt: 'desc' },
     lean: true,
   };
   const result = await foldermodel.paginate({ orgId: orgId, isStarred: false }, options);
-  return result;
+  return { status: true, response: result };
 };
 
 const updateFolder = async ({
   userId,
-  foldername,
+  folderName,
   description,
   orgId,
   folderId,
 }: {
   userId: string;
-  foldername: string;
-  description: string;
+  folderName?: string;
+  description?: string;
   orgId: string;
   folderId: string;
 }) => {
@@ -168,51 +151,42 @@ const updateFolder = async ({
   const folderExist = await foldermodel.findOne({
     _id: folderId,
     orgId: orgId,
+    folderName: folderName,
   });
-  if (!folderExist) {
+  if (folderExist) {
     throw new AppError({
-      httpCode: httpStatus.NOT_FOUND,
-      description: `Folder doesn't exist`,
+      httpCode: httpStatus.CONFLICT,
+      description: `${folderName} already exist. Kindly input a different one`,
     });
   }
 
   const updateFields: {
-    foldername?: string;
+    folderName?: string;
     description?: string;
   } = {};
 
-  if (foldername !== undefined) {
-    updateFields.foldername = foldername;
+  if (folderName !== undefined) {
+    updateFields.folderName = folderName;
   }
 
   if (description !== undefined) {
     updateFields.description = description;
   }
 
-  const folderNameExist = await foldermodel.findOne({
-    foldername: foldername,
-  });
-  if (folderNameExist) {
-    throw new AppError({
-      httpCode: httpStatus.CONFLICT,
-      description: `${foldername} already exist. Kindly input a different one`,
-    });
-  }
-
   const updatedFolder = await foldermodel.findOneAndUpdate(
-    { orgId, _id: folderId },
-    updateFields,
+    { _id: new mongoose.Types.ObjectId(folderId), orgId: orgId },
+    { $set: { ...updateFields } },
     { new: true }
   );
 
   if (!updatedFolder) {
     throw new AppError({
-      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-      description: 'An error occurred, could not update folder',
+      httpCode: httpStatus.NOT_FOUND,
+      description: errorMessages.FOLDER_NOT_FOUND,
     });
   }
 
-  return updatedFolder;
+  return { status: true, data: updatedFolder };
 };
 
 const getAllFolders = async ({
@@ -232,7 +206,7 @@ const getAllFolders = async ({
   };
 
   const allFolders = await foldermodel.paginate({ orgId: orgId }, options);
-  return allFolders;
+  return { status: true, response: allFolders };
 };
 
 const addFolderAccess = async ({
@@ -259,15 +233,15 @@ const addFolderAccess = async ({
       { $push: { collaborators: [collaboratorId] } },
       { new: true }
     )
-    .select('foldername -_id');
+    .select('folderName -_id');
   if (!addAccess)
     throw new AppError({
       httpCode: httpStatus.NOT_FOUND,
-      description: 'could not add user as collaborator',
+      description: errorMessages.FOLDER_NOT_FOUND,
     });
   const message = {
     status: true,
-    message: `Added ${isUser.name} as collaborator  to ${addAccess.foldername} Folder`,
+    message: `${isUser.name} Added  as collaborator  to ${addAccess.folderName} Folder`,
   };
   return message;
 };
@@ -279,22 +253,20 @@ const deleteFolder = async ({
 }: {
   userId: string;
   orgId: string;
-  folderId: string;
+  folderId: string | string[];
 }) => {
   await helperServices.checkUserPermission(userId, orgId);
-
-  await helperServices.checkIfUserBelongsToOrganization({
-    userId: userId,
-    orgId: orgId,
-  });
+  const session = await mongoose.startSession();
+  session.startTransaction();
   const [folder, file] = await Promise.all([
-    await foldermodel.findOneAndUpdate(
+    await foldermodel.updateMany(
       {
         _id: folderId,
         orgId: orgId,
         isDeleted: false,
       },
-      { $set: { isDeleted: true } }
+      { $set: { isDeleted: true } },
+      { new: true, session }
     ),
     await filemodel.updateMany(
       {
@@ -302,14 +274,18 @@ const deleteFolder = async ({
         folderId: { $in: [folderId] },
         isDeleted: false,
       },
-      { isDeleted: true }
+      { isDeleted: true },
+      { new: true, session }
     ),
   ]);
+
+  await session.commitTransaction();
+  session.endSession();
 
   if (!folder || !file)
     throw new AppError({
       httpCode: httpStatus.NOT_FOUND,
-      description: `Could not delete folder`,
+      description: errorMessages.FOLDER_NOT_FOUND,
     });
 
   return { status: true, message: 'File deleted successfully' };
@@ -325,32 +301,26 @@ const archiveFolder = async ({
   folderId: string;
 }) => {
   await helperServices.checkUserPermission(userId, orgId);
-
-  await helperServices.checkIfUserBelongsToOrganization({
-    userId: userId,
-    orgId: orgId,
-  });
-
-  const [folderArchive, fileArchive] = await Promise.all([
-    await foldermodel.findOneAndUpdate(
-      { _id: folderId, isarchived: false },
-      { isarchived: true },
+  const [folderArchive, _] = await Promise.all([
+    await foldermodel.updateMany(
+      { _id: folderId, isArchived: false },
+      { isArchived: true },
       { new: true }
     ),
     await filemodel.updateMany(
       {
         orgId: orgId,
         folderId: { $in: [folderId] },
-        isarchived: false,
+        isArchived: false,
       },
       { isArchived: true }
     ),
   ]);
 
-  if (!folderArchive || !fileArchive)
+  if (!folderArchive.modifiedCount)
     throw new AppError({
-      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-      description: 'An error ocured, could not archive folder',
+      httpCode: httpStatus.NOT_FOUND,
+      description: errorMessages.FOLDER_NOT_FOUND,
     });
   return { status: true, message: 'Folder archived' };
 };
@@ -362,37 +332,38 @@ const unarchiveFolder = async ({
 }: {
   userId: string;
   orgId: string;
-  folderId: string;
+  folderId: string | string[];
 }) => {
-  await helperServices.checkUserPermission(userId, orgId);
   await helperServices.checkIfUserBelongsToOrganization({
     userId: userId,
     orgId: orgId,
   });
 
-  const [folderArchiveUpdate, fileArchiveUpdate] = await Promise.all([
-    await foldermodel.findOneAndUpdate(
-      { _id: folderId, isarchived: true },
-      { isarchived: true },
+  console.log(folderId, 'SEE IDS');
+
+  const [folderArchiveUpdate, _] = await Promise.all([
+    await foldermodel.updateMany(
+      { _id: folderId, isArchived: true },
+      { isArchived: false },
       { new: true }
     ),
     await filemodel.updateMany(
       {
         orgId: orgId,
         folderId: { $in: [folderId] },
-        isarchived: true,
+        isArchived: true,
       },
-      { isArchived: true }
+      { isArchived: false }
     ),
   ]);
 
-  if (!folderArchiveUpdate || !fileArchiveUpdate)
+  if (!folderArchiveUpdate.modifiedCount)
     throw new AppError({
-      httpCode: httpStatus.INTERNAL_SERVER_ERROR,
-      description: 'An error ocured, could not unarchive folder',
+      httpCode: httpStatus.NOT_FOUND,
+      description: errorMessages.FOLDER_NOT_FOUND,
     });
 
-  return { status: true, message: 'File unarchived' };
+  return { status: true, message: 'Folder unarchived' };
 };
 
 const trashFolder = async ({
@@ -402,9 +373,8 @@ const trashFolder = async ({
 }: {
   userId: string;
   orgId: string;
-  folderId: string;
+  folderId: string[];
 }) => {
-  await helperServices.checkUserPermission(userId, orgId);
   await helperServices.checkIfUserBelongsToOrganization({
     userId: userId,
     orgId: orgId,
@@ -412,18 +382,26 @@ const trashFolder = async ({
 
   const isExpired = DateTime.now().plus({ days: 30 }).toJSDate();
 
-  const trashFolderUpdate = await foldermodel.findOneAndUpdate(
-    { _id: folderId, isTrashed: false },
-    { isTrashed: true, isExpired: isExpired },
-    { new: true }
-  );
-  if (!trashFolderUpdate)
+  const [trashFolderUpdate, _] = await Promise.all([
+    await foldermodel.updateMany(
+      { _id: folderId, isTrashed: false },
+      { isTrashed: true, isExpired: isExpired },
+      { new: true }
+    ),
+    await filemodel.updateMany(
+      { _id: folderId, isTrashed: false },
+      { isTrashed: true, isExpired: isExpired },
+      { new: true }
+    ),
+  ]);
+
+  if (!trashFolderUpdate.modifiedCount)
     throw new AppError({
       httpCode: httpStatus.NOT_FOUND,
-      description: 'Could not trash folder',
+      description: errorMessages.FOLDER_NOT_FOUND,
     });
 
-  return { status: true, message: 'File thrashed' };
+  return { status: true, message: 'File trashed' };
 };
 
 const untrashFolder = async ({
@@ -433,7 +411,7 @@ const untrashFolder = async ({
 }: {
   userId: string;
   orgId: string;
-  folderId: string;
+  folderId: string[];
 }) => {
   await helperServices.checkUserPermission(userId, orgId);
   await helperServices.checkIfUserBelongsToOrganization({
@@ -441,18 +419,26 @@ const untrashFolder = async ({
     orgId: orgId,
   });
 
-  const untrashFolderUpdate = await foldermodel.findOneAndUpdate(
-    { _id: folderId, isTrashed: true },
-    { isTrashed: false },
-    { new: true }
-  );
-  if (!untrashFolderUpdate)
+  const [untrashFolderUpdate, _] = await Promise.all([
+    await foldermodel.updateMany(
+      { _id: folderId, isTrashed: true },
+      { isTrashed: false },
+      { new: true }
+    ),
+    await filemodel.updateMany(
+      { _id: folderId, isTrashed: true },
+      { isTrashed: false },
+      { new: true }
+    ),
+  ]);
+
+  if (!untrashFolderUpdate.modifiedCount)
     throw new AppError({
       httpCode: httpStatus.NOT_FOUND,
-      description: 'Could not untrash folder',
+      description: errorMessages.FOLDER_NOT_FOUND,
     });
 
-  return { status: true, message: 'File unthrashed' };
+  return { status: true, message: 'File untrashed' };
 };
 
 const cleanupFolders = async () => {
@@ -492,28 +478,34 @@ const copyFolder = async ({
     userId: userId,
     orgId: orgId,
   });
-  if (Array.isArray(copiedFolderId)) {
-    folderIds = copiedFolderId.length;
-  }
-  const filterQuery = {
-    _id: copiedToFolderId,
-    orgId: orgId,
-  };
-  const updateQuery = {
-    $push: { folderId: [copiedToFolderId] },
-  };
+
   if (!copiedToFolderId) {
-    const folderCopy = await foldermodel.updateMany(filterQuery, {
-      existInHomeDirectory: true,
-    });
+    const folderCopy = await foldermodel.updateMany(
+      { orgId: orgId },
+      {
+        existInHomeDirectory: true,
+      }
+    );
+    await filemodel.updateMany(
+      { orgId: orgId },
+      { $set: { existInHomeDirectory: true } }
+    );
     if (!folderCopy)
       throw new AppError({
         httpCode: httpStatus.NOT_FOUND,
-        description: 'Could not copy folder',
+        description: errorMessages.FOLDER_NOT_FOUND,
       });
     const message = { status: true, message: `Folder copied successfully` };
     return message;
   } else {
+    const filterQuery = {
+      _id: copiedToFolderId,
+      orgId: orgId,
+    };
+
+    const updateQuery = {
+      $push: { folderId: [copiedToFolderId] },
+    };
     const [folderResponse, fileResponse] = await Promise.all([
       await foldermodel.updateMany(filterQuery, updateQuery, { new: true }),
       await filemodel.updateMany(filterQuery, updateQuery, { new: true }),
@@ -524,7 +516,7 @@ const copyFolder = async ({
     )
       throw new AppError({
         httpCode: httpStatus.NOT_FOUND,
-        description: 'Could not copy folder',
+        description: errorMessages.FOLDER_NOT_FOUND,
       });
     const message = { status: true, message: `Folder copied successfully` };
     return message;
@@ -559,11 +551,11 @@ const removeCollaboratorFolderAccess = async ({
   if (!addAccess)
     throw new AppError({
       httpCode: httpStatus.NOT_FOUND,
-      description: 'could not complete this operation',
+      description: errorMessages.FOLDER_NOT_FOUND,
     });
   const message = {
     status: true,
-    message: `Removed ${isUser.name} as collaborator on ${addAccess.foldername} Folder`,
+    message: `Removed ${isUser.name} as collaborator on ${addAccess.folderName} Folder`,
   };
   return message;
 };
@@ -604,7 +596,7 @@ const moveFolder = async ({
     if (!folderMove)
       throw new AppError({
         httpCode: httpStatus.NOT_FOUND,
-        description: messages.MOVE_FOLDER_ERROR,
+        description: errorMessages.FOLDER_NOT_FOUND,
       });
     const message = { status: true, message: 'Folder moved succesfully' };
     return message;
@@ -626,7 +618,7 @@ const moveFolder = async ({
       )
         throw new AppError({
           httpCode: httpStatus.NOT_FOUND,
-          description: messages.MOVE_FOLDER_ERROR,
+          description: errorMessages.FOLDER_NOT_FOUND,
         });
 
       const message = { status: true, message: 'Folder moved succesfully' };
@@ -647,7 +639,7 @@ const moveFolder = async ({
       )
         throw new AppError({
           httpCode: httpStatus.NOT_FOUND,
-          description: messages.MOVE_FOLDER_ERROR,
+          description: errorMessages.FOLDER_NOT_FOUND,
         });
 
       const message = { status: true, message: 'Folder moved succesfully' };
@@ -656,7 +648,31 @@ const moveFolder = async ({
   }
 };
 
-// pin folder and pin file
+const pinFolder = async ({ orgId, folderId }: { orgId: string; folderId: string }) => {
+  const folder = await Folder.findOneAndUpdate(
+    { orgId: orgId, _id: folderId, isPinned: false },
+    { $set: { isPinned: true } }
+  );
+  if (!folder)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: errorMessages.FOLDER_NOT_FOUND,
+    });
+  return { status: true, message: 'Folder Pinned succesfuly' };
+};
+
+const unPinFolder = async ({ orgId, folderId }: { orgId: string; folderId: string }) => {
+  const folder = await Folder.findByIdAndUpdate(
+    { orgId: orgId, _id: folderId, isPinned: true },
+    { $set: { isPinned: false } }
+  );
+  if (!folder)
+    throw new AppError({
+      httpCode: httpStatus.NOT_FOUND,
+      description: errorMessages.FOLDER_NOT_FOUND,
+    });
+  return { status: true, message: 'Folder unPinned succesfuly' };
+};
 
 export default {
   createFolder,
@@ -676,4 +692,6 @@ export default {
   copyFolder,
   removeCollaboratorFolderAccess,
   moveFolder,
+  pinFolder,
+  unPinFolder,
 };

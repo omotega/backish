@@ -20,7 +20,7 @@ async function checkUserPermission(userId: string, orgId: any) {
   const response = await orgMembers.findOne({
     memberId: userId,
     orgId: orgId,
-    role: userRoles.superAdmin || userRoles.admin,
+    role: userRoles.admin,
   });
   if (!response)
     throw new AppError({
@@ -36,7 +36,11 @@ async function checkIfUserBelongsToOrganization({
   userId: string;
   orgId: string;
 }) {
-  const result = await orgMembers.findOne({ memberId: userId, orgId: orgId });
+  const result = await orgMembers.findOne({
+    memberId: userId,
+    orgId: orgId,
+    active: true,
+  });
   if (!result)
     throw new AppError({
       httpCode: httpStatus.NOT_FOUND,
