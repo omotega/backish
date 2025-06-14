@@ -1,10 +1,10 @@
-import mongoose from "mongoose";
-import { Iorganization } from "../../types/organization";
+import mongoose from 'mongoose';
+import { Iorganization } from '../../types/organization';
 
 const organizationSchema = new mongoose.Schema(
   {
     orgName: {
-      type: "string",
+      type: 'string',
       unique: true,
     },
   },
@@ -13,7 +13,4 @@ const organizationSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model<Iorganization>(
-  "Organization",
-  organizationSchema
-);
+export default mongoose.model<Iorganization>('Organization', organizationSchema);

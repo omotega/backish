@@ -1,10 +1,10 @@
-import argon from "argon2";
-import jwt from "jsonwebtoken";
-import config from "../config/env";
-import shortuuid, { generate } from "short-uuid";
-import fs from "fs";
-import crypto from "crypto";
-import { promisify } from "util";
+import argon from 'argon2';
+import jwt from 'jsonwebtoken';
+import config from '../config/env';
+import shortuuid, { generate } from 'short-uuid';
+import fs from 'fs';
+import crypto from 'crypto';
+import { promisify } from 'util';
 const fileRead = promisify(fs.readFile);
 
 /**
@@ -38,7 +38,7 @@ class Helper {
 
   static generateToken(payload: any, secret = config.jwtSecret) {
     const token = jwt.sign(payload, secret, {
-      expiresIn: "5h",
+      expiresIn: '5h',
     });
 
     return token;
@@ -87,19 +87,19 @@ class Helper {
   static md5Generator = async (filePath: any) => {
     const fileBuffer = await fileRead(filePath);
 
-    const md5Hash = crypto.createHash("md5").update(fileBuffer).digest("hex");
+    const md5Hash = crypto.createHash('md5').update(fileBuffer).digest('hex');
     return md5Hash;
   };
 
   static formatFileSize(bytes: any) {
     if (bytes < 1024) {
-      return bytes + " bytes";
+      return bytes + ' bytes';
     } else if (bytes < 1024 * 1024) {
-      return (bytes / 1024).toFixed(2) + " KB";
+      return (bytes / 1024).toFixed(2) + ' KB';
     } else if (bytes < 1024 * 1024 * 1024) {
-      return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+      return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
     } else {
-      return (bytes / (1024 * 1024 * 1024)).toFixed(2) + " GB";
+      return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
     }
   }
 }

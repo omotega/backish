@@ -29,13 +29,13 @@ describe('GET api/org/org-users', () => {
       orgId: orgDataOne._id,
       memberId: userOne._id,
       role: userRoles.guest,
-      userName: faker.lorem.word()
+      userName: faker.lorem.word(),
     };
     const orgMemberTwo = {
       orgId: orgDataOne._id,
       memberId: userTwo._id,
       role: userRoles.guest,
-      userName: faker.lorem.word()
+      userName: faker.lorem.word(),
     };
 
     userToken = await genToken({
@@ -85,13 +85,13 @@ describe('GET api/org/get-a-user', () => {
       orgId: org[0]._id,
       memberId: userOne._id,
       role: userRoles.guest,
-      userName: faker.lorem.word()
+      userName: faker.lorem.word(),
     };
     const orgMemberTwo = {
       orgId: org[0]._id,
       memberId: userTwo._id,
       role: userRoles.guest,
-      userName: faker.lorem.word()
+      userName: faker.lorem.word(),
     };
 
     userToken = await genToken({
@@ -148,13 +148,13 @@ describe('PUT api/org/leave-org', () => {
       orgId: org[0]._id,
       memberId: userOne._id,
       role: userRoles.guest,
-      userName: faker.lorem.word()
+      userName: faker.lorem.word(),
     };
     const orgMemberTwo = {
       orgId: org[0]._id,
       memberId: userTwo._id,
       role: userRoles.guest,
-      userName: faker.lorem.word()
+      userName: faker.lorem.word(),
     };
 
     userToken = await genToken({
@@ -195,13 +195,13 @@ describe('GET api/org/usersorgs', () => {
       orgId: org[0]._id,
       memberId: userOne._id,
       role: userRoles.guest,
-      userName: faker.lorem.word()
+      userName: faker.lorem.word(),
     };
     const orgMemberTwo = {
       orgId: org[1]._id,
       memberId: userOne._id,
       role: userRoles.guest,
-      userName: faker.lorem.word()
+      userName: faker.lorem.word(),
     };
 
     userToken = await genToken({
@@ -258,13 +258,13 @@ describe('PUT api/org/update-user-role', () => {
       orgId: org[0]._id,
       memberId: userOne._id,
       role: userRoles.admin,
-      userName: faker.lorem.word()
+      userName: faker.lorem.word(),
     };
     const orgMemberTwo = {
       orgId: org[0]._id,
       memberId: userTwo._id,
       role: userRoles.guest,
-      userName: faker.lorem.word()
+      userName: faker.lorem.word(),
     };
 
     userToken = await genToken({
@@ -298,13 +298,13 @@ describe('PUT api/org/update-user-role', () => {
       orgId: org[0]._id,
       memberId: userOne._id,
       role: userRoles.guest,
-      userName: faker.lorem.word()
+      userName: faker.lorem.word(),
     };
     const orgMemberTwo = {
       orgId: org[1]._id,
       memberId: userTwo._id,
       role: userRoles.guest,
-      userName: faker.lorem.word()
+      userName: faker.lorem.word(),
     };
 
     userToken = await genToken({
@@ -342,13 +342,13 @@ describe('PUT api/org/deactivate-user', () => {
       orgId: org[0]._id,
       memberId: userOne._id,
       role: userRoles.admin,
-      userName: faker.lorem.word()
+      userName: faker.lorem.word(),
     };
     const orgMemberTwo = {
       orgId: org[0]._id,
       memberId: userTwo._id,
       role: userRoles.guest,
-      userName: faker.lorem.word()
+      userName: faker.lorem.word(),
     };
 
     userToken = await genToken({
@@ -381,13 +381,13 @@ describe('PUT api/org/deactivate-user', () => {
       orgId: org[0]._id,
       memberId: userOne._id,
       role: userRoles.guest,
-      userName: faker.lorem.word()
+      userName: faker.lorem.word(),
     };
     const orgMemberTwo = {
       orgId: org[0]._id,
       memberId: userTwo._id,
       role: userRoles.guest,
-      userName: faker.lorem.word()
+      userName: faker.lorem.word(),
     };
 
     userToken = await genToken({

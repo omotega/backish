@@ -28,10 +28,10 @@ const sendEmail = async ({
       html: message,
     });
     console.info(`Email sent to ${toEmail} to ${subject}`);
-    return true
+    return true;
   } catch (e: any) {
     console.error(`Error sending email: ${e.message}`);
-    return false
+    return false;
   }
 };
 

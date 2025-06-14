@@ -1,12 +1,12 @@
-import { Request, Response, NextFunction } from "express";
-import { AppError } from "../utils/errors";
-import httpStatus from "http-status";
+import { Request, Response, NextFunction } from 'express';
+import { AppError } from '../utils/errors';
+import httpStatus from 'http-status';
 const options = {
   stripUnknown: true,
   abortEarly: false,
   errors: {
     wrap: {
-      label: "",
+      label: '',
     },
   },
 };
@@ -19,9 +19,7 @@ const validate = (schemas: any, values: any) => {
       const schema = schemas[paramToValidate];
       let result = schema.validate(values[paramToValidate], options);
       if (result.error) {
-        error.push(
-          result.error.details.map((detail: any) => `${detail.message}`)
-        );
+        error.push(result.error.details.map((detail: any) => `${detail.message}`));
       } else {
         values[paramToValidate] = result.value;
       }

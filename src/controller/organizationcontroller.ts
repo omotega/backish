@@ -80,5 +80,5 @@ export default {
   signOutOfOrg,
   getAllUserOrgs,
   changeUserRole,
-  deactivateUserFromOrg
+  deactivateUserFromOrg,
 };

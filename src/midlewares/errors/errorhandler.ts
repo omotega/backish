@@ -1,7 +1,7 @@
-import { AppError } from "../../utils/errors";
-import { Response } from "express";
-import httpStatus from "http-status";
-import multer from "multer";
+import { AppError } from '../../utils/errors';
+import { Response } from 'express';
+import httpStatus from 'http-status';
+import multer from 'multer';
 class ErrorHandler {
   private isTrustedError(error: Error): boolean {
     if (error instanceof AppError) {
@@ -20,17 +20,14 @@ class ErrorHandler {
       this.handleCriticalError(error, response);
     }
   }
-  private handleCriticalError(
-    error: Error | AppError,
-    response?: Response
-  ): void {
+  private handleCriticalError(error: Error | AppError, response?: Response): void {
     if (response) {
       response
         .status(httpStatus.INTERNAL_SERVER_ERROR)
-        .json({ message: "Internal server error" });
+        .json({ message: 'Internal server error' });
     }
 
-    console.log("Application encountered a critical error. Exiting");
+    console.log('Application encountered a critical error. Exiting');
     process.exit(1);
   }
 
@@ -38,11 +35,11 @@ class ErrorHandler {
     if (error instanceof multer.MulterError) {
       response
         .status(httpStatus.INTERNAL_SERVER_ERROR)
-        .json({ message: "A Multer error occurred when uploading." });
+        .json({ message: 'A Multer error occurred when uploading.' });
     } else if (error) {
       response
         .status(httpStatus.INTERNAL_SERVER_ERROR)
-        .json({ message: "An unknown error occurred when uploading." });
+        .json({ message: 'An unknown error occurred when uploading.' });
     }
   }
 }

@@ -1,4 +1,4 @@
-import { httpTerminator, server } from "../../server";
+import { httpTerminator, server } from '../../server';
 
 class ExitHandler {
   public async handleExit(code: number, timeout = 5000): Promise<void> {
@@ -11,14 +11,14 @@ class ExitHandler {
       }, timeout).unref();
 
       if (server.listening) {
-        console.log("Terminating HTTP connections");
+        console.log('Terminating HTTP connections');
         await httpTerminator.terminate();
       }
 
       console.log(`Exiting gracefully with code ${code}`);
       process.exit(code);
     } catch (error) {
-      console.log("Error shutting down gracefully");
+      console.log('Error shutting down gracefully');
       console.log(error);
       console.log(`Forcing exit with code ${code}`);
       process.exit(code);
