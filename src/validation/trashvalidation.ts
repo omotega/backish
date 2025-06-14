@@ -1,25 +1,17 @@
-import joi from "joi";
-import { validationMessages } from "./custom";
-import { JoiObjectId } from "./helper";
+import joi from 'joi';
+import { validationMessages } from './custom';
+import { JoiObjectId } from './helper';
 
 const moveFolderToTrashValidation = {
   params: joi.object({
-    orgId: joi
-      .string()
-      .custom(JoiObjectId)
-      .required()
-      .messages(validationMessages.orgId),
+    orgId: joi.string().custom(JoiObjectId).required().messages(validationMessages.orgId),
     folderId: joi.string().required().messages(validationMessages.folderId),
   }),
 };
 
 const moveFileToTrashValidation = {
   params: joi.object({
-    orgId: joi
-      .string()
-      .custom(JoiObjectId)
-      .required()
-      .messages(validationMessages.orgId),
+    orgId: joi.string().custom(JoiObjectId).required().messages(validationMessages.orgId),
     folderId: joi
       .string()
       .custom(JoiObjectId)

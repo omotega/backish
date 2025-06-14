@@ -1,13 +1,13 @@
-import fs from "fs";
+import fs from 'fs';
 
 function createDirectory(directoryPath: string) {
   fs.access(directoryPath, fs.constants.F_OK, (err) => {
     if (err) {
       fs.mkdir(directoryPath, { recursive: true }, (err) => {
         if (err) {
-          console.error("Error creating directory:", err);
+          console.error('Error creating directory:', err);
         } else {
-          console.log("Directory created successfully!");
+          console.log('Directory created successfully!');
         }
       });
     } else {

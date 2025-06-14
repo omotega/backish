@@ -6,14 +6,15 @@ import fileservices from '../services/fileservices';
 
 const fileUpload = catchAsync(async (req: Request, res: Response) => {
   const { _id } = req.User;
-  const { folderId, orgId } = req.body;
-  const uploadedFile = req.files;
+  const { folderId, uploadedFileUrl, userId, orgId, mimeType, fileName } = req.body;
 
   const response = await fileServices.uploadFile({
     userId: _id,
     folderId: folderId,
-    uploadedFile: uploadedFile,
     orgId: orgId,
+    uploadedFileUrl: uploadedFileUrl,
+    mimeType: mimeType,
+    fileName: fileName,
   });
   res.status(httpStatus.OK).send(response);
 });

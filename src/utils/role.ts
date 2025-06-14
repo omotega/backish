@@ -1,9 +1,6 @@
 export const userRoles = {
-  admin: "admin",
-  guest: "guest",
+  admin: 'admin',
+  guest: 'guest',
 };
 
-export const userRoleEnum = [
-  userRoles.admin,
-  userRoles.guest,
-];
+export const userRoleEnum = [userRoles.admin, userRoles.guest];

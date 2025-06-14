@@ -6,6 +6,9 @@ const fileUploadValidation = {
   body: joi.object({
     orgId: joi.string().custom(JoiObjectId).required().messages(validationMessages.orgId),
     folderId: joi.string().custom(JoiObjectId).messages(validationMessages.folderId),
+    fileName: joi.string().required(),
+    uploadedFileUrl: joi.string().required(),
+    mimeType: joi.string().required(),
   }),
 };
 

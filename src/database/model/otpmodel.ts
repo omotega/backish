@@ -1,5 +1,5 @@
-import { Schema, model } from "mongoose";
-import { IOtp } from "../../types/user";
+import { Schema, model } from 'mongoose';
+import { IOtp } from '../../types/user';
 
 const otpSchema = new Schema(
   {
@@ -15,4 +15,4 @@ const otpSchema = new Schema(
   },
   { timestamps: true }
 );
-export default model<IOtp>("Otp", otpSchema);
+export default model<IOtp>('Otp', otpSchema);

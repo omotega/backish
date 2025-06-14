@@ -4,7 +4,8 @@ export interface Iuser {
   _id: string;
   name: string;
   email: string;
-  password: string;}
+  password: string;
+}
 
 export interface IOtp {
   _id?: string;
